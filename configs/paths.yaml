@@ -1,0 +1,14 @@
+project_root: .
+data:
+  legacy: data/00_legacy
+  raw: data/01_raw
+  interim: data/02_interim
+  processed: data/03_processed
+  validation: data/04_validation
+  indices: data/05_indices
+  model_ready: data/06_model_ready
+outputs:
+  tables: outputs/tables
+  figures: outputs/figures
+  logs: outputs/logs
+prompts: prompts

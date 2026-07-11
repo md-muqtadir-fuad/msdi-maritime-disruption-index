@@ -1,0 +1,6 @@
+id: severity_v001
+purpose: Score event severity using the predefined 0-10 rubric.
+uses_config: configs/scoring_rubric.yaml
+instruction: |
+  Score severity from 0 to 10 using the rubric. Penalize vague, speculative, or purely financial commentary without evidence of operational disruption.
+  Return strict JSON only with severity, confidence, and evidence_span.

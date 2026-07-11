@@ -1,0 +1,33 @@
+level_1_domains:
+  - port_logistics_disruption
+  - freight_cost_disruption
+  - container_equipment_imbalance
+  - production_factory_disruption
+  - demand_disruption
+  - policy_regulatory_disruption
+  - climate_weather_disruption
+  - geopolitical_security_disruption
+  - health_pandemic_disruption
+
+level_2_mechanisms:
+  - port_congestion
+  - port_shutdown
+  - labor_strike
+  - container_shortage
+  - route_diversion
+  - freight_rate_shock
+  - factory_closure
+  - demand_surge
+  - canal_blockage
+  - war_security_risk
+  - extreme_weather
+  - customs_regulatory_delay
+
+measurable_effects:
+  - delay
+  - capacity_reduction
+  - cost_increase
+  - volume_decline
+  - inventory_shortage
+  - route_change
+  - port_call_reduction

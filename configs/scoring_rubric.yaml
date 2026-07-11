@@ -1,0 +1,15 @@
+severity_scale:
+  0: no_disruption_or_irrelevant
+  1: very_minor_local_impact
+  2: minor_local_delay_or_cost_pressure
+  3: moderate_local_disruption
+  4: moderate_multi_firm_or_port_level_disruption
+  5: clear_regional_supply_chain_disruption
+  6: severe_regional_disruption_with_rate_or_delay_effects
+  7: major_multi_route_or_multi_country_disruption
+  8: extreme_global_or_key_route_disruption
+  9: near_systemic_disruption
+  10: systemic_global_disruption
+
+score_formula: event_score = relevance_probability * severity * confidence * novelty_weight
+aggregation_formula: weekly_index = zscore(sum(event_score) / log(1 + media_volume))

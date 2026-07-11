@@ -1,0 +1,6 @@
+id: taxonomy_v001
+purpose: Classify disruption events into the project taxonomy.
+uses_config: configs/taxonomy.yaml
+instruction: |
+  Assign exactly one primary Level-1 domain, one primary Level-2 mechanism, and any measurable effects supported by the text.
+  Return strict JSON only.

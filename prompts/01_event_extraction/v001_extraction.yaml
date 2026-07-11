@@ -1,0 +1,12 @@
+id: extraction_v001
+purpose: Extract structured event facts from full text.
+output_schema:
+  event_date: string|null
+  event_location: string|null
+  affected_ports_or_routes: list[string]
+  affected_supply_chain_layer: string|null
+  disruption_mechanism: string|null
+  evidence_span: string
+instruction: |
+  Extract only facts supported by the article text. Do not infer unavailable dates or locations.
+  Return strict JSON only.

@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+.venv/
+.env
+.env.*
+
+# Large/raw data
+/data
+/data/01_raw/**
+/data/00_legacy/**
+/data/**/*.env
+/data/**/*.env.*
+*.zip
+*.rar
+*.7z
+
+# LLM/API sensitive logs
+outputs/logs/llm_calls/*.jsonl
+outputs/logs/llm_calls/*.csv
+
+# OS/editor
+.DS_Store
+.vscode/*
+!.vscode/settings.json
+
+.csv
+.xlsx

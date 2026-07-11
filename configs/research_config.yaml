@@ -1,0 +1,43 @@
+research:
+  index_name: MSDI
+  index_full_name: Maritime Supply-chain Disruption Intelligence Index
+  frequency: weekly
+  primary_outcome: SCFI
+  route_level_analysis: true
+  use_scfi_inside_index: false
+
+aggregation:
+  media_volume_correction: true
+  duplicate_penalty: true
+  uncertainty_bands: true
+  z_score_index: true
+
+validation:
+  target_goldset_size: 1000
+  annotators_minimum: 2
+  reliability_metrics:
+    - cohens_kappa
+    - krippendorff_alpha
+
+models:
+  llm_temperature: 0
+  prompt_modes:
+    - zero_shot
+    - one_shot
+    - few_shot
+    - multi_prompt
+  baselines:
+    - tfidf_logistic_regression
+    - tfidf_svm
+    - xgboost
+
+causality:
+  baseline:
+    - var
+    - granger
+  robustness:
+    - local_projection
+    - ardl
+    - pcmci
+    - transfer_entropy
+    - double_ml

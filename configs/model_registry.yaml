@@ -1,0 +1,26 @@
+llm_models:
+  open_reproducible:
+    - name: qwen_or_mistral_candidate
+      provider: local_or_open_weights
+      role: reproducible scoring baseline
+  commercial_benchmark:
+    - name: to_be_filled
+      provider: to_be_filled
+      role: high-quality scoring benchmark
+
+ml_baselines:
+  - tfidf_logistic_regression
+  - tfidf_linear_svm
+  - xgboost_classifier
+  - sentence_transformer_classifier
+
+metadata_to_log:
+  - model_name
+  - provider
+  - model_version_or_date
+  - prompt_version
+  - temperature
+  - seed
+  - raw_response
+  - parsed_json
+  - parsing_errors

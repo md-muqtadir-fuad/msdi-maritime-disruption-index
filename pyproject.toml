@@ -1,0 +1,9 @@
+[project]
+name = "q1-maritime-disruption-index"
+version = "0.1.0"
+description = "Human-validated multi-LLM maritime disruption index and freight-rate causality pipeline"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

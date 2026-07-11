@@ -1,0 +1,13 @@
+id: relevance_v001_zero_shot
+purpose: Detect whether a news item is a maritime/supply-chain disruption event.
+input_fields:
+  - title
+  - publication_date
+  - article_text
+output_schema:
+  is_relevant: boolean
+  relevance_probability: float
+  reason: string
+instruction: |
+  Decide whether the article describes a real disruption to maritime shipping, container logistics, freight markets, ports, factories, trade flow, or supply-chain operations.
+  Return strict JSON only.
