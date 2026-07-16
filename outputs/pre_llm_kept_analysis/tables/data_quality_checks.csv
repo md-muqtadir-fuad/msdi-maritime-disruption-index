@@ -1,0 +1,16 @@
+﻿check,affected_rows,share_percent
+total_rows,6542,100.0
+missing_or_empty_full_text,0,0.0
+missing_or_empty_title,0,0.0
+missing_source_name,320,4.89
+missing_source_domain,0,0.0
+missing_url,0,0.0
+unparseable_or_missing_publication_date,3,0.05
+very_short_text_below_250_characters,0,0.0
+short_text_below_500_characters,3,0.05
+long_text_at_least_25000_characters,15,0.23
+extreme_text_at_least_50000_characters,0,0.0
+duplicate_article_id_rows,0,0.0
+duplicate_nonempty_url_rows,0,0.0
+duplicate_nonempty_normalized_text_rows,0,0.0
+suspected_topic_tag_search_or_index_pages,96,1.47

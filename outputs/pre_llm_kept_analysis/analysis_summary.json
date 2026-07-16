@@ -1,0 +1,96 @@
+{
+  "input_file": "data\\03_processed\\news_full_text\\pre_llm_filter\\pre_llm_kept.csv",
+  "output_directory": "outputs\\pre_llm_kept_analysis",
+  "row_count": 6542,
+  "column_count": 50,
+  "text_column_used": "retrieved_text",
+  "date_columns_considered": [
+    "date",
+    "retrieved_publish_date"
+  ],
+  "source_name_columns_considered": [
+    "source_name"
+  ],
+  "url_columns_considered": [
+    "preferred_url",
+    "canonical_url",
+    "final_url",
+    "source_url",
+    "url",
+    "link",
+    "normalized_link"
+  ],
+  "unique_source_names": 110,
+  "unique_source_domains": 94,
+  "top_source_share_percent": 9.8,
+  "top_10_source_share_percent": 58.58,
+  "first_publication_date": "2015-01-01",
+  "last_publication_date": "2026-01-01",
+  "parsed_publication_dates": 6539,
+  "unparsed_publication_dates": 3,
+  "date_parse_success_percent": 99.95,
+  "character_count": {
+    "total": 25213439,
+    "mean": 3854.09,
+    "median": 3050.5,
+    "minimum": 431,
+    "maximum": 41854,
+    "p95": 9096.05,
+    "p99": 14975.01
+  },
+  "word_count": {
+    "total": 4021572,
+    "mean": 614.73,
+    "median": 485.0,
+    "minimum": 76,
+    "maximum": 7343,
+    "p95": 1446.9,
+    "p99": 2414.95
+  },
+  "quality_checks": {
+    "total_rows": 6542,
+    "missing_or_empty_full_text": 0,
+    "missing_or_empty_title": 0,
+    "missing_source_name": 320,
+    "missing_source_domain": 0,
+    "missing_url": 0,
+    "unparseable_or_missing_publication_date": 3,
+    "very_short_text_below_250_characters": 0,
+    "short_text_below_500_characters": 3,
+    "long_text_at_least_25000_characters": 15,
+    "extreme_text_at_least_50000_characters": 0,
+    "duplicate_article_id_rows": 0,
+    "duplicate_nonempty_url_rows": 0,
+    "duplicate_nonempty_normalized_text_rows": 0,
+    "suspected_topic_tag_search_or_index_pages": 96
+  },
+  "generated_tables": [
+    "article_level_text_and_source_statistics.csv",
+    "collection_and_dataset_statistics.csv",
+    "column_missingness.csv",
+    "data_quality_checks.csv",
+    "domain_statistics.csv",
+    "language_statistics.csv",
+    "longest_100_articles.csv",
+    "matched_keyword_statistics.csv",
+    "month_of_year_statistics.csv",
+    "monthly_timeline_statistics.csv",
+    "publication_date_source_statistics.csv",
+    "retrieval_statistics.csv",
+    "shortest_100_articles.csv",
+    "source_statistics.csv",
+    "suspected_index_topic_tag_pages.csv",
+    "text_length_buckets.csv",
+    "text_length_summary.csv",
+    "year_month_matrix.csv",
+    "year_statistics.csv"
+  ],
+  "generated_figures": [
+    "01_text_character_distribution.png",
+    "02_top_sources.png",
+    "03_articles_by_year.png",
+    "04_articles_by_month_timeline.png",
+    "05_month_of_year_distribution.png",
+    "06_top_matched_keywords.png"
+  ]
+}

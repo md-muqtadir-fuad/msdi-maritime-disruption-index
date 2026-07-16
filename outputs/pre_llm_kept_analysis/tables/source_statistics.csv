@@ -1,0 +1,125 @@
+﻿source_name,source_domain,base_url,article_count,mean_character_count,median_character_count,mean_word_count,first_publication_date,last_publication_date,article_share_percent
+Supply Chain Dive,supplychaindive.com,https://supplychaindive.com,641,3689.29,3012.0,581.9,2016-08-15,2025-12-08,9.8
+Supply Chain Brain,supplychainbrain.com,https://supplychainbrain.com,521,4186.18,3954.0,642.29,2015-03-02,2025-12-19,7.96
+Business Insider,businessinsider.com,https://businessinsider.com,425,3386.56,2708.0,560.12,2015-01-05,2025-12-10,6.5
+gCaptain,gcaptain.com,https://gcaptain.com,414,2763.71,2535.0,443.88,2015-01-09,2025-12-26,6.33
+CNBC,cnbc.com,https://cnbc.com,389,4395.23,3871.0,717.15,2015-01-08,2025-11-21,5.95
+South China Morning Post,scmp.com,https://scmp.com,362,1561.02,1309.0,248.6,2015-01-06,2025-12-19,5.53
+Supply Chain Digital,supplychaindigital.com,https://supplychaindigital.com,298,5273.16,4731.0,798.06,2015-03-09,2025-12-18,4.56
+Container News,container-news.com,https://container-news.com,284,2885.13,2002.0,446.84,2018-06-09,2025-12-23,4.34
+ET Infra,infra.economictimes.indiatimes.com,https://infra.economictimes.indiatimes.com,263,4452.48,3822.0,713.07,2021-09-15,2025-12-16,4.02
+bbc.co.uk,bbc.co.uk,https://bbc.co.uk,235,4057.03,3731.0,673.46,2022-03-07,2024-05-08,3.59
+FreightWaves,freightwaves.com,https://freightwaves.com,225,4469.09,3465.0,717.91,2015-02-06,2025-12-08,3.44
+Forbes,forbes.com,https://forbes.com,162,5946.02,4709.0,973.45,2015-06-11,2025-11-12,2.48
+The Maritime Executive,maritime-executive.com,https://maritime-executive.com,151,3718.95,2942.0,594.29,2015-01-01,2025-12-10,2.31
+safety4sea,safety4sea.com,https://safety4sea.com,148,2566.47,1821.0,405.49,2015-02-03,2025-12-23,2.26
+Seatrade Maritime News,seatrade-maritime.com,https://seatrade-maritime.com,141,2194.03,1869.0,352.99,2015-01-08,2025-12-17,2.16
+The Straits Times,straitstimes.com,https://straitstimes.com,131,4214.1,3902.0,680.15,2015-01-15,2025-12-26,2.0
+The Loadstar,theloadstar.com,https://theloadstar.com,122,1459.21,1483.0,225.94,2015-01-12,2025-12-12,1.86
+The Daily Star,thedailystar.net,https://thedailystar.net,98,4060.93,3820.0,637.06,2015-11-09,2026-01-01,1.5
+indiatimes.com,economictimes.indiatimes.com,https://economictimes.indiatimes.com,97,3989.18,3120.0,638.39,2015-03-07,2025-12-25,1.48
+Splash247,splash247.com,https://splash247.com,86,2326.12,1800.5,368.05,2015-02-04,2025-12-16,1.31
+Fortune,fortune.com,https://fortune.com,84,4663.55,3237.5,758.29,2015-01-22,2025-08-08,1.28
+Automotive Logistics,automotivelogistics.media,https://automotivelogistics.media,80,7107.4,4839.5,1116.91,2017-06-27,2025-12-03,1.22
+The Hindu,thehindu.com,https://thehindu.com,80,3416.62,2513.0,546.22,2015-02-06,2025-11-30,1.22
+ET Auto,auto.economictimes.indiatimes.com,https://auto.economictimes.indiatimes.com,72,5153.65,4501.5,823.61,2015-07-08,2025-12-25,1.1
+DC Velocity,dcvelocity.com,https://dcvelocity.com,68,3960.91,3317.0,606.54,2015-01-25,2024-11-12,1.04
+Safety4Sea,safety4sea.com,https://safety4sea.com,64,2826.41,1937.5,441.03,2015-01-26,2025-12-18,0.98
+Manufacturing Dive,manufacturingdive.com,https://manufacturingdive.com,54,3142.76,2616.5,484.33,2022-11-11,2025-12-08,0.83
+CNA,channelnewsasia.com,https://channelnewsasia.com,47,5875.81,4737.0,961.49,2018-02-03,2025-11-06,0.72
+The Economic Times,economictimes.indiatimes.com,https://economictimes.indiatimes.com,47,5755.64,5386.0,921.66,2015-06-11,2025-12-12,0.72
+bbc.com,bbc.com,https://bbc.com,46,4368.7,4070.0,733.26,2024-04-04,2024-11-24,0.7
+BBC,bbc.com,https://bbc.com,44,4258.93,4288.5,700.11,2015-10-23,2025-11-19,0.67
+The Guardian,theguardian.com,https://theguardian.com,42,5127.21,4727.5,846.9,2015-05-07,2025-08-12,0.64
+huffpost.com,huffpost.com,https://huffpost.com,39,6213.23,5191.0,1015.33,2018-05-29,2022-04-26,0.6
+gCaptain Forum,forum.gcaptain.com,https://forum.gcaptain.com,32,3945.59,3886.5,692.75,2015-04-20,2024-11-10,0.49
+SupplyChainBrain,supplychainbrain.com,https://supplychainbrain.com,31,4815.45,5040.0,742.9,2015-04-20,2025-03-03,0.47
+Logistics Management,logisticsmgmt.com,https://logisticsmgmt.com,30,9423.97,9519.0,1478.5,2016-01-22,2025-10-01,0.46
+supplychaindive.com,supplychaindive.com,https://supplychaindive.com,30,4224.03,3118.5,670.3,2018-10-15,2025-12-23,0.46
+The New York Times,nytimes.com,https://nytimes.com,28,1991.04,1984.0,331.21,2015-08-06,2025-04-18,0.43
+ET EnergyWorld,energy.economictimes.indiatimes.com,https://energy.economictimes.indiatimes.com,27,3527.37,2934.0,571.37,2015-04-02,2025-12-06,0.41
+Al Jazeera,aljazeera.com,https://aljazeera.com,23,7864.35,5699.0,1281.43,2019-11-11,2025-05-15,0.35
+Dhaka Tribune,dhakatribune.com,https://dhakatribune.com,22,4365.23,3968.5,689.18,2018-04-02,2025-12-09,0.34
+ET Retail,retail.economictimes.indiatimes.com,https://retail.economictimes.indiatimes.com,20,3539.6,3068.5,563.8,2016-02-10,2024-11-20,0.31
+WorldCargo News,worldcargonews.com,https://worldcargonews.com,19,1908.74,1317.0,307.11,2015-01-21,2025-11-10,0.29
+DW.com,dw.com,https://dw.com,18,4906.44,5263.5,797.11,2015-11-04,2025-05-12,0.28
+The Korea Herald,koreaherald.com,https://koreaherald.com,17,3213.94,2199.0,502.35,2016-03-01,2025-10-14,0.26
+NPR,npr.org,https://npr.org,16,9799.81,7097.5,1659.75,2016-09-08,2025-12-07,0.24
+CNN,cnn.com,https://cnn.com,15,6831.93,5952.0,1122.07,2019-01-24,2024-04-03,0.23
+ETCFO.com,cfo.economictimes.indiatimes.com,https://cfo.economictimes.indiatimes.com,13,4890.23,5308.0,785.69,2017-08-17,2025-12-01,0.2
+Financial Times,markets.ft.com,https://markets.ft.com,13,830.23,857.0,116.15,2015-09-29,2024-12-01,0.2
+The Independent,independent.co.uk,https://independent.co.uk,13,3862.08,4015.0,633.23,2017-06-27,2024-09-18,0.2
+ET Telecom,telecom.economictimes.indiatimes.com,https://telecom.economictimes.indiatimes.com,12,3937.83,3784.0,620.92,2017-01-07,2025-11-29,0.18
+AP News,apnews.com,https://apnews.com,10,8827.5,7625.5,1462.6,2023-12-16,2025-12-26,0.15
+Los Angeles Times,latimes.com,https://latimes.com,10,6552.2,6525.0,1071.7,2015-06-02,2022-08-29,0.15
+Logistics Business,logisticsbusiness.com,https://logisticsbusiness.com,9,5081.56,3689.0,780.11,2020-09-04,2025-10-16,0.14
+WSJ,partners.wsj.com,https://partners.wsj.com,9,4638.67,4305.0,735.22,2015-11-11,2020-01-13,0.14
+Business Insider Africa,africa.businessinsider.com,https://africa.businessinsider.com,8,2711.5,2986.0,408.12,2019-12-27,2025-11-09,0.12
+Hellenic Shipping News,hellenicshippingnews.com,https://hellenicshippingnews.com,8,3934.0,3652.5,622.38,2021-09-30,2025-12-23,0.12
+NBC News,nbcnews.com,https://nbcnews.com,8,8722.12,5106.0,1439.5,2015-02-26,2025-02-03,0.12
+supplychaindigital.com,supplychaindigital.com,https://supplychaindigital.com,8,6125.12,3566.0,908.0,2023-03-03,2025-09-09,0.12
+Financial Times,ft.com,https://ft.com,7,4906.43,4809.0,830.29,2016-03-07,2025-06-14,0.11
+ET BrandEquity,brandequity.economictimes.indiatimes.com,https://brandequity.economictimes.indiatimes.com,6,5811.5,6287.5,936.5,2022-03-02,2025-11-12,0.09
+markets.businessinsider.com,markets.businessinsider.com,https://markets.businessinsider.com,6,2391.5,2464.5,388.67,2018-03-09,2023-08-18,0.09
+Automotive Logistics and Supply Chain Digital Strategies Europe,alscdseurope.automotivelogistics.media,https://alscdseurope.automotivelogistics.media,5,1128.8,1178.0,160.4,2025-11-27,2025-11-27,0.08
+Automotive Logistics · Automotive Logistics,automotivelogistics.media,https://automotivelogistics.media,5,1763.8,999.0,264.4,2020-03-06,2025-11-24,0.08
+ET HealthWorld,health.economictimes.indiatimes.com,https://health.economictimes.indiatimes.com,5,4971.2,3249.0,758.8,2021-04-17,2024-08-12,0.08
+ET Manufacturing,manufacturing.economictimes.indiatimes.com,https://manufacturing.economictimes.indiatimes.com,5,4469.8,3301.0,659.8,2024-10-03,2025-09-15,0.08
+ET Realty,realty.economictimes.indiatimes.com,https://realty.economictimes.indiatimes.com,4,2379.75,2364.5,382.5,2020-11-14,2024-10-23,0.06
+ET TravelWorld,travel.economictimes.indiatimes.com,https://travel.economictimes.indiatimes.com,4,2705.0,2610.5,432.5,2020-04-09,2022-11-09,0.06
+Indiatimes,auto.economictimes.indiatimes.com,https://auto.economictimes.indiatimes.com,4,4539.0,4287.5,750.25,2018-05-22,2025-07-25,0.06
+Indiatimes,cio.economictimes.indiatimes.com,https://cio.economictimes.indiatimes.com,4,4841.25,4162.0,758.75,2016-09-30,2020-08-13,0.06
+scmp.com,scmp.com,https://scmp.com,4,7465.0,5453.0,1217.75,2016-09-09,2018-10-09,0.06
+CNA Lifestyle,cnalifestyle.channelnewsasia.com,https://cnalifestyle.channelnewsasia.com,3,10297.67,13788.0,1812.0,2021-08-29,2021-12-19,0.05
+CNA Luxury,cnaluxury.channelnewsasia.com,https://cnaluxury.channelnewsasia.com,3,4788.33,4357.0,770.33,2021-03-30,2022-03-18,0.05
+ET Hospitality,hospitality.economictimes.indiatimes.com,https://hospitality.economictimes.indiatimes.com,3,3471.33,3460.0,578.33,2020-05-20,2022-06-24,0.05
+Frontline Magazine,frontline.thehindu.com,https://frontline.thehindu.com,3,10340.0,9583.0,1610.0,2016-12-07,2025-10-29,0.05
+WSJ,wsj.com,https://wsj.com,3,3035.0,3484.0,487.67,2015-03-13,2021-11-21,0.05
+manufacturingdive.com,manufacturingdive.com,https://manufacturingdive.com,3,2616.33,2681.0,407.67,2024-08-07,2025-07-29,0.05
+Bloomberg Media,sponsored.bloomberg.com,https://sponsored.bloomberg.com,2,5785.5,5785.5,898.5,2022-12-08,2024-11-30,0.03
+ETGovernment.com,government.economictimes.indiatimes.com,https://government.economictimes.indiatimes.com,2,6446.0,6446.0,931.5,2025-01-17,2025-12-07,0.03
+FT Channels,channels.ft.com,https://channels.ft.com,2,3151.0,3151.0,506.5,2020-06-24,2024-06-20,0.03
+Financial Times,ig.ft.com,https://ig.ft.com,2,16449.5,16449.5,2705.5,2016-10-21,2017-01-12,0.03
+Journal of Commerce,joc.com,https://joc.com,2,708.5,708.5,95.0,2022-12-05,2025-12-29,0.03
+Reuters,widerimage.reuters.com,https://widerimage.reuters.com,2,2076.5,2076.5,345.5,2015-07-09,2016-01-14,0.03
+go.com,abcnews.go.com,https://abcnews.go.com,2,9221.5,9221.5,1492.0,2018-09-17,2024-07-03,0.03
+indiatimes.com,m.economictimes.indiatimes.com,https://m.economictimes.indiatimes.com,2,3174.0,3174.0,522.5,2015-09-03,2023-06-19,0.03
+safety4sea · The Editorial Team,safety4sea.com,https://safety4sea.com,2,1235.5,1235.5,190.5,2018-01-22,2022-10-12,0.03
+ALSC Digital Strategies North America,alscdsnorthamerica.automotivelogistics.media,https://alscdsnorthamerica.automotivelogistics.media,1,1450.0,1450.0,214.0,2025-06-02,2025-06-02,0.02
+Automotive Logistics,alscasean.automotivelogistics.media,https://alscasean.automotivelogistics.media,1,1210.0,1210.0,165.0,2025-11-04,2025-11-04,0.02
+Automotive Logistics,alscmexico.automotivelogistics.media,https://alscmexico.automotivelogistics.media,1,1501.0,1501.0,213.0,2025-06-27,2025-06-27,0.02
+Automotive Logistics UK,alscuk.automotivelogistics.media,https://alscuk.automotivelogistics.media,1,720.0,720.0,98.0,2025-09-15,2025-09-15,0.02
+BFSI News,bfsi.economictimes.indiatimes.com,https://bfsi.economictimes.indiatimes.com,1,5941.0,5941.0,916.0,2021-10-18,2021-10-18,0.02
+Bloomberg.com,bloomberg.com,https://bloomberg.com,1,7560.0,7560.0,1181.0,2018-04-23,2018-04-23,0.02
+ET CFO,cfo.economictimes.indiatimes.com,https://cfo.economictimes.indiatimes.com,1,7924.0,7924.0,1294.0,2022-09-01,2022-09-01,0.02
+ET CIO,cio.economictimes.indiatimes.com,https://cio.economictimes.indiatimes.com,1,4341.0,4341.0,678.0,2024-10-03,2024-10-03,0.02
+ET HRSEA,hrsea.economictimes.indiatimes.com,https://hrsea.economictimes.indiatimes.com,1,3476.0,3476.0,527.0,2022-03-28,2022-03-28,0.02
+ETHRWorld.com,hr.economictimes.indiatimes.com,https://hr.economictimes.indiatimes.com,1,1537.0,1537.0,247.0,2021-04-12,2021-04-12,0.02
+ETLegalWorld.com,legal.economictimes.indiatimes.com,https://legal.economictimes.indiatimes.com,1,2019.0,2019.0,311.0,2021-03-16,2021-03-16,0.02
+Economic Times Auto,auto.economictimes.indiatimes.com,https://auto.economictimes.indiatimes.com,1,5282.0,5282.0,835.0,2023-05-18,2023-05-18,0.02
+FT Professional,professional.ft.com,https://professional.ft.com,1,990.0,990.0,162.0,2022-03-10,2022-03-10,0.02
+Indiatimes,energymea.economictimes.indiatimes.com,https://energymea.economictimes.indiatimes.com,1,1224.0,1224.0,196.0,2024-01-31,2024-01-31,0.02
+Indiatimes,hrme.economictimes.indiatimes.com,https://hrme.economictimes.indiatimes.com,1,1560.0,1560.0,228.0,2025-04-21,2025-04-21,0.02
+Journal of Commerce · JOCNews,joc.com,https://joc.com,1,955.0,955.0,132.0,2016-04-14,2016-04-14,0.02
+Reuters Professional,plus.reuters.com,https://plus.reuters.com,1,1856.0,1856.0,303.0,2024-09-20,2024-09-20,0.02
+Safety4Sea · CNBC,safety4sea.com,https://safety4sea.com,1,1817.0,1817.0,271.0,2025-05-07,2025-05-07,0.02
+South China Morning Post · South China Morning Post,scmp.com,https://scmp.com,1,880.0,880.0,140.0,2024-12-08,2024-12-08,0.02
+Sportstar,sportstar.thehindu.com,https://sportstar.thehindu.com,1,4132.0,4132.0,676.0,2023-01-11,2023-01-11,0.02
+Supply Chain Brain · SupplyChainBrain,supplychainbrain.com,https://supplychainbrain.com,1,1929.0,1929.0,296.0,2022-03-14,2022-03-14,0.02
+Supply Chain Digital,live.supplychaindigital.com,https://live.supplychaindigital.com,1,1991.0,1991.0,281.0,2025-02-11,2025-02-11,0.02
+The Maritime Executive · 902.gr,maritime-executive.com,https://maritime-executive.com,1,2144.0,2144.0,364.0,,,0.02
+The Maritime Executive · GOPER CHANNEL,maritime-executive.com,https://maritime-executive.com,1,1491.0,1491.0,246.0,,,0.02
+The Maritime Executive · Ini Karimun,maritime-executive.com,https://maritime-executive.com,1,1569.0,1569.0,271.0,,,0.02
+USA Today,usatoday.com,https://usatoday.com,1,4056.0,4056.0,659.0,2025-05-12,2025-05-12,0.02
+WSJ,financialcrisis.wsj.com,https://financialcrisis.wsj.com,1,4714.0,4714.0,789.0,2016-05-29,2016-05-29,0.02
+businessinsider.com,businessinsider.com,https://businessinsider.com,1,6068.0,6068.0,997.0,2015-01-08,2015-01-08,0.02
+economist.com,impact.economist.com,https://impact.economist.com,1,8680.0,8680.0,1252.0,2024-11-15,2024-11-15,0.02
+freightwaves.com,knowledge.freightwaves.com,https://knowledge.freightwaves.com,1,822.0,822.0,132.0,2025-01-14,2025-01-14,0.02
+gCaptain · Crowley,gcaptain.com,https://gcaptain.com,1,1989.0,1989.0,307.0,2016-03-30,2016-03-30,0.02
+gCaptain · DP World London Gateway,gcaptain.com,https://gcaptain.com,1,727.0,727.0,123.0,2015-09-22,2015-09-22,0.02
+gCaptain · Maersk,gcaptain.com,https://gcaptain.com,1,1153.0,1153.0,181.0,2015-11-06,2015-11-06,0.02
+gCaptain · PoliceInPortsaid,gcaptain.com,https://gcaptain.com,1,629.0,629.0,112.0,2015-05-03,2015-05-03,0.02
+gCaptain · Shipping TV,gcaptain.com,https://gcaptain.com,1,856.0,856.0,130.0,2015-01-08,2015-01-08,0.02
+gCaptain · Wendover Productions,gcaptain.com,https://gcaptain.com,1,658.0,658.0,102.0,2021-11-18,2021-11-18,0.02
+gCaptain · abbmarine,gcaptain.com,https://gcaptain.com,1,1300.0,1300.0,209.0,2015-11-13,2015-11-13,0.02
+koreaherald.com,koreaherald.com,https://koreaherald.com,1,4712.0,4712.0,777.0,2022-12-28,2022-12-28,0.02

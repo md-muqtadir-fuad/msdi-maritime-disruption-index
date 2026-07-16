@@ -1,0 +1,8 @@
+﻿field,value,article_count,share_percent
+collection,current,6222,95.11
+collection,legacy,320,4.89
+source_dataset,Unknown,6222,95.11
+source_dataset,dataset1v5,281,4.3
+source_dataset,dataset2v5,39,0.6
+source_file,Unknown,6222,95.11
+source_file,C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\01_raw\news\headlines\final_dataset_with_links_legacy.xlsx,320,4.89
