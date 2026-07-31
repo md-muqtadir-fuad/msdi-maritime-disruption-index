@@ -8,6 +8,39 @@ llm_models:
       provider: to_be_filled
       role: high-quality scoring benchmark
 
+active_scoring_models:
+  - alias: gemma_2_9b_it
+    name_contains: gemma-2-9b-it
+    parameter_count_billion: 9
+  - alias: qwen_3_8b
+    name_contains: qwen-3
+    parameter_count_billion: 8
+  - alias: qwen_2_5_7b
+    name_contains: qwen2.5
+    parameter_count_billion: 7
+
+topsis_operational_ranking:
+  # This ranking is reported separately and never weights the median MSDI.
+  criteria:
+    scoring_success_rate:
+      direction: benefit
+      weight: 0.25
+    mean_pairwise_spearman:
+      direction: benefit
+      weight: 0.15
+    parameter_count_billion:
+      direction: cost
+      weight: 0.15
+    median_inference_seconds:
+      direction: cost
+      weight: 0.25
+    median_input_tokens:
+      direction: cost
+      weight: 0.10
+    median_generated_tokens:
+      direction: cost
+      weight: 0.10
+
 ml_baselines:
   - tfidf_logistic_regression
   - tfidf_linear_svm

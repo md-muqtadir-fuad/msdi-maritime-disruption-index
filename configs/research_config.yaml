@@ -7,6 +7,9 @@ research:
   use_scfi_inside_index: false
 
 aggregation:
+  primary_article_score: median_overall_disruption_max
+  secondary_article_score: equal_weight_mean_of_dimension_medians
+  score_scale: 0-4
   media_volume_correction: true
   duplicate_penalty: true
   uncertainty_bands: true

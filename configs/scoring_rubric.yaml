@@ -1,15 +1,15 @@
 severity_scale:
   0: no_disruption_or_irrelevant
-  1: very_minor_local_impact
-  2: minor_local_delay_or_cost_pressure
-  3: moderate_local_disruption
-  4: moderate_multi_firm_or_port_level_disruption
-  5: clear_regional_supply_chain_disruption
-  6: severe_regional_disruption_with_rate_or_delay_effects
-  7: major_multi_route_or_multi_country_disruption
-  8: extreme_global_or_key_route_disruption
-  9: near_systemic_disruption
-  10: systemic_global_disruption
+  1: low_or_localized_disruption
+  2: moderate_operational_disruption
+  3: high_regional_or_multi_actor_disruption
+  4: severe_systemic_or_key_route_disruption
 
-score_formula: event_score = relevance_probability * severity * confidence * novelty_weight
-aggregation_formula: weekly_index = zscore(sum(event_score) / log(1 + media_volume))
+article_aggregation:
+  primary_peak: median overall_disruption_max across the three models
+  secondary_breadth: equal-weight mean of the seven dimension-level model medians
+
+weekly_aggregation:
+  novelty_weight: 1 / sqrt(duplicate_group_size)
+  media_correction: weighted_score_sum / log(1 + weekly_article_count)
+  forecast_standardization: training-window or prior-only statistics
