@@ -3,6 +3,7 @@ numpy
 scipy
 scikit-learn
 statsmodels
+tigramite==5.2.10.1
 matplotlib
 openpyxl
 pyyaml

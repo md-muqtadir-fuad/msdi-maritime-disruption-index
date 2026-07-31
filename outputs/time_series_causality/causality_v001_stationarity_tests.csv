@@ -1,0 +1,91 @@
+frequency,msdi_path,variable,transformation,n_observations,adf_statistic,adf_p_value,adf_used_lag,adf_n_observations,adf_critical_5pct,kpss_statistic,kpss_p_value,kpss_used_lag,kpss_critical_5pct,joint_decision,warnings
+weekly,peak,scfi_log,log_level,522,-1.8899770333255153,0.33679082170555596,14,507,-2.867257567756961,1.439429009839025,0.01,15,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+weekly,peak,scfi_return,first_difference_of_log,521,-4.203373725821096,0.0006502892015493709,19,501,-2.867326248740681,0.13957521709340878,0.1,10,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+weekly,peak,brent_log,log_level,522,-2.7370376312613507,0.06784548257366198,9,512,-2.86720156693697,1.2343322987627905,0.01,15,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+weekly,peak,brent_return,first_difference_of_log,521,-8.946936905273668,8.935932584575707e-15,8,512,-2.86720156693697,0.07284242216985704,0.1,6,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+weekly,peak,msdi_level,media_corrected_level,518,-2.341927285803458,0.15880179922702625,11,506,-2.8672689011327894,1.7588405329653598,0.01,14,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+weekly,peak,msdi_change,first_difference,517,-10.986749541651617,7.22716999490243e-20,10,506,-2.8672689011327894,0.14441748380225508,0.1,71,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+weekly,peak,log_news_volume,log1p_level,518,-2.7922184247817503,0.05939393668975833,17,500,-2.8673378563200003,2.7091967663962517,0.01,13,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+weekly,peak,news_volume_change,first_difference_of_log1p,517,-9.103720701992865,3.54867675641682e-15,16,500,-2.8673378563200003,0.20656058472079836,0.1,75,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+weekly,breadth,scfi_log,log_level,522,-1.8899770333255153,0.33679082170555596,14,507,-2.867257567756961,1.439429009839025,0.01,15,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+weekly,breadth,scfi_return,first_difference_of_log,521,-4.203373725821096,0.0006502892015493709,19,501,-2.867326248740681,0.13957521709340878,0.1,10,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+weekly,breadth,brent_log,log_level,522,-2.7370376312613507,0.06784548257366198,9,512,-2.86720156693697,1.2343322987627905,0.01,15,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+weekly,breadth,brent_return,first_difference_of_log,521,-8.946936905273668,8.935932584575707e-15,8,512,-2.86720156693697,0.07284242216985704,0.1,6,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+weekly,breadth,msdi_level,media_corrected_level,518,-2.2760246246783282,0.1798171245612366,11,506,-2.8672689011327894,1.3462028757890798,0.01,14,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+weekly,breadth,msdi_change,first_difference,517,-10.888808562810947,1.2401757843620501e-19,10,506,-2.8672689011327894,0.11996004714371963,0.1,66,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+weekly,breadth,log_news_volume,log1p_level,518,-2.7922184247817503,0.05939393668975833,17,500,-2.8673378563200003,2.7091967663962517,0.01,13,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+weekly,breadth,news_volume_change,first_difference_of_log1p,517,-9.103720701992865,3.54867675641682e-15,16,500,-2.8673378563200003,0.20656058472079836,0.1,75,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+monthly,peak,scfi_log,log_level,121,-2.9748091297231944,0.0373148224786974,6,114,-2.887246327182993,0.7996693374727072,0.01,6,0.463,mixed_test_evidence,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+monthly,peak,scfi_return,first_difference_of_log,120,-3.529412989181532,0.0072630675218890856,13,106,-2.8892174239808703,0.16323810519385346,0.1,3,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+monthly,peak,brent_log,log_level,121,-2.6258244296409687,0.08777647349883755,2,118,-2.8863625166643136,0.733796572940729,0.010473038823570093,6,0.463,nonstationary_by_both,
+monthly,peak,brent_return,first_difference_of_log,120,-8.902161696738522,1.163476999143284e-14,1,118,-2.8863625166643136,0.0909524876239973,0.1,2,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+monthly,peak,msdi_level,media_corrected_level,120,-1.801930586521036,0.3795036331195735,3,116,-2.8867966864160075,0.9248975491278891,0.01,6,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+monthly,peak,msdi_change,first_difference,119,-9.823146627960597,5.272503332814657e-17,2,116,-2.8867966864160075,0.17046865980599263,0.1,9,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+monthly,peak,log_news_volume,log1p_level,120,-2.4839108063173105,0.11943823724691777,4,115,-2.887019521656941,1.5190506975264466,0.01,4,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+monthly,peak,news_volume_change,first_difference_of_log1p,119,-5.64821914713454,9.999160616565546e-07,10,108,-2.8886968193364835,0.32020469875073965,0.1,10,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+monthly,breadth,scfi_log,log_level,121,-2.9748091297231944,0.0373148224786974,6,114,-2.887246327182993,0.7996693374727072,0.01,6,0.463,mixed_test_evidence,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+monthly,breadth,scfi_return,first_difference_of_log,120,-3.529412989181532,0.0072630675218890856,13,106,-2.8892174239808703,0.16323810519385346,0.1,3,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+monthly,breadth,brent_log,log_level,121,-2.6258244296409687,0.08777647349883755,2,118,-2.8863625166643136,0.733796572940729,0.010473038823570093,6,0.463,nonstationary_by_both,
+monthly,breadth,brent_return,first_difference_of_log,120,-8.902161696738522,1.163476999143284e-14,1,118,-2.8863625166643136,0.0909524876239973,0.1,2,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+monthly,breadth,msdi_level,media_corrected_level,120,-1.7764981009755088,0.3921905660279736,3,116,-2.8867966864160075,0.7079065123397026,0.012826680696390673,6,0.463,nonstationary_by_both,
+monthly,breadth,msdi_change,first_difference,119,-9.217587774799474,1.816188539108274e-15,2,116,-2.8867966864160075,0.14108943472859523,0.1,11,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"
+monthly,breadth,log_news_volume,log1p_level,120,-2.4839108063173105,0.11943823724691777,4,115,-2.887019521656941,1.5190506975264466,0.01,4,0.463,nonstationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is smaller than the p-value returned.
+"
+monthly,breadth,news_volume_change,first_difference_of_log1p,119,-5.64821914713454,9.999160616565546e-07,10,108,-2.8886968193364835,0.32020469875073965,0.1,10,0.463,stationary_by_both,"The test statistic is outside of the range of p-values available in the
+look-up table. The actual p-value is greater than the p-value returned.
+"

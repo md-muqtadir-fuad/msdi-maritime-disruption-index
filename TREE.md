@@ -70,6 +70,12 @@ sc-disrupt/
 ├── experiments/
 ├── notebooks/
 ├── outputs/
+│   ├── prediction_benchmarks/           # rolling forecasts and DM/Clark-West tests
+│   ├── time_series_causality/           # VAR/VARX, Granger, PCMCI, local projections
+│   ├── causal_ml/                       # DML and heterogeneous-effect outputs
+│   ├── robustness/                      # ablation and sensitivity outputs
+│   ├── diagnostics/                     # forecast/residual/error diagnostics
+│   ├── significance/                    # consolidated multiplicity-aware inference
 │   ├── tables/
 │   ├── figures/
 │   ├── logs/
@@ -90,10 +96,12 @@ sc-disrupt/
 │   ├── 04_human_validation_metrics.py
 │   ├── 05_build_disruption_index.py
 │   ├── 06_build_model_panels.py
-│   ├── 07_prediction_benchmarks.py
-│   ├── 08_causality_analysis.py
-│   ├── 08b_causal_ml.py               # planned time-aware DML/causal forests
-│   ├── 09_robustness_checks.py
+│   ├── 07_prediction_benchmarks.py      # statistical + time-series ML forecasts
+│   ├── 08_causality_analysis.py         # VAR/VARX, Granger, PCMCI, local projections
+│   ├── 08b_causal_ml.py                 # time-aware DML/causal forests
+│   ├── 09_robustness_checks.py          # ablation and sensitivity
+│   ├── 09b_error_diagnostics.py         # residual, regime, event, influence errors
+│   ├── 09c_significance_analysis.py     # CIs, effect sizes, p-value correction
 │   └── 10_make_figures_tables.py
 ├── tests/
 ├── README.md
@@ -113,15 +121,24 @@ News ingestion and full-text enrichment
             └── Article consensus, event clustering, and weekly MSDI
                 ├── External and known-event validation
                 ├── Out-of-sample freight-rate forecasting
+                │   ├── Statistical time-series benchmarks
+                │   ├── Lag-feature time-series ML
+                │   └── DM / Clark-West forecast significance
                 ├── Econometric dynamic analysis
-                │   ├── VAR / predictive precedence
+                │   ├── VAR / VARX
+                │   ├── Conventional Granger predictive precedence
+                │   ├── PCMCI conditional temporal dependencies
                 │   ├── Local projections
                 │   └── Event-study or IV identification
-                └── Causal machine learning
-                    ├── Time-aware Double/Debiased ML
-                    ├── DML-IV when an instrument is defensible
-                    ├── Causal forests and heterogeneous effects
-                    └── Sensitivity, placebo, and overlap diagnostics
+                ├── Causal machine learning
+                │   ├── Time-aware Double/Debiased ML
+                │   ├── DML-IV when an instrument is defensible
+                │   └── Causal forests and heterogeneous effects
+                └── Publication-validity audit
+                    ├── Component ablation
+                    ├── Frequency/specification sensitivity
+                    ├── Error and residual diagnostics
+                    └── Multiplicity-aware significance analysis
 ```
 
 Items marked `planned` describe the Q1 research target architecture and are not yet implemented.

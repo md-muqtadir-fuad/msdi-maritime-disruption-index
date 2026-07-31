@@ -34,13 +34,106 @@ models:
     - tfidf_svm
     - xgboost
 
-causality:
-  baseline:
+prediction:
+  primary_frequency: weekly
+  monthly_frequency_role: robustness_only
+  horizons_weeks: [1, 2, 4, 8, 12]
+  validation: expanding_window_with_horizon_purge
+  statistical_models:
+    - naive_zero_change
+    - historical_mean
+    - ridge
+    - elastic_net
+  time_series_ml_models:
+    - histogram_gradient_boosting
+  optional_ml_robustness:
+    - random_forest
+    - xgboost
+  inference:
+    - diebold_mariano_hac
+    - clark_west_hac
+    - out_of_sample_r2
+
+dynamic_time_series:
+  primary_frequency: weekly
+  monthly_frequency_role: robustness_and_long_run_dynamics
+  lag_selection:
+    criterion: bic
+    maximum_lags_weekly: 12
+    maximum_lags_monthly: 6
+  models:
     - var
-    - granger
-  robustness:
+    - varx
     - local_projection
-    - ardl
+  predictive_precedence:
+    - conventional_granger
     - pcmci
-    - transfer_entropy
-    - double_ml
+  required_pretests:
+    - adf
+    - kpss
+    - cointegration_when_levels_are_used
+  interpretation: dynamic_association_not_automatic_causality
+
+causal_ml:
+  treatment: msdi_innovation
+  outcomes_weeks: [1, 2, 4, 8, 12]
+  methods:
+    - time_aware_double_ml
+    - causal_forest_after_average_effect_validation
+  optional_methods:
+    - dml_iv_when_instrument_is_defensible
+  cross_fitting: blocked_or_expanding_with_horizon_gap
+  required_diagnostics:
+    - overlap
+    - nuisance_out_of_fold_performance
+    - placebo_leads
+    - negative_controls
+    - learner_stability
+
+ablation_and_sensitivity:
+  ablations:
+    - no_msdi
+    - peak_path_only
+    - breadth_path_only
+    - leave_one_llm_out
+    - leave_one_dimension_out
+    - no_media_volume_correction
+    - no_duplicate_penalty
+    - no_control_groups
+  sensitivity:
+    - weekly_vs_monthly
+    - alternative_lag_lengths
+    - alternative_training_windows
+    - alternative_standardization_windows
+    - alternative_treatment_definitions
+    - pre_covid_covid_post_covid
+    - exclude_price_focused_news
+    - hac_vs_block_bootstrap
+
+diagnostics:
+  forecast_errors:
+    - bias
+    - mae_rmse_by_horizon
+    - directional_errors
+    - errors_by_market_regime
+    - errors_by_disruption_type
+    - largest_error_cases
+  residual_tests:
+    - ljung_box_autocorrelation
+    - arch_heteroskedasticity
+    - jarque_bera_normality
+    - parameter_stability
+    - influence_and_outliers
+
+significance:
+  alpha: 0.05
+  confidence_level: 0.95
+  report_effect_sizes: true
+  report_confidence_intervals: true
+  report_raw_p_values: true
+  primary_family_correction: holm
+  exploratory_family_correction: benjamini_hochberg_fdr
+  dependence_robust_inference:
+    - hac
+    - moving_block_bootstrap
+  rule: significance_must_be_reported_with_economic_magnitude

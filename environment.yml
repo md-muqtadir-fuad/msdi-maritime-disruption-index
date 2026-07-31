@@ -29,3 +29,4 @@ dependencies:
       - evaluate
       - sentence-transformers
       - krippendorff
+      - tigramite==5.2.10.1

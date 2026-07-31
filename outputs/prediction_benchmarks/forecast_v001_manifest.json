@@ -1,0 +1,80 @@
+{
+  "version": "forecast_v001",
+  "status": "provisional_pending_human_validation",
+  "input": {
+    "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\msdi_scfi_weekly_panel.csv",
+    "sha256": "3761cb49f7cbce5bd546a8868e4008a9800bf8cfbd91d3f91551bcd9f88f15dc",
+    "rows": 522
+  },
+  "design": {
+    "evaluation": "expanding-window rolling-origin",
+    "training_label_purge": "training row s allowed only when s + horizon <= origin",
+    "refit_every_origins": 13,
+    "nonlinear_refit_every_origins": 52,
+    "minimum_training_rows": 156,
+    "horizons_weeks": [
+      1,
+      2,
+      4,
+      8,
+      12
+    ],
+    "target": "forward SCFI log change",
+    "identical_evaluation_dates_enforced": true,
+    "random_train_test_split": false,
+    "preprocessing_fit_inside_training_window": true,
+    "hist_gradient_boosting_internal_random_early_stopping": false,
+    "algorithm_matched_incremental_tests": true
+  },
+  "measurement_paths": {
+    "peak": "primary median-overall-maximum MSDI",
+    "breadth": "secondary equal-weight seven-dimension MSDI",
+    "both": "union of peak and breadth features"
+  },
+  "best_rmse_model_by_horizon": [
+    {
+      "horizon_weeks": 1,
+      "model_id": "hist_gradient_boosting__ar_brent",
+      "rmse_log_change": 0.04850539320577962,
+      "oos_r2_vs_zero_change": 0.08510409670117636
+    },
+    {
+      "horizon_weeks": 2,
+      "model_id": "hist_gradient_boosting__ar_brent_peak",
+      "rmse_log_change": 0.08647200585449223,
+      "oos_r2_vs_zero_change": 0.03930321689155203
+    },
+    {
+      "horizon_weeks": 4,
+      "model_id": "naive_zero_change",
+      "rmse_log_change": 0.15309450100205416,
+      "oos_r2_vs_zero_change": 0.0
+    },
+    {
+      "horizon_weeks": 8,
+      "model_id": "naive_zero_change",
+      "rmse_log_change": 0.25158681086317874,
+      "oos_r2_vs_zero_change": 0.0
+    },
+    {
+      "horizon_weeks": 12,
+      "model_id": "naive_zero_change",
+      "rmse_log_change": 0.3339663116015562,
+      "oos_r2_vs_zero_change": 0.0
+    }
+  ],
+  "outputs": {
+    "predictions": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\prediction_benchmarks\\forecast_v001_forecast_predictions.csv",
+    "metrics": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\prediction_benchmarks\\forecast_v001_forecast_metrics.csv",
+    "statistical_tests": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\prediction_benchmarks\\forecast_v001_forecast_statistical_tests.csv",
+    "fit_audit": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\prediction_benchmarks\\forecast_v001_model_fit_audit.csv",
+    "feature_sets": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\prediction_benchmarks\\forecast_v001_feature_sets.json",
+    "log": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\logs\\07_prediction_benchmarks_forecast_v001.log",
+    "manifest": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\prediction_benchmarks\\forecast_v001_manifest.json"
+  },
+  "software": {
+    "python": "3.11.9",
+    "pandas": "3.0.3",
+    "numpy": "2.4.6"
+  }
+}

@@ -1,11 +1,13 @@
-"""09_robustness_checks.py
+"""Component-ablation and sensitivity-analysis stage.
 
-Pipeline placeholder. Implement this step after freezing schemas/configs.
+All variants must use matched samples and log their exact index path, removed
+component, frequency, lag design, estimation window, and paired performance or
+effect difference with uncertainty.
 """
 
 
 def main() -> None:
-    print("TODO: implement 09_robustness_checks.py")
+    print("TODO: implement matched ablation and sensitivity stage")
 
 
 if __name__ == "__main__":

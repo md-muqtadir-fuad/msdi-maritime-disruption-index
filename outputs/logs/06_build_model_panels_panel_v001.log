@@ -1,0 +1,12 @@
+2026-08-01 01:38:40,791 | INFO | Starting model-panel build version=panel_v001
+2026-08-01 01:38:40,792 | INFO | Arguments: {'msdi': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/05_indices/weekly/msdi_weekly.csv'), 'scfi': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/01_raw/freight/scfi/freight_index_data_legacy.xlsx'), 'scfi_sheet': 'Sheet1', 'brent': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/01_raw/controls/brent/brent_weekly_legacy.csv'), 'weekly_output': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/prediction/msdi_scfi_weekly_panel.csv'), 'monthly_output': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/causality/msdi_scfi_monthly_panel.csv'), 'audit_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/model_panel_audit'), 'log_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/logs'), 'version': 'panel_v001', 'maximum_feature_age_days': 6}
+2026-08-01 01:38:42,249 | INFO | SCFI: rows=522 range=2016-02-08 00:00:00 to 2026-02-02 00:00:00
+2026-08-01 01:38:42,251 | INFO | MSDI: rows=575 range=2015-01-02 00:00:00 to 2026-01-02 00:00:00
+2026-08-01 01:38:42,253 | INFO | Brent: rows=2034 range=1987-05-29 00:00:00 to 2026-05-15 00:00:00
+2026-08-01 01:38:42,788 | INFO | Weekly panel: rows=522 complete=518 first_complete=2016-02-08 00:00:00 last_complete=2026-01-05 00:00:00
+2026-08-01 01:38:42,789 | INFO | Monthly panel: rows=121
+2026-08-01 01:38:42,789 | INFO | Future feature violations: {'msdi': 0, 'brent': 0}
+2026-08-01 01:38:42,789 | INFO | Weekly output: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\06_model_ready\prediction\msdi_scfi_weekly_panel.csv
+2026-08-01 01:38:42,789 | INFO | Monthly output: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\06_model_ready\causality\msdi_scfi_monthly_panel.csv
+2026-08-01 01:38:42,789 | INFO | Audit: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\model_panel_audit\panel_v001_merge_audit.json
+2026-08-01 01:38:42,790 | INFO | Model-panel build completed successfully

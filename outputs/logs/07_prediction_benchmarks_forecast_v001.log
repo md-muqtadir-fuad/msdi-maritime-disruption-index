@@ -1,0 +1,87 @@
+2026-08-01 02:09:48,326 | INFO | Starting forecasting benchmarks version=forecast_v001
+2026-08-01 02:09:48,327 | INFO | Arguments: {'panel': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/prediction/msdi_scfi_weekly_panel.csv'), 'output_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/prediction_benchmarks'), 'log_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/logs'), 'version': 'forecast_v001', 'minimum_training_rows': 156, 'refit_every': 13, 'nonlinear_refit_every': 52, 'ridge_alpha': 1.0, 'elastic_alpha': 0.01, 'elastic_l1_ratio': 0.2, 'seed': 20260712}
+2026-08-01 02:09:48,712 | INFO | Panel rows=522 range=2016-02-08 00:00:00 to 2026-02-02 00:00:00
+2026-08-01 02:09:48,713 | INFO | Feature set ar: 13 variables
+2026-08-01 02:09:48,713 | INFO | Feature set ar_brent: 22 variables
+2026-08-01 02:09:48,713 | INFO | Feature set ar_brent_peak: 43 variables
+2026-08-01 02:09:48,713 | INFO | Feature set ar_brent_breadth: 43 variables
+2026-08-01 02:09:48,713 | INFO | Feature set ar_brent_both: 61 variables
+2026-08-01 02:09:48,713 | INFO | Running horizon=1 weeks
+2026-08-01 02:09:53,151 | INFO | Completed horizon=1 model=ridge__ar forecasts=362 fits=28
+2026-08-01 02:09:55,365 | INFO | Completed horizon=1 model=ridge__ar_brent forecasts=362 fits=28
+2026-08-01 02:09:57,805 | INFO | Completed horizon=1 model=ridge__ar_brent_peak forecasts=362 fits=28
+2026-08-01 02:09:59,819 | INFO | Completed horizon=1 model=ridge__ar_brent_breadth forecasts=362 fits=28
+2026-08-01 02:10:01,648 | INFO | Completed horizon=1 model=ridge__ar_brent_both forecasts=362 fits=28
+2026-08-01 02:10:03,300 | INFO | Completed horizon=1 model=elastic_net__ar_brent forecasts=362 fits=28
+2026-08-01 02:10:05,170 | INFO | Completed horizon=1 model=elastic_net__ar_brent_peak forecasts=362 fits=28
+2026-08-01 02:10:07,001 | INFO | Completed horizon=1 model=elastic_net__ar_brent_breadth forecasts=362 fits=28
+2026-08-01 02:10:09,961 | INFO | Completed horizon=1 model=elastic_net__ar_brent_both forecasts=362 fits=28
+2026-08-01 02:10:14,640 | INFO | Completed horizon=1 model=hist_gradient_boosting__ar_brent forecasts=362 fits=7
+2026-08-01 02:10:19,771 | INFO | Completed horizon=1 model=hist_gradient_boosting__ar_brent_peak forecasts=362 fits=7
+2026-08-01 02:10:24,121 | INFO | Completed horizon=1 model=hist_gradient_boosting__ar_brent_breadth forecasts=362 fits=7
+2026-08-01 02:10:29,555 | INFO | Completed horizon=1 model=hist_gradient_boosting__ar_brent_both forecasts=362 fits=7
+2026-08-01 02:10:29,555 | INFO | Running horizon=2 weeks
+2026-08-01 02:10:35,141 | INFO | Completed horizon=2 model=ridge__ar forecasts=361 fits=28
+2026-08-01 02:10:40,532 | INFO | Completed horizon=2 model=ridge__ar_brent forecasts=361 fits=28
+2026-08-01 02:10:46,255 | INFO | Completed horizon=2 model=ridge__ar_brent_peak forecasts=361 fits=28
+2026-08-01 02:10:52,279 | INFO | Completed horizon=2 model=ridge__ar_brent_breadth forecasts=361 fits=28
+2026-08-01 02:10:59,891 | INFO | Completed horizon=2 model=ridge__ar_brent_both forecasts=361 fits=28
+2026-08-01 02:11:03,242 | INFO | Completed horizon=2 model=elastic_net__ar_brent forecasts=361 fits=28
+2026-08-01 02:11:06,782 | INFO | Completed horizon=2 model=elastic_net__ar_brent_peak forecasts=361 fits=28
+2026-08-01 02:11:11,081 | INFO | Completed horizon=2 model=elastic_net__ar_brent_breadth forecasts=361 fits=28
+2026-08-01 02:11:15,771 | INFO | Completed horizon=2 model=elastic_net__ar_brent_both forecasts=361 fits=28
+2026-08-01 02:11:20,667 | INFO | Completed horizon=2 model=hist_gradient_boosting__ar_brent forecasts=361 fits=7
+2026-08-01 02:11:25,950 | INFO | Completed horizon=2 model=hist_gradient_boosting__ar_brent_peak forecasts=361 fits=7
+2026-08-01 02:11:31,350 | INFO | Completed horizon=2 model=hist_gradient_boosting__ar_brent_breadth forecasts=361 fits=7
+2026-08-01 02:11:36,569 | INFO | Completed horizon=2 model=hist_gradient_boosting__ar_brent_both forecasts=361 fits=7
+2026-08-01 02:11:36,570 | INFO | Running horizon=4 weeks
+2026-08-01 02:11:39,799 | INFO | Completed horizon=4 model=ridge__ar forecasts=359 fits=28
+2026-08-01 02:11:41,766 | INFO | Completed horizon=4 model=ridge__ar_brent forecasts=359 fits=28
+2026-08-01 02:11:43,606 | INFO | Completed horizon=4 model=ridge__ar_brent_peak forecasts=359 fits=28
+2026-08-01 02:11:45,397 | INFO | Completed horizon=4 model=ridge__ar_brent_breadth forecasts=359 fits=28
+2026-08-01 02:11:47,329 | INFO | Completed horizon=4 model=ridge__ar_brent_both forecasts=359 fits=28
+2026-08-01 02:11:49,044 | INFO | Completed horizon=4 model=elastic_net__ar_brent forecasts=359 fits=28
+2026-08-01 02:11:50,991 | INFO | Completed horizon=4 model=elastic_net__ar_brent_peak forecasts=359 fits=28
+2026-08-01 02:11:53,167 | INFO | Completed horizon=4 model=elastic_net__ar_brent_breadth forecasts=359 fits=28
+2026-08-01 02:11:56,728 | INFO | Completed horizon=4 model=elastic_net__ar_brent_both forecasts=359 fits=28
+2026-08-01 02:12:00,873 | INFO | Completed horizon=4 model=hist_gradient_boosting__ar_brent forecasts=359 fits=7
+2026-08-01 02:12:05,567 | INFO | Completed horizon=4 model=hist_gradient_boosting__ar_brent_peak forecasts=359 fits=7
+2026-08-01 02:12:10,683 | INFO | Completed horizon=4 model=hist_gradient_boosting__ar_brent_breadth forecasts=359 fits=7
+2026-08-01 02:12:16,055 | INFO | Completed horizon=4 model=hist_gradient_boosting__ar_brent_both forecasts=359 fits=7
+2026-08-01 02:12:16,055 | INFO | Running horizon=8 weeks
+2026-08-01 02:12:20,228 | INFO | Completed horizon=8 model=ridge__ar forecasts=351 fits=27
+2026-08-01 02:12:21,875 | INFO | Completed horizon=8 model=ridge__ar_brent forecasts=351 fits=27
+2026-08-01 02:12:23,849 | INFO | Completed horizon=8 model=ridge__ar_brent_peak forecasts=351 fits=27
+2026-08-01 02:12:25,791 | INFO | Completed horizon=8 model=ridge__ar_brent_breadth forecasts=351 fits=27
+2026-08-01 02:12:27,840 | INFO | Completed horizon=8 model=ridge__ar_brent_both forecasts=351 fits=27
+2026-08-01 02:12:29,657 | INFO | Completed horizon=8 model=elastic_net__ar_brent forecasts=351 fits=27
+2026-08-01 02:12:31,882 | INFO | Completed horizon=8 model=elastic_net__ar_brent_peak forecasts=351 fits=27
+2026-08-01 02:12:34,117 | INFO | Completed horizon=8 model=elastic_net__ar_brent_breadth forecasts=351 fits=27
+2026-08-01 02:12:39,314 | INFO | Completed horizon=8 model=elastic_net__ar_brent_both forecasts=351 fits=27
+2026-08-01 02:12:43,679 | INFO | Completed horizon=8 model=hist_gradient_boosting__ar_brent forecasts=351 fits=7
+2026-08-01 02:12:48,668 | INFO | Completed horizon=8 model=hist_gradient_boosting__ar_brent_peak forecasts=351 fits=7
+2026-08-01 02:12:56,834 | INFO | Completed horizon=8 model=hist_gradient_boosting__ar_brent_breadth forecasts=351 fits=7
+2026-08-01 02:13:05,092 | INFO | Completed horizon=8 model=hist_gradient_boosting__ar_brent_both forecasts=351 fits=7
+2026-08-01 02:13:05,092 | INFO | Running horizon=12 weeks
+2026-08-01 02:13:12,594 | INFO | Completed horizon=12 model=ridge__ar forecasts=343 fits=27
+2026-08-01 02:13:14,886 | INFO | Completed horizon=12 model=ridge__ar_brent forecasts=343 fits=27
+2026-08-01 02:13:19,212 | INFO | Completed horizon=12 model=ridge__ar_brent_peak forecasts=343 fits=27
+2026-08-01 02:13:23,675 | INFO | Completed horizon=12 model=ridge__ar_brent_breadth forecasts=343 fits=27
+2026-08-01 02:13:33,914 | INFO | Completed horizon=12 model=ridge__ar_brent_both forecasts=343 fits=27
+2026-08-01 02:13:37,081 | INFO | Completed horizon=12 model=elastic_net__ar_brent forecasts=343 fits=27
+2026-08-01 02:13:40,864 | INFO | Completed horizon=12 model=elastic_net__ar_brent_peak forecasts=343 fits=27
+2026-08-01 02:13:43,719 | INFO | Completed horizon=12 model=elastic_net__ar_brent_breadth forecasts=343 fits=27
+2026-08-01 02:13:47,885 | INFO | Completed horizon=12 model=elastic_net__ar_brent_both forecasts=343 fits=27
+2026-08-01 02:13:53,392 | INFO | Completed horizon=12 model=hist_gradient_boosting__ar_brent forecasts=343 fits=7
+2026-08-01 02:13:59,561 | INFO | Completed horizon=12 model=hist_gradient_boosting__ar_brent_peak forecasts=343 fits=7
+2026-08-01 02:14:05,493 | INFO | Completed horizon=12 model=hist_gradient_boosting__ar_brent_breadth forecasts=343 fits=7
+2026-08-01 02:14:11,684 | INFO | Completed horizon=12 model=hist_gradient_boosting__ar_brent_both forecasts=343 fits=7
+2026-08-01 02:14:14,878 | INFO | Forecast rows=26640 fit events=1382
+2026-08-01 02:14:14,879 | INFO | Best RMSE horizon=1w model=hist_gradient_boosting__ar_brent rmse=0.048505 OOS_R2_zero=0.085104
+2026-08-01 02:14:14,882 | INFO | Best RMSE horizon=2w model=hist_gradient_boosting__ar_brent_peak rmse=0.086472 OOS_R2_zero=0.039303
+2026-08-01 02:14:14,883 | INFO | Best RMSE horizon=4w model=naive_zero_change rmse=0.153095 OOS_R2_zero=0.000000
+2026-08-01 02:14:14,883 | INFO | Best RMSE horizon=8w model=naive_zero_change rmse=0.251587 OOS_R2_zero=0.000000
+2026-08-01 02:14:14,884 | INFO | Best RMSE horizon=12w model=naive_zero_change rmse=0.333966 OOS_R2_zero=0.000000
+2026-08-01 02:14:14,886 | INFO | Metrics: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\prediction_benchmarks\forecast_v001_forecast_metrics.csv
+2026-08-01 02:14:14,888 | INFO | Statistical tests: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\prediction_benchmarks\forecast_v001_forecast_statistical_tests.csv
+2026-08-01 02:14:14,888 | INFO | Forecasting benchmarks completed successfully

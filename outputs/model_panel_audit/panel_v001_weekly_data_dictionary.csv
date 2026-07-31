@@ -1,0 +1,101 @@
+variable,role,definition,information_timing,dtype,missing_count
+observation_date,key,Monday SCFI observation date,t,datetime64[us],0
+scfi,outcome/history,Raw Monday-dated SCFI level,raw,float64,0
+article_count,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+source_count,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+effective_article_count,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+peak_active_article_count,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+breadth_active_article_count,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+peak_score_sum,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+breadth_score_sum,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+peak_score_unweighted_mean,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,5
+breadth_score_unweighted_mean,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,5
+peak_model_disagreement_mean,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,5
+dimension_disagreement_mean,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,5
+peak_score_media_corrected,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+breadth_score_media_corrected,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+peak_msdi_z_expanding_realtime,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+breadth_msdi_z_expanding_realtime,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+port_disruption_media_corrected,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+global_container_movement_disruption_media_corrected,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+freight_cost_disruption_media_corrected,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+supply_disruption_media_corrected,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+production_disruption_media_corrected,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+covid19_related_disruption_media_corrected,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+demand_disruption_media_corrected,MSDI predictor,Backward-aligned Friday-ended MSDI field,latest available at or before t,float64,4
+msdi_week_ending,provenance,Matched MSDI source date,<= t,datetime64[us],4
+msdi_age_days,provenance,Days from MSDI source date to SCFI date,nonnegative,float64,4
+brent_observation_date,provenance,Matched Brent source date,<= t,datetime64[us],0
+brent_price,control,Latest backward-matched Brent price,current,float64,0
+brent_age_days,provenance,Days from Brent source date to SCFI date,nonnegative,int64,0
+scfi_log,outcome/history,Natural log of current SCFI,current,float64,0
+brent_log,control,Natural log of Brent price,current,float64,0
+scfi_log_lag_1w,autoregressive predictor,SCFI log lagged 1 rows/weeks,t-1,float64,1
+brent_log_lag_1w,control,Brent log lagged 1 rows/weeks,t-1,float64,1
+peak_score_media_corrected_lag_1w,MSDI predictor,peak_score_media_corrected lagged 1 rows/weeks,t-1,float64,4
+breadth_score_media_corrected_lag_1w,MSDI predictor,breadth_score_media_corrected lagged 1 rows/weeks,t-1,float64,4
+scfi_log_lag_2w,autoregressive predictor,SCFI log lagged 2 rows/weeks,t-2,float64,2
+brent_log_lag_2w,control,Brent log lagged 2 rows/weeks,t-2,float64,2
+peak_score_media_corrected_lag_2w,MSDI predictor,peak_score_media_corrected lagged 2 rows/weeks,t-2,float64,4
+breadth_score_media_corrected_lag_2w,MSDI predictor,breadth_score_media_corrected lagged 2 rows/weeks,t-2,float64,4
+scfi_log_lag_4w,autoregressive predictor,SCFI log lagged 4 rows/weeks,t-4,float64,4
+brent_log_lag_4w,control,Brent log lagged 4 rows/weeks,t-4,float64,4
+peak_score_media_corrected_lag_4w,MSDI predictor,peak_score_media_corrected lagged 4 rows/weeks,t-4,float64,4
+breadth_score_media_corrected_lag_4w,MSDI predictor,breadth_score_media_corrected lagged 4 rows/weeks,t-4,float64,4
+scfi_log_lag_8w,autoregressive predictor,SCFI log lagged 8 rows/weeks,t-8,float64,8
+brent_log_lag_8w,control,Brent log lagged 8 rows/weeks,t-8,float64,8
+peak_score_media_corrected_lag_8w,MSDI predictor,peak_score_media_corrected lagged 8 rows/weeks,t-8,float64,8
+breadth_score_media_corrected_lag_8w,MSDI predictor,breadth_score_media_corrected lagged 8 rows/weeks,t-8,float64,8
+scfi_log_lag_12w,autoregressive predictor,SCFI log lagged 12 rows/weeks,t-12,float64,12
+brent_log_lag_12w,control,Brent log lagged 12 rows/weeks,t-12,float64,12
+peak_score_media_corrected_lag_12w,MSDI predictor,peak_score_media_corrected lagged 12 rows/weeks,t-12,float64,12
+breadth_score_media_corrected_lag_12w,MSDI predictor,breadth_score_media_corrected lagged 12 rows/weeks,t-12,float64,12
+scfi_log_change_1w,autoregressive predictor,Backward 1-week SCFI log change,current and past,float64,1
+brent_log_change_1w,control,Backward 1-week Brent log change,current and past,float64,1
+scfi_log_change_4w,autoregressive predictor,Backward 4-week SCFI log change,current and past,float64,4
+brent_log_change_4w,control,Backward 4-week Brent log change,current and past,float64,4
+scfi_log_change_13w,autoregressive predictor,Backward 13-week SCFI log change,current and past,float64,13
+brent_log_change_13w,control,Backward 13-week Brent log change,current and past,float64,13
+peak_score_media_corrected_rolling_mean_4w,MSDI predictor,Trailing 4-week mean including current known value,through t,float64,7
+peak_score_media_corrected_rolling_sd_4w,MSDI predictor,Trailing 4-week standard deviation,through t,float64,7
+peak_score_media_corrected_rolling_mean_13w,MSDI predictor,Trailing 13-week mean including current known value,through t,float64,16
+peak_score_media_corrected_rolling_sd_13w,MSDI predictor,Trailing 13-week standard deviation,through t,float64,16
+peak_score_media_corrected_rolling_mean_26w,MSDI predictor,Trailing 26-week mean including current known value,through t,float64,29
+peak_score_media_corrected_rolling_sd_26w,MSDI predictor,Trailing 26-week standard deviation,through t,float64,29
+peak_score_media_corrected_rolling_mean_52w,MSDI predictor,Trailing 52-week mean including current known value,through t,float64,55
+peak_score_media_corrected_rolling_sd_52w,MSDI predictor,Trailing 52-week standard deviation,through t,float64,55
+peak_score_media_corrected_acceleration_1w,MSDI predictor,Second backward difference,current and past,float64,6
+breadth_score_media_corrected_rolling_mean_4w,MSDI predictor,Trailing 4-week mean including current known value,through t,float64,7
+breadth_score_media_corrected_rolling_sd_4w,MSDI predictor,Trailing 4-week standard deviation,through t,float64,7
+breadth_score_media_corrected_rolling_mean_13w,MSDI predictor,Trailing 13-week mean including current known value,through t,float64,16
+breadth_score_media_corrected_rolling_sd_13w,MSDI predictor,Trailing 13-week standard deviation,through t,float64,16
+breadth_score_media_corrected_rolling_mean_26w,MSDI predictor,Trailing 26-week mean including current known value,through t,float64,29
+breadth_score_media_corrected_rolling_sd_26w,MSDI predictor,Trailing 26-week standard deviation,through t,float64,29
+breadth_score_media_corrected_rolling_mean_52w,MSDI predictor,Trailing 52-week mean including current known value,through t,float64,55
+breadth_score_media_corrected_rolling_sd_52w,MSDI predictor,Trailing 52-week standard deviation,through t,float64,55
+breadth_score_media_corrected_acceleration_1w,MSDI predictor,Second backward difference,current and past,float64,6
+target_scfi_level_h1w,forecast target,SCFI level 1 weeks ahead,t+1,float64,1
+target_scfi_log_change_h1w,forecast target,Forward SCFI log change over 1 weeks,t+1,float64,1
+target_scfi_pct_change_h1w,forecast target,Forward SCFI percentage change over 1 weeks,t+1,float64,1
+target_scfi_level_h2w,forecast target,SCFI level 2 weeks ahead,t+2,float64,2
+target_scfi_log_change_h2w,forecast target,Forward SCFI log change over 2 weeks,t+2,float64,2
+target_scfi_pct_change_h2w,forecast target,Forward SCFI percentage change over 2 weeks,t+2,float64,2
+target_scfi_level_h4w,forecast target,SCFI level 4 weeks ahead,t+4,float64,4
+target_scfi_log_change_h4w,forecast target,Forward SCFI log change over 4 weeks,t+4,float64,4
+target_scfi_pct_change_h4w,forecast target,Forward SCFI percentage change over 4 weeks,t+4,float64,4
+target_scfi_level_h8w,forecast target,SCFI level 8 weeks ahead,t+8,float64,8
+target_scfi_log_change_h8w,forecast target,Forward SCFI log change over 8 weeks,t+8,float64,8
+target_scfi_pct_change_h8w,forecast target,Forward SCFI percentage change over 8 weeks,t+8,float64,8
+target_scfi_level_h12w,forecast target,SCFI level 12 weeks ahead,t+12,float64,12
+target_scfi_log_change_h12w,forecast target,Forward SCFI log change over 12 weeks,t+12,float64,12
+target_scfi_pct_change_h12w,forecast target,Forward SCFI percentage change over 12 weeks,t+12,float64,12
+calendar_year,calendar control,Deterministic calendar feature,t,int32,0
+calendar_month,calendar control,Deterministic calendar feature,t,int64,0
+calendar_iso_week,calendar control,Deterministic calendar feature,t,int64,0
+calendar_week_sin,calendar control,Deterministic calendar feature,t,float64,0
+calendar_week_cos,calendar control,Deterministic calendar feature,t,float64,0
+calendar_month_sin,calendar control,Deterministic calendar feature,t,float64,0
+calendar_month_cos,calendar control,Deterministic calendar feature,t,float64,0
+has_msdi_predictors,derived/diagnostic,Derived panel variable,current or past only,bool,0
+has_brent_control,derived/diagnostic,Derived panel variable,current or past only,bool,0
+base_model_complete_case,derived/diagnostic,Derived panel variable,current or past only,bool,0
