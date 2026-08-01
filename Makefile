@@ -1,4 +1,4 @@
-.PHONY: setup audit ingest enrich score validate index panel predict causality causal-ml robustness diagnostics significance figures analysis all
+.PHONY: setup audit ingest enrich score validate index panel predict compare-llms-weekly compare-llms-monthly causality causal-ml robustness diagnostics significance figures analysis all
 
 ifeq ($(OS),Windows_NT)
 PYTHON ?= .venv/Scripts/python.exe
@@ -33,6 +33,12 @@ panel:
 predict:
 	$(PYTHON) scripts/07_prediction_benchmarks.py
 
+compare-llms-weekly:
+	$(PYTHON) scripts/07b_llm_scfi_comparison.py
+
+compare-llms-monthly: compare-llms-weekly
+	$(PYTHON) scripts/07c_monthly_llm_scfi_comparison.py
+
 causality:
 	$(PYTHON) scripts/08_causality_analysis.py
 
@@ -51,6 +57,6 @@ significance:
 figures:
 	$(PYTHON) scripts/10_make_figures_tables.py
 
-analysis: predict causality causal-ml robustness diagnostics significance figures
+analysis: predict compare-llms-monthly causality causal-ml robustness diagnostics significance figures
 
 all: ingest enrich score validate index panel analysis

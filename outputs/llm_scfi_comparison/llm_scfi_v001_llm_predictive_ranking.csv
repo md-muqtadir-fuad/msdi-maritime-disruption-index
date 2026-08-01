@@ -1,0 +1,4 @@
+score_source,primary_comparison_cells,mean_rmse_rank,mean_mae_rank,mean_skill_rank,mean_rmse_log_change,mean_relative_rmse_vs_coverage,mean_oos_r2_vs_coverage,mean_directional_accuracy,rmse_cell_wins,adjusted_dm_squared_pairwise_wins,adjusted_dm_squared_pairwise_losses,predictive_point_rank,ranking_scope
+qwen_3_8b,10,1.3,1.2,1.3,0.25904371301174145,1.200877857519408,-0.4530279797866078,0.5722208105308408,7,0,0,1,equal-weight overall-max and dimension-mean7 RMSE ranks across five horizons
+gemma_2_9b_it,10,1.7,1.8,1.7,0.264342467188975,1.2307945722642382,-0.523977722236735,0.5912622360342067,3,0,0,2,equal-weight overall-max and dimension-mean7 RMSE ranks across five horizons
+qwen_2_5_7b,10,3.0,3.0,3.0,0.3245878103483978,1.5618830804161512,-1.4570531769453077,0.47309849249294594,0,0,0,3,equal-weight overall-max and dimension-mean7 RMSE ranks across five horizons

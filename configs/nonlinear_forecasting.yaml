@@ -1,0 +1,80 @@
+design:
+  seed: 20260712
+  inner_splits: 3
+  frequency:
+    weekly:
+      minimum_training_rows: 156
+      refit_every: 13
+      sequence_length: 12
+    monthly:
+      minimum_training_rows: 60
+      refit_every: 3
+      sequence_length: 6
+
+# Fixed values are the publication pre-specification used when --tune is absent.
+# The candidate lists are intentionally compact.  --tune evaluates them only
+# with nested, horizon-purged expanding-window validation inside each outer fit.
+models:
+  random_forest:
+    fixed:
+      n_estimators: 500
+      max_depth: 6
+      min_samples_leaf: 5
+      max_features: 0.7
+      bootstrap: true
+      n_jobs: -1
+    candidates:
+      - {n_estimators: 300, max_depth: 4, min_samples_leaf: 3, max_features: 0.5, bootstrap: true, n_jobs: -1}
+      - {n_estimators: 300, max_depth: 8, min_samples_leaf: 8, max_features: 0.7, bootstrap: true, n_jobs: -1}
+      - {n_estimators: 500, max_depth: 6, min_samples_leaf: 5, max_features: 0.7, bootstrap: true, n_jobs: -1}
+      - {n_estimators: 500, max_depth: 8, min_samples_leaf: 3, max_features: 1.0, bootstrap: true, n_jobs: -1}
+
+  xgboost:
+    fixed:
+      objective: reg:squarederror
+      n_estimators: 300
+      learning_rate: 0.03
+      max_depth: 2
+      min_child_weight: 5
+      subsample: 0.8
+      colsample_bytree: 0.8
+      reg_alpha: 0.1
+      reg_lambda: 5.0
+      tree_method: hist
+      n_jobs: 1
+    candidates:
+      - {objective: reg:squarederror, n_estimators: 200, learning_rate: 0.02, max_depth: 2, min_child_weight: 8, subsample: 0.8, colsample_bytree: 0.8, reg_alpha: 0.1, reg_lambda: 5.0, tree_method: hist, n_jobs: 1}
+      - {objective: reg:squarederror, n_estimators: 300, learning_rate: 0.03, max_depth: 2, min_child_weight: 5, subsample: 0.8, colsample_bytree: 0.8, reg_alpha: 0.1, reg_lambda: 5.0, tree_method: hist, n_jobs: 1}
+      - {objective: reg:squarederror, n_estimators: 400, learning_rate: 0.02, max_depth: 3, min_child_weight: 8, subsample: 0.8, colsample_bytree: 0.8, reg_alpha: 0.1, reg_lambda: 5.0, tree_method: hist, n_jobs: 1}
+      - {objective: reg:squarederror, n_estimators: 200, learning_rate: 0.05, max_depth: 3, min_child_weight: 3, subsample: 0.8, colsample_bytree: 0.8, reg_alpha: 0.1, reg_lambda: 1.0, tree_method: hist, n_jobs: 1}
+
+  lstm:
+    fixed:
+      hidden_size: 16
+      num_layers: 1
+      dropout: 0.0
+      learning_rate: 0.001
+      weight_decay: 0.0001
+      batch_size: 16
+      epochs: 40
+    candidates:
+      - {hidden_size: 8, num_layers: 1, dropout: 0.0, learning_rate: 0.001, weight_decay: 0.0001, batch_size: 16, epochs: 40}
+      - {hidden_size: 16, num_layers: 1, dropout: 0.0, learning_rate: 0.001, weight_decay: 0.0001, batch_size: 16, epochs: 40}
+      - {hidden_size: 32, num_layers: 1, dropout: 0.0, learning_rate: 0.0005, weight_decay: 0.0001, batch_size: 16, epochs: 60}
+
+  prophet:
+    fixed:
+      growth: linear
+      seasonality_mode: additive
+      changepoint_prior_scale: 0.05
+      seasonality_prior_scale: 1.0
+      yearly_seasonality: true
+      weekly_seasonality: false
+      daily_seasonality: false
+      uncertainty_samples: 0
+      regressor_prior_scale: 0.1
+    candidates:
+      - {growth: linear, seasonality_mode: additive, changepoint_prior_scale: 0.01, seasonality_prior_scale: 1.0, yearly_seasonality: true, weekly_seasonality: false, daily_seasonality: false, uncertainty_samples: 0, regressor_prior_scale: 0.1}
+      - {growth: linear, seasonality_mode: additive, changepoint_prior_scale: 0.05, seasonality_prior_scale: 1.0, yearly_seasonality: true, weekly_seasonality: false, daily_seasonality: false, uncertainty_samples: 0, regressor_prior_scale: 0.1}
+      - {growth: linear, seasonality_mode: additive, changepoint_prior_scale: 0.05, seasonality_prior_scale: 10.0, yearly_seasonality: true, weekly_seasonality: false, daily_seasonality: false, uncertainty_samples: 0, regressor_prior_scale: 0.1}
+      - {growth: linear, seasonality_mode: additive, changepoint_prior_scale: 0.1, seasonality_prior_scale: 10.0, yearly_seasonality: true, weekly_seasonality: false, daily_seasonality: false, uncertainty_samples: 0, regressor_prior_scale: 0.1}

@@ -1,0 +1,2290 @@
+PROPOSING A LARGE LANGUAGE MODEL-BASED DISRUPTION
+            INDEX FOR CONTAINER SHIPPING
+
+
+                              by
+
+
+                    ASHRAFUL HUDA ASIF
+                     STUDENT ID.: 2008109
+                              &
+                  JANNATUL MAOYA HOSSAIN
+                     STUDENT ID.: 2008120
+
+
+
+
+BACHELOR OF SCIENCE IN INDUSTRIAL AND PRODUCTION ENGINEERING
+
+
+
+
+   DEPARTMENT OF INDUSTRIAL AND PRODUCTION ENGINEERING
+
+    BANGLADESH UNIVERSITY OF ENGINEERING &TECHNOLOGY
+
+                    DHAKA, BANGLADESH
+
+
+                          June, 2026
+Proposing a Large Language Model Based Disruption Index for Container
+                                   Shipping
+
+
+
+                                       by
+
+                              Ashraful Huda Asif
+                                    2008109
+
+
+                           Jannatul Maoya Hossain
+                                    2008120
+
+
+                           A thesis submitted to the
+              Department of Industrial and Production Engineering
+                     in partial fulfillment for the degree of
+ BACHELOR OF SCIENCE IN INDUSTRIAL AND PRODUCTION ENGINEERING
+
+
+
+
+              Department of Industrial and Production Engineering
+             Bangladesh University of Engineering and Technology
+                              Dhaka, Bangladesh
+                                10th June, 2026
+                                        June, 2026
+
+
+
+                            CERTIFICATE OF APPROVAL
+
+The thesis titled “Proposing a Large Language Model Based Disruption Index for
+Container Shipping” submitted by Ashraful Huda Asif (Student ID: 2008109) and Jannatul
+Maoya Hossain (Student ID: 2008120), has been accepted as satisfactory in partial fulfilment
+of the requirement for the degree of Bachelor of Science in Industrial and Production
+Engineering on 10th June, 2026.
+
+
+
+
+     Approved by
+
+
+
+
+     Dr Syed Mithun Ali
+     Professor
+     Department of IPE, BUET
+
+
+
+
+                                             i
+                             CANDIDATE’S DECLARATION
+
+We hereby declare that this thesis is our own work and to the best of our knowledge it contains
+no materials previously published or written by another person, or has been accepted for the
+award of any other degree or diploma at Bangladesh University of Engineering and Technology
+(BUET) or any other educational institution, except where due acknowledgement is made. We
+also declare that the intellectual content of this thesis is the product of our own work and any
+contribution made to the research by others, with whom we have worked at BUET or
+elsewhere, is explicitly acknowledged.
+
+
+
+
+10th June, 2026
+                                                                     Md. Ashraful Huda Asif (2008109)
+
+
+
+
+                                                                     Jannatul Maoya Hossain (2008120)
+
+
+
+
+                                               ii
+Dedicated
+
+    to
+
+our family
+
+
+
+
+    iii
+                                                         Table of Contents
+
+
+CERTIFICATE OF APPROVAL ............................................................................................... i
+CANDIDATE’S DECLARATION ...........................................................................................ii
+Table of Contents ...................................................................................................................... iv
+List of Tables ............................................................................................................................ vi
+List of Figures ..........................................................................................................................vii
+Acknowledgement ................................................................................................................. viii
+Abstract: ..................................................................................................................................... 1
+1 Introduction ............................................................................................................................. 2
+2 Literature Review.................................................................................................................... 5
+   2.1 News-Based Economic Indices....................................................................................... 6
+       2.1.1 The Economic Policy Uncertainty Index ................................................................. 7
+       2.1.2 Implications for a Sector-Specific Maritime Index ................................................. 8
+   2.2 Text-Based Sentiment and the Media-Finance Literature .............................................. 8
+       2.2.1 Continuous Sentiment Extraction ............................................................................ 8
+       2.2.2 Regime-Dependent Informativeness ........................................................................ 9
+       2.3.3 Domain Adaptation and the Limits of Generic Dictionaries ................................... 9
+       2.3.4 Temporal Smoothing of Sentiment Indices ........................................................... 10
+   2.3 Large Language Models for Financial and Supply Chain Text Analysis ..................... 10
+       2.3.1 LLMs as Financial Text Classifiers ....................................................................... 10
+       2.3.2 Structured Prompting for Supply Chain Risk ........................................................ 11
+       2.3.3 Open-Source Models and Reproducibility............................................................. 12
+   2.4 Container Shipping Economics and the COVID 19 Disruption .................................... 12
+       2.4.1 A Maritime Disruption Taxonomy ........................................................................ 12
+       2.4.2 COVID-19 and Container Freight Rate Dynamics ................................................ 13
+       2.4.3 Broader Supply Chain Crisis Literature ................................................................. 14
+   2.5 Econometric Methods for Time-Series Validation ....................................................... 14
+       2.5.1 Vector Autoregression and Granger Causality ...................................................... 14
+       2.5.2 Stationarity, Cointegration, and Robust Inference ................................................. 15
+       2.5.3 Lag Selection ......................................................................................................... 16
+   2.6 Research Gap and Positioning of the Thesis.................................................................. 16
+3 Methodology ......................................................................................................................... 25
+   3.1 Data ................................................................................................................................ 27
+   3.2 Stage 1: LLM-Based Headline Classification................................................................ 27
+       3.2.1 Classification Framework ....................................................................................... 27
+
+
+                                                                       iv
+       3.2.2 Model and Inference Configuration ........................................................................ 28
+       3.2.3 Prompt Structure and Output Parsing ..................................................................... 28
+       3.2.4 Classification Output .............................................................................................. 28
+   3.3 Stage 2: Monthly Index Construction ............................................................................ 29
+       3.3.1 Candidate Index Formulations ................................................................................ 29
+       3.3.2 Selection of the Final Index .................................................................................... 29
+   3.4 Stage 3: Econometric Validation ................................................................................... 30
+       3.4.1 Stationarity and Cointegration ................................................................................ 30
+       3.4.2 VAR Specification .................................................................................................. 30
+       3.4.3 Granger-Causality Analysis .................................................................................... 31
+       3.4.4 Impulse Responses and Forecast Error Variance Decomposition .......................... 31
+       3.4.5 Diagnostic Tests and Regime Analysis................................................................... 31
+4 Results and Discussion ......................................................................................................... 32
+   4.1 Headline-Level Classification Results ........................................................................... 32
+   4.2 Monthly Disruption Index Right.................................................................................... 34
+   4.3 Association between the Disruption Index and the Freight Rates. ................................ 34
+   4.4 Stationarity and Cointegration Results .......................................................................... 35
+   4.5 Granger-Causality Results ............................................................................................. 36
+   4.6 Analysis of impulse response function. ......................................................................... 37
+   4.7 Forecast Error Variance Decomposition ........................................................................ 39
+   4.8 Time-Varying Timelike Correlation and Regime Dependence ..................................... 40
+   4.9 VAR Diagnostic Results ................................................................................................ 42
+   4.10 Overall Discussion ....................................................................................................... 42
+5 Conclusions and Recommendations ..................................................................................... 43
+   5.1 Conclusions .................................................................................................................... 43
+   5.2 Recommendations .......................................................................................................... 45
+References ................................................................................................................................ 46
+
+
+
+
+                                                                      v
+                                                              List of Tables
+
+Table 1: Mapping from prior contributions to methodology components developed in Section
+3................................................................................................................................................ 18
+Table 2: Analysis of Literature Review ................................................................................... 20
+
+
+
+
+                                                                        vi
+                                                           List of Figures
+
+Figure 1: Whole pipeline of Construction of the Container Shipping Disruption Index ......... 26
+Figure 2: Score Distribution of LLM-Based Headline Classification ..................................... 33
+Figure 3: Cross-Correlation Between the Disruption Index and Freight Index ....................... 35
+Figure 4: Granger-Causality Test Results Across Lags 1–6 (log(freight to Disruption) ......... 36
+Figure 5: Granger-Causality Test Results Across Lags 1–6 (Disruption to log(freight) ......... 37
+Figure 6: Impulse Response Functions from the VAR Model in Levels (log(freight to
+Disruption) ............................................................................................................................... 38
+Figure 7: Impulse Response Functions from the VAR Model in Levels (Disruption to
+log(freight) ............................................................................................................................... 38
+Figure 8: Forecast Error Variance Decomposition of Disruption equation ............................. 39
+Figure 9: Forecast Error Variance Decomposition of log-freight equation ............................. 40
+Figure 10: Rolling 24-Month Correlation Between the Disruption Index and Freight Index . 41
+
+
+
+
+                                                                     vii
+                                     Acknowledgement
+
+All praise and gratitude to the Almighty Allah for His infinite grace in the successful
+completion of this thesis.
+
+
+We acknowledge our profound indebtedness and express sincere gratitude to our supervisor
+and mentor Dr. Syed Mithun Ali, Professor, Department of Industrial & Production
+Engineering (IPE), BUET, Dhaka. He provided essential professional guidance, supervision,
+and constructive feedback throughout this research. Being part of his research group has been
+an enriching experience, fostering our development as independent researchers in supply chain
+management—specifically in applying large language models to the Container Shipping
+Disruption Index. We are deeply honored to have had his mentorship during our undergraduate
+thesis.
+
+
+We extend our deepest gratitude to the esteemed faculty members of the Department of
+Industrial and Production Engineering (IPE) at BUET for their invaluable guidance and
+support. Additionally, we express our heartfelt appreciation to our families, whose unwavering
+encouragement and support have been instrumental in our academic journey, enabling us to
+reach this milestone.
+We acknowledge the use of AI-based language tools, including Claude, ChatGPT, and Gemini,
+to clarify and refine certain sections of this thesis. These tools helped enhance the linguistic
+clarity and coherence of the text while maintaining the absolute technical integrity of our
+research.
+
+
+Finally, we are grateful to all of our friends and classmates for their constant motivation and
+support in completing this thesis on time
+
+
+
+
+                                              viii
+Abstract
+Container shipping disruptions impose substantial costs on global supply chains, yet tools to
+measure them in real time remain limited. Established news-based indicators rely on simple
+keyword counting, which cannot capture the specific language of maritime disruption or
+distinguish a genuinely critical headline from one that merely mentions trade. This study
+addresses that gap by building and validating the first container shipping disruption index
+derived from news headlines using a large language model. A corpus of 5,586 headlines
+spanning January 2015 to December 2025 was classified by an open-source, instruction-tuned
+language model against an established maritime disruption framework of two dimensions and
+seven themes, producing a graded relevance score for each headline rather than a yes-or-no
+match. These scores were aggregated into a monthly index after filtering out irrelevant
+coverage, then validated against the SCFI, the standard benchmark for container shipping costs.
+The index tracks freight rates closely, and the relationship strengthens markedly during acute
+disruptions while fading in calm periods. A time-series analysis reveals a clear, one-directional
+pattern: freight rate movements lead disruption coverage by one to two months, whereas
+coverage carries no predictive power for future rates. The media therefore reflects shipping
+shocks rather than anticipating them. The study delivers a transparent, reproducible tool for
+measuring disruption intensity and new evidence on how disruption signals travel between
+markets and news.
+Keywords: Shanghai Containerized Freight Index (SCFI), Disruption Index (DI).
+
+                                         Graphical Abstract
+
+
+
+
+                                               1
+1 Introduction
+Container shipping is the key channel of international merchandise trade. The United Nations
+Conference on Trade and Development emphasizes that maritime transport carries the
+overwhelming majority of internationally traded goods by volume, and within this system
+containerized liner shipping is responsible for the great bulk of manufactured cargoes that move
+between continents (Unctad, 2021). This seamless operation of this network is in the normal
+operation of things accepted as a virtually invisible precondition of the contemporary
+economical life: the factories get the parts at the right time, the shelves are always replenished,
+and the consumers do not face the lack of goods or the sudden increase or decrease of their
+price that happen to cross the continents. Only this disturbance of the system leads to its
+centrality being seen. The years 2015-2025 have provided a comparatively abundant list of
+such upheavals - the COVID-19 pandemic and the Suez Canal blockage of March 2021, the
+Shanghai port lockdown of 2022 and the Red Sea transit lockdown since the end of 2023 -
+uncovering how ill-equipped the current analytical equipment is to quantify the severity, nature
+and duration of shipping disruption in continuous time.
+
+
+The COVID-19 pandemic represents the most significant shipping likely to have happened in
+recent history. Factory shutdowns in early 2020 cascaded into uneven port demand and severe
+equipment imbalances, container vessels became trapped on the wrong side of trade lanes, and
+dwell times at major hubs rose substantially (Unctad, 2021). Khan and colleagues (Khan et al.,
+2022) document the pronounced volatility this generated in containerized freight indices using
+quantile-on-quantile methods . Nevertheless, the disruption was not some singular shock but
+rather a series of shocks that interacted over a span of over two years and the post pandemic
+period has been no less turbulent. The blockade of the Suez Canal, the closure of the Shanghai
+port and the capacity reallocation and the freight rate pressure caused by the Houthi and the
+disruption of Red Sea transit and its subsequent repositioning around the Cape of Good Hope
+each caused new waves of reallocation of capacities and the pressure of freight. These outbursts
+underscore one key point shipping disruption is not an isolated historical incident but a
+recurrent aspect of modern international trade, and the resulting impacts on freight markets,
+downstream producing also take their quantifiable toll and impacts on consumer welfare.
+
+
+With such disruptions being undoubtedly of great economic significance, the analytical
+infrastructure to quantify them in real time is, surprisingly, rather minimal. The regularly
+quoted freight indices, such as the Shanghai Containerized Freight Index (SCFI), Baltic Dry
+
+                                                2
+Index, Harpex Container Index, reflect the market price of shipping capacity but only as a
+reaction to disruption as opposed to disruption. The existence of spike in freight rates is
+confirmation that something is going on in the market; it does not reveal to the analyst what in
+the underlying supply chain is the most active of the themes of disruption or whether the system
+is being strained how long. News coverage, in contrast, carries with it abundant amounts of
+this contextual information, but in an unstructured format which is hard to put into a
+quantitative time series. The missing element has been a continuous, theme-decomposed and
+machine-readable index of the intensity of disruption which draws upon the open universe of
+modern news coverage, and which is calibrated against time-tested freight norms. The
+construction of such an index is the central concern of this thesis. The intellectual precedent is
+the Economic Policy Uncertainty Index of Baker and colleagues (Baker et al., 2016a), which
+demonstrates that newspaper coverage can be converted into a continuous quantitative measure
+for an intangible economic phenomenon — in their case, policy uncertainty. The technological
+facilitator is the fast maturation of open-source large language models, which have now made
+it feasible to classify large amounts of free text against a structured taxonomy without incurring
+proprietary application-programming-interface costs and without the manual coding cost that
+would otherwise be prohibitive on scale. Combining these two developments with a recent
+qualitative taxonomy of container shipping disruption developed by Munim (Munim, 2025),
+this thesis produces a monthly disruption index for the period 2015 to 2025 and tests its
+statistical relationship with the SCFI using standard time-series econometric methods.
+
+
+The problem that the given research will address can be summarized in a few words. The
+available literature includes on the one hand qualitative taxonomies of container shipping
+disruption as a result of thematic analysis of news reports on certain crises; on the other hand,
+freight indices to measure the market value of the shipping capacity; and, independently, news-
+based economic indices to other related areas such as macroeconomic policy uncertainty. The
+only thing it lacks to the best of our knowledge is a continuous, theme-decomposed, news-
+based disruption index that is specific to container shipping and has been built in a manner that
+can be fully replicated by other researchers using commodity hardware and without access to
+proprietary data.
+
+
+The timeliness of this thesis is apt on two fronts. The qualitative groundwork is now in place:
+Munim (Munim, 2025) provides a thematic taxonomy of container shipping disruption derived
+from systematic analysis of news articles during the COVID-19 crisis, identifying the
+                                                3
+dimensions, themes, and codes that distinguish disruption-relevant content from other
+coverage. The technical foundations are also ready: open-source instruction-tuned language
+models are now able to perform research-grade classification on hardware cost accessible even
+to undergraduate researchers, eliminating the major bottleneck of large-scale taxonomy-
+directed text classification. It is the gap of how to reconcile the two developments, to produce
+a reproducible monthly index, to be checked against a current freight index, that this thesis fills.
+The literature behind each of these assertions is described in some detail and a formal mapping
+of each of the preceding contributions into the respective element of the current methodology
+is given in the literature review
+
+
+The primary objective of this work is to construct a reproducible, continuous monthly index of
+container shipping disruption intensity for the period 2015 to 2025, derived from large
+language model-based classification of news headlines against the Munim (Munim, 2025)
+taxonomy, and to validate this index econometrically against the SCFI.
+This thesis can benefit us in three ways. Methodologically, it shows that, sector-specific
+disruption index can be entirely created using the free-open-source components on the freely-
+available cloud infrastructure, to overcome a question of reproducibility that lingers over a
+body of recent literature on the use of language-model-based financial and supply chain text
+analysis. The task of injecting the language model with instructions based on an existing
+qualitative taxonomy, absent of finetuning, demonstrates a tendency of "domain knowledge
+through prompting" which can be likely generalized to other sectoral implementations.
+
+
+The thesis constructs an empirically eligible operationalization of an earlier qualitative
+taxonomy into a monthly time series with continuous values and an econometric description of
+the dynamic interaction between this index and the best box freight reference point. Extending
+news-based index approach to the maritime space, the thesis contributes to the small, yet
+recently growing, research base that quantifies sector-specific disruption effects of media
+content. In practice, the resulting index can be effectively used as an analyst, policymaker, and
+supply chain manager of the descriptive continuous measure of shipping-sector stress. The
+theme-level decomposition also allows the practitioners to understand which channels of
+disruption are being most active at any point such as port congestion, container availability or
+freight cost, which are not possible to do when using aggregate freight indices. The pipeline,
+dataset, and prompt design can be replicated in full in zero monetary cost and thus reduce the
+entry cost of future researcher building up on this work.
+                                                 4
+The rest of this thesis is divided into five chapters. section 2 conducts a literature review of the
+existing literature in four streams, news-based economic indices, text-based sentiment and the
+media-finance tradition, language model applications in financial and supply chain text
+analysis, and container shipping economics, and concludes by formally stating the research gap
+and by mapping each aspect of the proposed methodology to its academic antecedent. Section
+3 outlines the three phases of the methodology, as follows: (1) the language-model-based
+classification pipeline; (2) the monthly index construction procedure; and (3) the econometric
+validation framework. Each stage is defined to the level required to reproduce individually, in
+terms of model and prompt specification, aggregation, and smoothing parameters and the test
+sequence exploited to characterize the disruption-freight relationship. Section 4 displays the
+empirical findings, such as the time-series behavior of the index over the sample, ranking the
+candidate index formulations with the Shanghai Containerized Freight Index, the estimates of
+the vector autoregression, the estimates of the Granger causality, the impulse response
+functions, the share of variance decomposition and the rolling correlations that describe the
+regime-dependent nature of the disruption-freight relationship.
+
+
+These findings are discussed in section 5 in relation to literature with a specific focus on the
+directionality of the disruption-freight relation, the index disclosability that is regime-specific,
+and the consequences of this evidence to the supply chain monitoring practice. Section 6
+concludes with a summary of the contributions, a statement of limitations, and a set of
+directions for future research.(Yazir et al., 2020)
+
+
+2 Literature Review
+Monthly news-based disruption index of container shipping is at the crossroads of four strands
+of research that until recently have been developed in relative isolation: the news-based
+economic indices tradition, the text-based sentiment and media-finance tradition, the newly
+flourishing large language model (LLM) literature in financial and supply chain text analysis,
+and the empirical literature on the economics of container shipping. Methodological validation
+of such an index also capitalizes on a fifth body of literature; that is the time-series econometric
+literature. In this chapter, each of these streams is briefly reviewed, which also serves the
+purpose of illustrating the methodological background upon which the current thesis is based
+as well as the gap that inspired it.
+
+
+
+
+                                                 5
+The review is structured in a way that it brings about the necessity of the next section. Section
+2.1 examines the news-based economic indices literature, anchored in the Economic Policy
+Uncertainty (EPU) Index of Baker, Bloom and Davis (Baker et al., 2016a), which establishes
+the foundational premise that newspaper coverage can be converted into a continuous
+quantitative measure. Section 2.2 reviews the text-based sentiment and media-finance
+literature, in which Tetlock (Tetlock, 2007), Tetlock and colleagues (Tetlock et al., 2008),
+Garcia (Garcia, 2013), Loughran and McDonald (Loughran & McDonald, 2011), and Arratia
+and colleagues (Arratia et al., 2021) collectively establish what information such indices carry,
+when this information is most useful, and how it should be aggregated and smoothed. Section
+2.4 turns to the recent and rapidly maturing literature on LLMs as tools for text classification
+in financial and supply chain settings, in which Kim, Muhn and Nikolaev (Kim et al., 2023),
+Lopez-Lira and Tang (Lopez-Lira & Tang, 2023), Fang and colleagues (Fang et al., 2026), and
+Yang and colleagues at the Qwen Team (Yang & Qwen, 2024) document a clear informational
+and operational advantage over keyword and dictionary methods. Section 2.5 reviews container
+shipping economics, with emphasis on COVID-19 era disruptions and the maritime disruption
+taxonomy of Munim (Munim, 2025) grounded in the thematic analysis methodology of Braun
+and Clarke (Braun & Clarke, 2006). Section 2.6 is a survey of time-series econometric
+techniques employed to test the resulting index. Section 2.7 then officially marks the gap in the
+research and traces every previous contribution to the appropriate aspect of the methodology
+constructed in section 3 and Section 2.8 brings the chapter to an end.
+
+
+This literature review is limited to peer-reviewed journal articles, working papers published in
+reputable research institutions, official publication of policies by intergovernmental
+organizations and authoritative econometric monographs. In cases where assertions are made
+based on a best-of-knowledge evaluation as opposed to a direct verification quote, it is made
+plain in the text as opposed to hiding a citation that tries to place excess confidence in its ability
+to be verified.
+
+
+2.1 News-Based Economic Indices
+The methodological history behind this thesis is that of the news-based literature of economic
+indices, whereby text-based reports of an economic phenomenon are transformed into a
+continuous, quantitative time series that is amenable to econometric analysis. The canonical
+contribution is the Economic Policy Uncertainty (EPU) Index of Baker, Bloom and Davis
+
+
+                                                  6
+(Baker et al., 2016a), which has become a reference point for subsequent text-based index
+construction across multiple economic domains.
+
+
+2.1.1 The Economic Policy Uncertainty Index
+Baker and colleagues (Baker et al., 2016a) construct a monthly index of policy-related
+economic uncertainty using newspaper coverage from ten major United States newspapers.
+Article counts are calculated on the coincidence of sets of keywords consisting of the terms:
+economic, policy and uncertainty. The resultant counts are then divided by the total number of
+articles in order to adjust differences between newspaper sizes and amount of historical
+coverage and averaged across the newspapers to yield a monthly time series. Next, the authors
+test EPU index versus other measures of economic uncertainty such as the Chicago Board
+Options Exchange Volatility Index and show that EPU innovations augment a nontrivial
+proportion of forecast error variance in investment and output in a panel of twelve countries.
+
+
+This work directly builds the index based on three methodological aspects of the EPU
+framework. First, the structure creates a premise that the versus of newspapers can be
+transformed into a continuous measure of a quantitative nature, which cannot be analyzed by
+econometrics, as long as the set of keywords targeted the phenomenon of interest. Second, it
+makes text-based indices institutionalized to be validated against the known market standards
+instead of viewing it as independent measurement. Third, it gives unapologetically open
+consideration to the possibility that news-based measures are more of a reflection than a cause
+of economic outcomes - an interpretive caveat that is likewise apparent in the literature
+surveyed in Section 2.3 and has been subsequently reiterated literally in the empirical results
+of section 4.
+
+
+The principal methodological limitation of the EPU approach, acknowledged by Baker and
+colleagues (Baker et al., 2016a) themselves, is its reliance on simple keyword matching. The
+classification based on keywords is unable to distinguish between those articles in which the
+terms of interest occur in the middle and those in which they occur by chance, as well as those
+in which the underlying phenomenon is discussed by other words. In this study, the current
+thesis will overcome this limitation, substituting keyword matching with large language model
+classification against a structured taxonomy, which has been reviewed in Section 2.4.
+
+
+
+
+                                               7
+2.1.2 Implications for a Sector-Specific Maritime Index
+
+The EPU approach has been scaled down to many areas and country specific conditions in the
+latter literature. None such continuous, news-based disruption index of container shipping is
+available in the literature we have reviewed to develop this thesis to the best of our knowledge.
+The UNCTAD Policy Brief on COVID-19 era container shipping (Unctad, 2021) documents
+the unprecedented surge in container freight rates and outlines policy implications for shipping
+disruption monitoring, but does not itself constitute a continuous measurement instrument. This
+fact, paired with the proven viability of the news-driven approach to the index exhibited by the
+EPU literature, inspires the sector-specific maritime disruption index developed in section 3.
+
+2.2 Text-Based Sentiment and the Media-Finance Literature
+
+Although the EPU framework confirms that news-based indices are viable, the general media-
+finite literature offers theoretical underpinnings to what information such indices can entail,
+when such information is the most valuable and whether the information is aggregated. In this
+section, four contributions of this literature are reviewed that directly influence the design of
+the disruption index: continuous sentiment extraction, regime-dependent informativeness,
+domain adaptation and temporal smoothing.
+
+
+2.2.1 Continuous Sentiment Extraction
+The foundational study in the media-finance literature is Tetlock (Tetlock, 2007), which
+extracts a continuous pessimism factor from the daily Wall Street Journal “Abreast of the
+Market” column using word-frequency analysis based on the Harvard IV-4 General Inquirer
+dictionary. The author records that high media pessimism foretells market prices in downward
+movements followed by a way back to the fundamentals and that supernormal pessimism or
+abnormally excessive or low pessimism foretells high performing market trading volume.
+Two methodological insights from Tetlock (Tetlock, 2007) directly motivate the design of the
+disruption index. The first is the application of a continuous measure of sentiment as opposed
+to a binary positive-negative measure, which maintains the gradient in the meaning which
+headlines and articles reflect. The second, and perhaps more significant, is the concomitant
+effect of intensity and range of coverage of information on the transmission of economic
+information: a small number of strongly negative articles, but large number of moderately
+negative articles, can have different content, and both measures need to be kept in any
+aggregate index. This two-level construction is explicitly a stimulus to the intensity-by-volume
+formulation of the disruption index formulated in Chapter 3.
+
+                                               8
+Tetlock, Saar-Tsechansky and Macskassy (Tetlock et al., 2008) extend this framework by
+processing approximately three hundred and fifty thousand Dow Jones News Service stories to
+extract firm-level sentiment, demonstrating that the linguistic content of news predicts both
+firm earnings and stock returns. The size of their analysis makes it clear that large-scale
+automated text processing of news content is not only feasible but informative, as a precedent
+that helps the batch-processing pipeline proposed in this thesis to classify the 5,586 headlines
+between the years 2015 and 2025.
+
+
+2.2.2 Regime-Dependent Informativeness
+A somewhat pertinent line of the media-finance literature is the informativeness of news-based
+measures that vary with the regime. Garcia (Garcia, 2013) documents that the predictive power
+of news-based sentiment for stock market returns is concentrated in recession periods, with
+substantially weaker signal during expansionary phases. The implication of this observation on
+the current thesis is as follows: since the disruption freight relationship is itself regime
+dependent, the information content of the news based index would be greatest at times of acute
+disruption and less at times of calm.
+
+
+This expectation of the maritime domain is confirmed by the rolling-weighted correlation
+analysis in Chapter 4. Correlation between disruption and freight is significantly increased
+during the COVID-19 crisis and zero in the intervening peaceful periods. To the best of our
+knowledge, this pattern has not previously been documented in the maritime domain, and it
+constitutes one of the more substantive empirical extensions of this thesis from the equity-
+market findings of Garcia (Garcia, 2013) into the container shipping setting.
+
+
+2.3.3 Domain Adaptation and the Limits of Generic Dictionaries
+Loughran and McDonald (Loughran & McDonald, 2011) demonstrate that general-purpose
+sentiment dictionaries perform poorly when applied to financial texts. About three-quarters of
+the words that the Harvard IV-4 dictionary calls negative do not mean negative in a monetary
+sense - a false rate that is enough to significantly bias measures of sentiment based on the
+generic word list. The authors develop a domain specific financial sentiment dictionary that
+does very well in clustering financial disclosures compared to the Harvard dictionary.
+
+
+The methodological implication to the current thesis is that domain is required to be adapted
+when applying any of the approaches to text-classification to a specialized domain like
+                                               9
+container shipping. Terminology of maritime disruption - blank sailings, demurrage, TEU
+imbalance, transshipment, port congestion - is specialized enough that a classification solution
+based on generic English-language word lists will tend to be poor. The present thesis achieves
+domain adaptation not through a custom dictionary but through prompt-engineered taxonomy
+injection in a large language model, an approach that combines the domain-specificity principle
+of Loughran and McDonald (Loughran & McDonald, 2011) with the contextual reasoning
+capacity reviewed in Section 2.4.
+
+
+2.3.4 Temporal Smoothing of Sentiment Indices
+The use of exponential moving average smoothing in the index construction follows the
+practice documented by Arratia, Avalos and Renedo-Mirambell (Arratia et al., 2021) in their
+treatment of sentiment analysis of financial news. The authors remark that the raw monthly
+sentiment indices are normally characterized with significant editorial noise that distorts the
+underlying signal, and that short-window smoothing will enhance the signal-to-noise ratio
+without significantly weakening the information of a crisis period. The three-month
+exponential moving average used in the present thesis represents a moderate smoothing
+window that retains crisis-period responsiveness while suppressing month-to-month noise of
+the kind discussed by Arratia and colleagues (Arratia et al., 2021).
+
+
+2.3 Large Language Models for Financial and Supply Chain Text Analysis
+Venturing into the financial and supply chain text analysis using large language models (LLMs)
+is a relatively new but quickly growing area of research. This subsection discusses three sets
+of this literature consecutively: the empirical demonstration of the informational advantage of
+the use of LLMs over a keyword and dictionary paradigm, the most immediate methodological
+antecedent of the structured-prompt method found in this thesis, and the reasons that lead to
+the selection of an open-source model.
+
+
+2.3.1 LLMs as Financial Text Classifiers
+Kim, Muhn and Nikolaev (Kim et al., 2023) demonstrate that LLM-derived measures of
+corporate risk extracted from earnings conference call transcripts outperform traditional bag-
+of-words approaches in predicting market volatility, firm-level investment decisions and
+capital structure choices. . The authors emphasize that Conditional language, future tense
+forms, and subjunctive constructions are contextual features of language that token-frequency
+
+
+                                              10
+methods fail to capture, yet are captured by LLMs. The results of this study demonstrate that,
+in financial contexts, the use of LLM-based classification offers a real informational benefit to
+keyword and dictionary methods, as well as to the more broadly speaking conclusions of the
+media-finance literature surveyed in Section 2.3.
+
+
+Lopez-Lira and Tang (Lopez-Lira & Tang, 2023) provide complementary evidence using a
+proprietary LLM to score the sentiment of news headlines and predict subsequent stock returns.
+The authors report that sentiment scores that are generated by the LLM generate positive
+abnormal returns when utilized as trading signals, especially in smaller firms. Even though this
+result confirms that information contained in the LLM-derived signals of news headlines, at
+least relative to those of longer corporate disclosures, are specific to that information, the result
+also demonstrates a recurring practical problem of this literature: studies that utilize proprietary
+application-programming-interface models are upheld by infrastructure whose internal
+weights, version history and access conditions are not available to the researcher in all respects.
+This is the reason behind a conscious decision to adopt an open-source model in the current
+thesis as 2.4.3 will discuss below.
+
+
+2.3.2 Structured Prompting for Supply Chain Risk
+The most directly relevant LLM application for the present thesis is Fang, Su, Wang and Wang
+(Fang et al., 2026), published in the International Journal of Production Economics, which
+develops an LLM framework for identifying digital supply chain risks from unstructured
+corporate disclosures. The authors develop structured prompt templates that direct GPT-based
+models to derive standardized and interpretable risk indicators and discover that the measures
+derived by the LLM can explain ten to fifteen percent more variance in firm-level market
+volatility, digital investment and inventory choices compared with traditional bag-of-words
+models. Importantly to the current thesis, the authors underline that such instability and
+interpretability issues that are plagued by zero-shot analyses of semantically complex and
+narrative business texts can be but alleviated by structured prompting.
+
+
+The methodological pattern established by Fang and colleagues (Fang et al., 2026) — namely,
+the injection of explicit domain knowledge and structured output requirements into the LLM
+prompt rather than into model fine-tuning — directly motivates the structured prompt design
+adopted in this thesis. As detailed in Chapter 3, the prompt embeds the complete Munim
+(Munim, 2025) taxonomy, an explicit zero-to-ten scoring rubric, a constrained theme
+                                                 11
+vocabulary and a fixed output schema, following exactly the principle that domain expertise
+can be supplied through prompting rather than through retraining.
+
+
+2.3.3 Open-Source Models and Reproducibility
+Yang and colleagues at the Qwen Team (Yang & Qwen, 2024) introduce the Qwen2 model
+family in a technical report from Alibaba Cloud, from which the Qwen2.5 release series
+subsequently descends. The instruction-tuned version of Qwen2.5-7B-Instruct model applied
+in this thesis is based on a variety of multilingual and code corpora that it has been trained on,
+and the reported performance is close to that of much larger proprietary models on traditional
+reasoning and classification tasks.
+
+
+There are three reasons based on this literature that educates the decision to use Qwen2.5-7B-
+Instruct instead of a closed-source option. First, open-source models can be version-locked: the
+version of model weights employed in this thesis are publicly available in archives and cannot
+be silently changed or changed by a provider decision that would lead to invalidation of the
+experimental results. Second, the seven-billion-parameter scale is an empirical trade-off
+between classification quality and computation at a scale reachable on free-tier GPU compute,
+making the entire classification pipeline to be executable in the completely free cloud
+infrastructure. Third, the instruction-tuned variant is specifically optimized for following
+structured prompts of the kind used in this thesis and demonstrated effective by Fang and
+colleagues (Fang et al., 2026).
+
+
+2.4 Container Shipping Economics and the COVID 19 Disruption
+The practical area of this thesis is container shipping and the quantification of disruption in this
+industry over the next 10 years starting in 2015. This section provides the review of the
+literature defining the empirical domain in three segments: the qualitative disruption taxonomy
+that provides the classification framework, the freight-rate dynamics literature that reason the
+selection of validation benchmark, and the larger literature on the supply chain crisis that
+contextualizes the current one.
+
+
+2.4.1 A Maritime Disruption Taxonomy
+The classification taxonomy used in this thesis is drawn from Munim (Munim, 2025),
+published in the Journal of Shipping and Trade. The author conducts a thematic analysis of one
+hundred news articles covering the container shipping crisis during COVID-19, applying the
+                                                12
+established thematic analysis methodology of Braun and Clarke (Braun & Clarke, 2006), to
+develop a cross-domain conceptual framework. The taxonomy differentiates between two
+aggregate levels of disruption - shipping disruptions (port, global container movement, freight-
+cost) and economic disruptions (supply, production, demand, COVID-19 related) and breaks
+them down into seven second-order themes and seventeen first-order codes.
+
+
+This taxonomy is technically useful to the current thesis because of two reasons. It is first of
+all based on a thematic methodology of extracting contemporary news, that is to say that the
+taxonomy is empirically stimulated precisely by the form of text that this thesis of actions
+creates. Second, it is hierarchically structured, which can be easily analyzed with multi-
+resolution: the LLM classifier may be requested to classify content among themes, and the
+resulting index can be analyzed either in bulk or at the theme level, to produce a more narrow-
+level interpretation.
+
+
+Earlier project drafts attributed this taxonomy to Durugbo and Al-Balushi (Durugbo & Al-
+Balushi, 2023). Independent verification confirms that Durugbo and Al-Balushi (Durugbo &
+Al-Balushi, 2023) is a separate systematic review article in Management Review Quarterly,
+and the specific COVID-19 container shipping taxonomy operationalized in this thesis is from
+Munim (Munim, 2025). The basis of the corrected attribution in this chapter is indicated in its
+reference list at the end of this chapter.
+
+
+2.4.2 COVID-19 and Container Freight Rate Dynamics
+Khan, Su, Khurshid and Umar (Khan et al., 2022), published in European Transport Research
+Review, apply a wavelet quantile-on-quantile approach to characterize the dynamic interaction
+between COVID-19 and shipping freight rates. The authors discover that the pandemic
+influenced greatly the freight costs in shipping with systematic effects across quantiles of
+effects of the pandemic strength and the freight rate distributions. Their analysis indicates that
+linear mean-effects estimators do not sufficiently explain pandemic-era volatility in the freight
+rates and that the impact of disruption shocks on freight rates depends on the intensity of a
+shock and the market regime existing.
+
+
+The Shanghai Containerized Freight Index (SCFI) which is the benchmark of validation in the
+current thesis is a value that is highly utilized in determining the spot freight rates of container
+routes that are based in Far East. The choice of the SCFI as the benchmark for the news-based
+                                                13
+disruption index constructed in this thesis follows the broader empirical practice of using it as
+a primary indicator of container-specific freight conditions, as exemplified by the maritime
+disruption literature including Khan and colleagues (Khan et al., 2022).
+
+
+The UNCTAD Policy Brief on container shipping during COVID-19 (Unctad, 2021)
+documents the sequence of disruptive events affecting the global container shipping network:
+factory shutdowns in early 2020, port congestion and container imbalance through 2020 and
+2021, and the eventual freight rate peak in early 2022. This time history may be directly
+observed in the disruption index time series shown in Chapter 4 that gives a qualitative type of
+construct validation of the index and the quantitative correlation of the index against the SCFI.
+
+
+2.4.3 Broader Supply Chain Crisis Literature
+The thematic-analysis approach used by Munim (Munim, 2025) is part of a broader resurgence
+of qualitative supply chain crisis research that emerged in response to the COVID-19
+disruption. Durugbo and Al-Balushi (Durugbo & Al-Balushi, 2023), in Management Review
+Quarterly, conduct a systematic review of the supply chain management literature concerning
+times of crisis, identifying structural factors that distinguish disruption-resilient supply chains
+from disruption-vulnerable ones. Although their systematic review does not itself provide a
+measurement instrument, it documents the breadth of the qualitative supply chain crisis
+literature and confirms that the maritime taxonomy of Munim (Munim, 2025) is consistent with
+the broader scholarly understanding of pandemic-era supply chain phenomena.
+
+
+2.5 Econometric Methods for Time-Series Validation
+Section 4 is based on an econometric validation of the disruption index, relying on a standard
+set of time-series instruments. In this section, the methodological background is discussed in
+three sections: vector autoregression and Granger causality, stationarity and cointegration
+testing and lag selection.
+
+
+2.5.1 Vector Autoregression and Granger Causality
+The econometric framework used in Chapter 4 follows the vector autoregression (VAR)
+methodology introduced by Sims (Sims, 1980). The VAR model considers both variables as
+potentially endogenous, and does not impose priori constraints as to which variables cause the
+others. This is especially suitable to the current thesis, in which the focal point of empirical
+
+
+                                                14
+inquiry is accurately whether the index of disruption based on the news predicts freight rates
+or otherwise.
+
+
+The Granger causality concept, formalized by Granger (Granger, 1969), provides the statistical
+test for whether the past values of one variable improve the prediction of another beyond what
+its own past values already provide. Although Granger causality does not imply causation in a
+philosophical sense, it offers a aimed-at-statistically rigorous characterization of lead-lag
+structure that is highly appropriate to the descriptive aims of the current thesis.
+
+
+Comprehensive technical treatments of VAR estimation, stability checks, and impulse response
+identification are provided by Hamilton (Hamilton, 1994) and Lütkepohl (Lütkepohl, 2005),
+which are used as the primary references throughout Chapter 4. Supplementary practitioner-
+oriented coverage is provided by Enders (Enders, 2015).
+
+
+2.5.2 Stationarity, Cointegration, and Robust Inference
+Stationarity testing is conducted using the Augmented Dickey-Fuller test of Dickey and Fuller
+(Dickey & Fuller, 1979). When two non-stationary series are integrated of the same order, the
+possibility of cointegration must be evaluated before VAR specification, following the
+residual-based test of Engle and Granger (Engle & Granger, 1987) and the trace-statistic test
+of Johansen (Johansen, 1991).
+
+
+A particularly important result for the present thesis is established by Sims, Stock and Watson
+(Sims et al., 1990), who show that VAR in levels produces consistent estimates for Granger
+causality testing even when variables are integrated of order one and not cointegrated. This
+finding explains the presence of the VAR-in-levels specification in Chapter 4 after the near
+failure in the rejection of cointegration in the Engle-Granger test.
+
+
+For robust inference in the presence of heteroscedasticity and autocorrelation, Newey and West
+(Newey & West, 1987) propose a positive semi-definite covariance estimator that is widely
+adopted for time-series regression. The methodological-extension discussion of Chapter 6 cites
+this estimator as a robustness test of inference to inference in the regime-dependent residual
+environment that is a hallmark of the disruption-freight relationship.
+
+
+
+
+                                                15
+2.5.3 Lag Selection
+There is a lag length selection in the Vector autoregression specification that is a trade-off
+between bias (too few lags) and loss of efficiency (too many lags). The information-criteria
+framework discussed by Burnham and Anderson (Burnham & Anderson, 2002) provides the
+methodological foundation for this choice. Akaike Information Criterion is desirable where
+prediction is required in the model selection whereas Bayesian Information Criterion comes up
+with denser models that could be used where the inference framework is adapted. The lag
+length employed in this thesis is chosen based on the Akaike Information Criterion as discussed
+in section 3, with sensitivity analyses with neighboring lag length values presented in section
+4.
+2.6 Research Gap and Positioning of the Thesis
+The above literature review reveals a research gap. As far as we understand based on the
+reviewed literature, no published continuous, monthly news-based index with the
+measurements of container shipping disruption intensity specifically which are built with a
+large language model and tested against an existing freight benchmark. The nearest precedents
+are deficient in this requirement in three different ways.
+
+
+First, the Economic Policy Uncertainty Index of Baker, Bloom and Davis (Baker et al., 2016a)
+provides the methodological template for a news-based index but uses simple keyword
+matching and is targeted at macroeconomic policy uncertainty rather than at sector-specific
+maritime disruption. The authors themselves recognize the weakness of the use of keywords
+(the reason being the presence of the keyword-matching weakness) and this urge to use a more
+semantically capable classifier in this thesis.
+
+
+Second, the LLM-based supply chain risk literature, exemplified by Fang and colleagues (Fang
+et al., 2026), focuses on firm-level disclosures rather than on aggregate market-level news
+coverage, and does not produce an aggregate index that can be validated against a market
+benchmark. The methodological building block which this thesis is based on is the structured-
+prompt design that was developed in that literature, although the scope of the empirical data is
+different.
+
+
+Third, the maritime economics literature on COVID-19 disruptions, including Khan and
+colleagues (Khan et al., 2022) and the UNCTAD Policy Brief (Unctad, 2021), characterizes
+the consequences of specific disruption events but does not offer a continuous measurement
+
+                                                  16
+instrument that operates at the monthly frequency and that can be extended naturally to
+subsequent disruption episodes.
+
+
+The present thesis addresses this gap by combining the qualitative taxonomy of Munim
+(Munim, 2025) with the structured-prompt LLM methodology of Fang and colleagues (Fang
+et al., 2026), validating the resulting monthly index against the Shanghai Containerized Freight
+Index in the empirical spirit of Khan and colleagues (Khan et al., 2022), using the vector-
+autoregression and Granger-causality framework of Sims (Sims, 1980) and Granger (Granger,
+1969). The thesis thereby incorporates qualitative taxonomy literature, the text classification
+literature based on LLM, the news-based economic indices literature and the time-series
+econometric literature to an all-in-one reproducible measurement system.
+
+
+The relationship between prior studies and the proposed methodology is summarized in Table
+1. This mapping explains why the current thesis is informed by, and builds on, existing
+literature.
+
+
+
+
+                                              17
+Table 1: Mapping from prior contributions to methodology components
+developed in Section 3.
+
+    Methodology Component                                  Scholarly Precedent
+ Overall paradigm: news coverage              Baker, Bloom and Davis (Baker et al., 2016a)
+ → continuous quantitative index
+validated against market benchmark
+     Joint intensity × volume         Tetlock (Tetlock, 2007); Tetlock and colleagues (Tetlock et al.,
+     formulation of the index                                     2008)
+Regime-dependent rolling-window                           Garcia (Garcia, 2013)
+      correlation analysis
+  Domain adaptation via prompt-       Loughran and McDonald (Loughran & McDonald, 2011); Fang
+  engineered taxonomy injection                    and colleagues (Fang et al., 2026)
+ Three-month exponential moving        Arratia, Avalos and Renedo-Mirambell (Arratia et al., 2021)
+       average smoothing
+  Structured prompt design with          Fang and colleagues (Fang et al., 2026); Kim, Muhn and
+      explicit output schema                           Nikolaev (Kim et al., 2023)
+   Open-source LLM selection          Yang and colleagues at the Qwen Team (Yang & Qwen, 2024);
+     (Qwen2.5-7B-Instruct)             reproducibility argument supported by Lopez-Lira and Tang
+                                                        (Lopez-Lira & Tang, 2023)
+Domain taxonomy (2 dimensions, 7 Munim (Munim, 2025); thematic-analysis foundation from Braun
+       themes, 17 codes)                    and Clarke (Braun & Clarke, 2006)
+  SCFI as validation benchmark;       Khan, Su, Khurshid and Umar (Khan et al., 2022); UNCTAD
+  COVID-era empirical context                              (Unctad, 2021)
+ Vector autoregression framework        Sims (Sims, 1980); Hamilton (Hamilton, 1994); Lütkepohl
+                                                (Lütkepohl, 2005); Enders (Enders, 2015)
+     Granger causality testing                           Granger (Granger, 1969)
+    Augmented Dickey-Fuller                     Dickey and Fuller (Dickey & Fuller, 1979)
+        stationarity test
+   Cointegration testing (Engle-          Engle and Granger (Engle & Granger, 1987); Johansen
+     Granger and Johansen)                                 (Johansen, 1991)
+ VAR-in-levels with I(1) variables              Sims, Stock and Watson (Sims et al., 1990)
+      and no cointegration
+  Lag-length selection by Akaike          Burnham and Anderson (Burnham & Anderson, 2002)
+      Information Criterion
+ HAC standard errors (robustness                 Newey and West (Newey & West, 1987)
+    extension in Chapter 6)
+Broader supply chain crisis context      Durugbo and Al-Balushi (Durugbo & Al-Balushi, 2023)
+
+
+
+                                                 18
+In this section, the four streams of research that bring together to build on the construction of
+a news-based disruption index of container shipping have been reviewed. The news-based
+economic indices literature establishes that newspaper coverage can be converted into a
+continuous quantitative measure (Baker et al., 2016a). The text-based sentiment and media-
+finance literature establishes what information such measures carry, why intensity and volume
+of coverage must both be retained, and why the information content of news-based measures
+is regime-dependent and domain-specific (Arratia et al., 2021; Garcia, 2013; Loughran &
+McDonald, 2011; Tetlock, 2007; Tetlock et al., 2008). The recent LLM-based text-analysis
+literature provides the technological enabler, with structured prompting demonstrated as an
+effective domain-adaptation strategy (Fang et al., 2026; Kim et al., 2023; Lopez-Lira & Tang,
+2023; Yang & Qwen, 2024). The maritime disruption literature supplies both the empirical
+domain and the qualitative taxonomy operationalized in this thesis (Braun & Clarke, 2006;
+Durugbo & Al-Balushi, 2023; Khan et al., 2022; Munim, 2025; Unctad, 2021). The time-series
+econometric literature supplies the validation toolkit (Burnham & Anderson, 2002; Dickey &
+Fuller, 1979; Enders, 2015; Engle & Granger, 1987; Granger, 1969; Hamilton, 1994; Johansen,
+1991; Lütkepohl, 2005; Newey & West, 1987; Sims, 1980; Sims et al., 1990). Table 2 describes
+the analysis of literature review.
+The combination of these inputs into one reproducible measurement pipeline forms the three-
+stage methodology developed in section 3. The first stage details the LLM-based classification
+of the news corpus against the Munim (Munim, 2025) taxonomy. The second step also covers
+how the monthly disruption index is built up such as the systematic comparison between
+candidate aggregation rules. The third phase outlines the econometric validation with Shanghai
+Containerized Freight Index. Here A comparative summary of the reviewed literature is
+presented in Table 2.
+
+
+
+
+                                               19
+Table 2: Analysis of Literature Review
+
+                       Methodology / Modelling
+     Author                                                  Summary                Field of Study
+                             Approach
+  (Baker et al.,      Newspaper-based keyword-         Foundational news-based     Macroeconomics
+     2016)          counting index methodology.       index methodology (EPU)       / News-Based
+                      Constructs a monthly index       using keyword matching          Indices
+                            of economic policy        across 10 US newspapers;
+                      uncertainty from articles in  demonstrates that text-based
+                        10 major US newspapers          indices carry economic
+                      containing combinations of     information beyond market
+                       "economic," "policy," and            prices. Used as the
+                    "uncertainty" terms. Validated methodological precedent for
+                    against the VIX (correlation ≈ index construction and as the
+                      0.58) and tested with panel      reference benchmark for
+                        VAR across 12 countries;           FEVD comparisons.
+                          forecast error variance
+                              decomposition.
+ (Tetlock, 2007)         Dictionary-based word-            Extracts continuous       Behavioural
+                     frequency analysis using the   pessimism factor from WSJ         Finance /
+                           Harvard IV-4 General         column; establishes that   Media-Finance
+                            Inquirer. Extracts a    media content reflects rather
+                     continuous pessimism factor    than drives markets and that
+                       from the daily Wall Street       intensity and volume of
+                          Journal "Abreast of the         coverage jointly carry
+                           Market" column, then      information. Motivates the
+                     regresses Dow Jones returns       intensity × volume index
+                       and trading volume on the        formulation used in this
+                           pessimism measure.                      thesis.
+ (Tetlock et al.,     Large-scale automated text       Processes ~350,000 Dow         Empirical
+     2008)           processing of approximately Jones News Service stories to        Finance /
+                       350,000 Dow Jones News          predict firm earnings and   Textual Analysis
+                       Service stories. Constructs stock returns. Establishes that
+                           firm-level sentiment       large-scale automated text
+                        measures using negative-      processing is informative;
+                       word frequencies and tests  supports the feasibility of the
+                        their predictive power for 5,586-headline pipeline used
+                       earnings and stock returns              in this thesis.
+                       through panel regressions.
+ (Garcia, 2013)      Constructs a sentiment index Documents that the predictive      Behavioural
+                          from New York Times       power of news sentiment for       Finance /
+                      financial columns spanning    stock returns is concentrated Regime Analysis
+                         1905–2005, then tests its       in recessions. Directly
+                       predictive power for stock         motivates the regime-
+                     returns across business-cycle dependent rolling-correlation
+                        regimes using time-series        analysis, where similar
+                          regressions with state-      concentration is observed
+                             dependent slopes.           during shipping crises.
+
+
+
+                                             20
+(Loughran &           Compares Harvard IV-4         Shows that general-purpose         Accounting /
+ McDonald,           General Inquirer dictionary    sentiment dictionaries fail in      Financial
+   2011)               against a purpose-built            financial settings and     Textual Analysis
+                   financial sentiment dictionary   constructs a domain-specific
+                    using 10-K corporate filings.    lexicon. Motivates domain
+                    Tests classification accuracy      adaptation in the present
+                     and downstream predictive         thesis, achieved here via
+                     power for trading volume,     taxonomy-injected prompting
+                         returns, and fraud.                rather than custom
+                                                               dictionaries.
+(Arratia et al.,        Methodological chapter         Documents the standard        Computational
+    2021)            reviewing sentiment-index           practice of EMA-style         Finance /
+                     construction techniques for         smoothing in financial        Sentiment
+                       financial news. Discusses          sentiment indices and         Analysis
+                   smoothing (moving averages,           justifies short-window
+                           exponential moving              smoothing for noise
+                      averages), noise-reduction         reduction. Cited as the
+                       principles, and signal-to-     precedent for the EMA(3)
+                      noise diagnostics for daily    smoothing used in the final
+                   and monthly sentiment series.            index formulation.
+ (Fang et al.,          Structured-prompt large    Develops a structured-prompt       Supply Chain
+    2026)           language model framework         LLM framework for supply         Management /
+                           applied to corporate       chain risk extraction from         LLM
+                    disclosures. Designs prompt          corporate disclosures,       Applications
+                      templates that guide GPT-    showing 10–15% incremental
+                        based models to extract       variance explanation over
+                      standardized, interpretable   bag-of-words methods. Most
+                   risk indicators, then validates       direct methodological
+                     the LLM-derived measures        precedent for the structured
+                   through panel regressions and prompting approach used in
+                          behavioral inventory                  this thesis.
+                               simulations.
+ (Kim et al.,            Applies large language        Demonstrates that LLM-          Empirical
+   2023)                 models (GPT-based) to       derived risk measures from         Finance /
+                        earnings conference call        earnings call transcripts    Generative AI in
+                           transcripts to extract      outperform bag-of-words          Research
+                            continuous, multi-        approaches for predicting
+                     dimensional risk measures.         volatility and firm-level
+                     Benchmarks LLM-derived         investment. Establishes that
+                       measures against bag-of-              LLM contextual
+                          words baselines using        understanding provides a
+                   regressions predicting market         genuine informational
+                           volatility, firm-level      advantage over keyword
+                         investment, and capital                 methods.
+                                 structure.
+ (Sims et al.,     Theoretical paper establishing       Establishes that VAR in      Econometrics /
+    1990)           the distributional properties     levels produces consistent       Unit-Root
+                   of OLS estimators and F-tests          estimates for Granger         Theory
+                      in VAR models containing          causality even with I(1)
+                          I(1) variables. Proves             variables and no
+
+                                            21
+                 consistency of VAR-in-levels      cointegration. Justifies the
+                    estimation for Granger        VAR-in-levels specification
+                 causality testing even without   used after the Engle-Granger
+                         cointegration.           test returned borderline (p =
+                                                      0.063) non-rejection.
+  (Dickey &           Derives the asymptotic       Foundational paper for the      Econometrics /
+ Fuller, 1979)        distribution of the OLS      Augmented Dickey-Fuller           Unit-Root
+                     estimator in a first-order       unit root test used for         Testing
+                    autoregression with a unit          stationarity testing
+                    root, and tabulates critical
+                 values for testing the null of a
+                     unit root. Introduces the
+                  (Augmented) Dickey-Fuller
+                                 test.
+  (Engle &         Defines cointegration as a          Foundational paper for      Econometrics /
+Granger, 1987)         long-run equilibrium          cointegration testing. Used   Cointegration
+                    relationship between non-          for the Engle-Granger
+                  stationary series. Develops a    residual-based cointegration
+                      residual-based two-step             test in Chapter 4.
+                   procedure: regress one I(1)
+                   series on another, then test
+                  the residuals for stationarity
+                   using an ADF-style test on
+                            the residuals.
+  (Johansen,         Develops the maximum           Provides the Johansen trace    Econometrics /
+    1991)               likelihood (trace and     test for cointegration. Used as  Cointegration
+                  maximum-eigenvalue) tests           the second cointegration
+                   for cointegration in vector            robustness check.
+                      autoregressive models.
+                    Provides a systems-based
+                     alternative to the Engle-
+                   Granger residual approach
+                  that simultaneously tests for
+                  the number of cointegrating
+                            relationships.
+(Newey & West,       Develops a kernel-based         Standard HAC covariance       Econometrics /
+    1987)             heteroscedasticity- and         estimator. Suggested as a   Robust Inference
+                    autocorrelation-consistent       robustness extension in the
+                 (HAC) covariance estimator. limitations section of Chapter
+                    Guarantees positive semi-           4 to address residual
+                    definiteness via a Bartlett      heteroscedasticity in crisis
+                     kernel weighting scheme                    periods.
+                          applied to lagged
+                          autocovariances.
+  (Hamilton,        Comprehensive graduate-         Comprehensive monograph        Econometrics /
+    1994)           level monograph on time-       on time-series econometrics.      Reference
+                 series econometrics. Provides Used as the primary reference        Monograph
+                         unified treatment of      for VAR estimation, stability
+                 stationarity, VAR estimation,             checks, and log-
+                   impulse response analysis.       transformation justification.
+
+                                          22
+  (Lütkepohl,     Authoritative graduate-level      Authoritative reference for    Econometrics /
+    2005)           reference for multivariate        multivariate time-series      Multivariate
+                  time-series methods. Covers        methods, including VAR         Time Series
+                VAR identification, structural         identification, impulse
+                     decompositions, impulse           response analysis, and
+                   response analysis, forecast         forecast error variance
+                error variance decomposition, decomposition. Provides the
+                         and cointegration in      technical foundation for the
+                       multivariate systems.     IRF and FEVD computations
+  (Burnham &           Information-theoretic        Reference for information-       Statistics /
+Anderson, 2002) treatment of statistical model         criterion-based model       Model Selection
+                  selection. Develops the AIC       selection. Justifies the AIC
+                   framework and contrasts it       choice for VAR lag-length
+                   with BIC and other criteria       selection (selected p = 3).
+                for prediction-oriented versus
+                 identification-oriented model
+                          selection contexts.
+    (Braun &           Methodological paper        Methodological foundation        Qualitative
+  Clarke, 2006)     formalising the six-phase    for thematic analysis. Cited to     Research
+                  thematic analysis procedure     support the qualitative rigour    Methodology
+                         for qualitative data:          of the Munim (2025)
+                   familiarisation, initial code    taxonomy that grounds the
+                    generation, theme search,      LLM classification scheme.
+                        theme review, theme
+                       definition, and report
+                              production.
+ (Enders, 2015) Practitioner-oriented graduate Standard graduate textbook             Applied
+                    textbook on applied time-          on applied time-series      Econometrics /
+                        series econometrics.             methods. Used as a          Textbook
+                       Emphasises empirical      supporting reference for VAR
+                  implementation of unit-root          practice and diagnostic
+                  tests, ARIMA models, VAR,                 interpretation.
+                      and cointegration, with
+                      applied diagnostics and
+                      interpretation guidance.
+ (Lopez-Lira &       Uses a proprietary LLM      Shows that proprietary LLM-       Empirical Finance /
+                                                                                    LLM Forecasting
+   Tang, 2023)        (ChatGPT) to score the      generated sentiment predicts
+                 sentiment of news headlines,        subsequent stock returns.
+                       then tests whether the     Used to support the viability
+                    resulting sentiment scores        of LLM scoring of news
+                     predict subsequent stock    headlines and to motivate the
+                     returns. Trading-strategy    open-source model choice in
+                    backtests across different          the present thesis for
+                  firm-size segments and time              reproducibility.
+                               windows.
+(Yang & Qwen,      Technical report describing        Technical report for the     Natural Language
+                                                                                   Processing / Open-
+      2024)      the Qwen2 open-source large Qwen2 family of open-source              Source LLMs
+                      language model family.      LLMs from which Qwen2.5-
+                 Documents pre-training data,         7B-Instruct (used in this
+                instruction-tuning procedures,      thesis) descends. Provides
+
+                                           23
+                   and benchmark performance           benchmark performance,
+                             across reasoning,        training methodology, and
+                        classification, code, and      instruction-tuning details
+                        multilingual evaluation    supporting the model choice.
+                                   suites.
+(Munim, 2025)      Qualitative thematic analysis Conducts thematic analysis of       Maritime Economics
+                                                                                      / Shipping Crisis
+                  of 100 news articles covering 100 news articles to develop               Analysis
+                       the COVID-19 container       the cross-domain disruption
+                      shipping crisis, following     taxonomy (2 dimensions, 7
+                       Braun and Clarke (2006)    themes, 17 codes) used in this
+                  procedures. Develops a cross-          thesis. Note: this is the
+                            domain conceptual          correct attribution for the
+                       framework comprising 2          taxonomy; earlier project
+                        aggregate dimensions, 7         drafts misattributed it to
+                   second-order themes, and 17           Durugbo & Al-Balushi
+                             first-order codes.                  (2023).
+ (Khan et al.,     Wavelet quantile-on-quantile       Uses wavelet quantile-on-      Maritime Economics
+                                                                                       / Freight Rate
+   2022)               regression methodology.             quantile methods to            Dynamics
+                         Examines the dynamic           characterise COVID-19
+                   interaction between COVID-         impacts on freight indices
+                     19 pandemic intensity and     including the SCFI. Justifies
+                         Baltic shipping freight   the choice of the SCFI as the
+                          indices across the full     validation benchmark and
+                     conditional distributions of       provides quantile-based
+                      both variables and across    evidence of pandemic-driven
+                             frequency bands.             freight rate volatility.
+(Durugbo & Al-      Systematic literature review   Systematic review of supply         Supply Chain
+                                                                                       Management /
+ Balushi, 2023)     (PRISMA-style protocol) of            chain crisis literature.   Systematic Review
+                      supply chain management      Included for completeness as
+                  research published during and            the work originally
+                          around crisis periods.      referenced in early drafts;
+                    Synthesizes findings across          note that the disruption
+                    multiple disruption contexts   taxonomy used in this thesis
+                    and identifies research gaps.    is from Munim (2025), not
+                                                    from this systematic review.
+(Unctad, 2021)             Official policy brief           Official policy brief      Policy / Maritime
+                                                                                           Trade
+                         synthesizing trade-data      documenting the temporal
+                   analysis with narrative case-         narrative of COVID-19
+                    tracing. Compiles container   container shipping disruption
+                          shipping volume, port      (factory shutdowns → port
+                          congestion, container        congestion → freight rate
+                     imbalance, and freight rate     peak). Provides qualitative
+                           data to document the        validation context for the
+                       temporal sequence of the    disruption index time series.
+                         COVID-19 disruption.
+ (Sims, 1980)             Introduces the Vector     Seminal VAR methodology            Econometrics /
+                                                                                        Time-Series
+                         Autoregression (VAR)       paper. Justifies treating both      Methodology
+                     modelling approach. Treats         the disruption index and
+                     all variables as potentially     freight rates as potentially
+                      endogenous and estimates
+
+                                            24
+                     each as a function of lagged           endogenous in the
+                     values of itself and all other       econometric analysis.
+                    variables; demonstrates VAR
+                             applications to
+                             macroeconomic
+                              identification.
+ (Granger, 1969)       Formalizes the concept of        Foundational definition of       Econometrics /
+                                                                                        Causality Testing
+                    predictive (Granger) causality      Granger causality. Provides
+                      through F-tests on whether       the statistical framework for
+                        the lagged values of one         the central finding of the
+                          variable improve the         thesis: freight rates Granger-
+                    prediction of another beyond      cause disruption coverage but
+                      what its own lagged values               not vice versa.
+                        provide. Implements via
+                     comparison of restricted and
+                          unrestricted models.
+
+3 Methodology
+This thesis develops and validates a monthly, news-based disruption index for the container
+shipping sector using a three-stage methodological framework. The first stage applies a large
+language model (LLM) to classify container-shipping-related news headlines according to their
+disruption relevance. The second stage aggregates the headline-level classification outputs into
+alternative monthly index formulations and selects the final disruption index. The third stage
+evaluates the empirical validity and econometric behaviour of the selected index by comparing
+it with the Shanghai Containerized Freight Index (SCFI), which is used as the external freight-
+market benchmark. Figure 1 shows the whole pipeline of construction of the container shipping
+disruption index.
+The overall research design follows the broader logic of news-based index construction, where
+textual information is converted into a continuous quantitative indicator and then assessed
+against observable economic or market variables(Baker et al., 2016b; Tetlock, 2007). However,
+this study departs from traditional keyword-counting approaches by using contextual LLM-
+based classification. This approach is intended to capture the meaning and disruption relevance
+of headlines more effectively than simple token-frequency methods, particularly because
+container shipping disruptions may be expressed through varied and context-dependent
+language(Fang et al., 2026; Kim et al., 2023). Therefore, the methodology combines automated
+text interpretation, index construction, and time-series econometric validation within a single
+reproducible analytical pipeline. Now, the whole pipeline of construction of the container
+shipping disruption index is shown in figure 1.
+
+
+
+                                              25
+                                             STAGE 1 — Data collection
+
+
+
+                                                                                 Disruption taxonomy
+              5,586 news headlines
+                                                                 7 themes · 17 first-order codes (Durugbo & Al-Balushi,
+          2015–2025 · multiple newspapers
+                                                                                          2023)
+
+                                                          ▼
+
+                               STAGE 2 — LLM classification (Qwen2.5-7B-Instruct)
+
+
+
+                                              Prompt engineering
+                    System prompt: taxonomy + scoring rules (0–10) + batch of 5 headlines per call
+
+                                                          ▼
+
+                                     Qwen2.5-7B-Instruct (local GPU inference)
+                      Float16 precision · Kaggle T4 GPU · ~1,100 calls · Free, no API key needed
+
+                                                          ▼
+
+                                               JSON output per headline
+                  score (0–10) · themes[ ] · dimension (shipping / economic / both / none) · reasoning
+
+
+               “Port congestion worsens at LA” → score: 8, themes: [port_disruption], dim: shipping
+
+
+                         “Disneyland measles outbreak” → score: 0, themes: [ ], dim: none
+
+                                                          ▼
+
+                                         Output: classified_headlines.csv
+                     5,586 rows × 6 columns (headline, date, score, themes, dimension, reasoning)
+
+                                                          ▼
+
+
+                                       STAGE 3 — Monthly index construction
+
+
+         Step A: Filter
+                                                   Step B: Aggregate                            Step C: Smooth
+Keep only score > 3 Remove 75%       →                                             →
+                                                 Per month: mean × count                   EMA span = 3 Reduce spikes
+             noise
+
+
+
+                                         DIₜ = EMA₃ [ mean(scores) × √count]
+
+                                                          ▼
+
+                                              Monthly Disruption Index
+                                    119 overlapping months (Feb 2016 – Dec 2025)
+
+                                                          ▼
+
+                                 STAGE 4 — Econometric validation (VAR analysis)
+
+
+
+            Shanghai freight index (SCFI)                                    VAR model + Granger causality
+            Weekly data → monthly average                            ADF · lag selection · IRF · FEVD · cross-correlation
+
+                                                          ▼
+
+               Correlation: r = 0.79                                             Granger: Freight → Media
+Strong co-movement between disruption index and freight            p = 0.0018 (highly significant) Freight leads media by 1–
+                       rates                                                               2 months
+
+    Figure 1: Whole pipeline of Construction of the Container Shipping Disruption Index
+
+
+                                                          26
+3.1 Data
+The textual dataset used in this study consists of 5,586 container-shipping-related news
+headlines with corresponding publication dates covering the period from January 2015 to
+December 2025. The publication dates are parsed from a YYYYMMDD integer field.
+Observations with missing headline or date values are removed, and the remaining dataset is
+arranged chronologically before further processing. This ensures that the subsequent monthly
+aggregation and time-series analysis are conducted on a clean and temporally ordered corpus.
+
+
+The validation benchmark used in the study is the Shanghai Containerized Freight Index
+(SCFI), collected at monthly frequency(Khan et al., 2022). The SCFI is selected because it
+directly reflects container freight-market conditions and has been used in prior empirical work
+on container shipping and pandemic-era freight dynamics. In this thesis, the SCFI is treated as
+a defensible market benchmark for validating the constructed disruption index. However, the
+choice should be interpreted as a methodological decision rather than as a claim that SCFI is
+the only or universally accepted benchmark for container freight-market disruption.
+
+
+3.2 Stage 1: LLM-Based Headline Classification
+3.2.1 Classification Framework
+In the first stage, each news headline is classified using an LLM-based scoring framework.
+Every headline is assigned a disruption relevance score on a 0–10 ordinal scale, where higher
+values indicate stronger disruption relevance. In addition, each headline is assigned to one or
+more disruption themes(Munim, 2025) and tagged with an aggregate dimension: shipping,
+economic, both, or none.
+
+
+The classification framework is based on the cross-domain disruption taxonomy developed by
+Munim (2025). This taxonomy consists of two aggregate dimensions, seven second-order
+themes, and seventeen first-order codes(Braun & Clarke, 2006). The complete taxonomy is
+inserted into the model prompt so that the LLM performs classification within a clearly defined
+domain-specific structure(Loughran & McDonald, 2011). This prompt-based domain
+adaptation is important because general-purpose textual approaches may misclassify
+specialized shipping and financial language. Instead of relying on a fixed keyword dictionary,
+this study uses structured prompting to guide the model toward context-sensitive interpretation
+of container-shipping disruption signals.
+
+
+                                              27
+3.2.2 Model and Inference Configuration
+Headline classification is performed using Qwen2.5-7B-Instruct, an open-source instruction-
+tuned LLM derived from the Qwen model family(Yang & Qwen, 2024). The use of an open-
+source model supports greater reproducibility because the model version can be fixed and
+reused, unlike proprietary API-based systems where model behaviour may change over
+time(Lopez-Lira & Tang, 2023).
+
+
+The model is loaded in float16 precision with automatic device mapping and executed in a
+Kaggle dual-T4 GPU environment. Inference is conducted in batches of five headlines per
+model call. The generation settings are fixed as follows: max_new_tokens = 2048, temperature
+= 0.1, top_p = 0.9, and do_sample = True. The low temperature setting is used to reduce output
+variability and produce near-deterministic responses. However, because sampling remains
+enabled, the output cannot be considered fully deterministic at the bit level.
+
+
+3.2.3 Prompt Structure and Output Parsing
+The model prompt contains four fixed components that remain unchanged across all 1,118
+classification batches. These components are: the full disruption taxonomy, a 0–10 scoring
+rubric with anchored descriptions, a constrained vocabulary of valid theme labels, and a strict
+JSON output schema. This structured prompting strategy is used to increase consistency,
+improve interpretability, and make the classification output suitable for downstream
+quantitative analysis(Fang et al., 2026).
+
+
+The model responses are parsed using a two-step fallback procedure. First, the parser attempts
+to identify and extract the complete JSON array from the model output. If this fails, a secondary
+strategy extracts individual JSON objects using regular expressions. When fewer than five
+objects are successfully recovered from a batch, the missing entries are replaced with zero-
+score placeholders to preserve alignment between the original headline list and the
+classification output. Progress is checkpointed every twenty batches to reduce the risk of data
+loss under the computational session limit.
+
+
+3.2.4 Classification Output
+The LLM classification produced a highly sparse disruption-score distribution. Out of 5,586
+headlines, 4,222 headlines, or 75.6%, received a score of 0. A further 569 headlines, or 10.2%,
+received scores between 1 and 3; 269 headlines, or 4.8%, received scores between 4 and 6; and
+
+                                               28
+526 headlines, or 9.4%, received scores between 7 and 10. This distribution indicates that a
+large share of the original news corpus was not directly disruption-relevant, which justifies the
+use of noise-resistant monthly aggregation procedures in the second stage.
+
+
+The final classification output also contains 849 zero-score placeholders, of which 847 are
+marked as missing and 2 are marked as parse errors. These placeholders represent
+approximately 15.2% of all headlines and 20.1% of all zero-score observations. Therefore,
+placeholder zeros are not treated as equivalent to genuine zero-disruption classifications. They
+are acknowledged as a potential source of measurement error and should be considered when
+interpreting the reliability of the final index.
+
+
+3.3 Stage 2: Monthly Index Construction
+3.3.1 Candidate Index Formulations
+After headline-level classification, the disruption scores are aggregated to monthly frequency.
+Eight base index formulations are constructed to capture different theoretical dimensions of
+disruption intensity and disruption volume. These formulations include a raw mean-intensity
+measure(Tetlock, 2007), a raw volume-sum measure(Baker et al., 2016b), relevant-only
+intensity measures, intensity-by-volume formulations, logarithmic and square-root volume-
+scaled measures(Manning et al., 2008), a high-impact headline ratio, and a shipping-theme
+coverage count based on the disruption taxonomy.
+
+
+A three-month exponential moving average is then applied to each base formulation to reduce
+short-term editorial noise and month-to-month volatility(Arratia et al., 2021). This procedure
+generates sixteen candidate index series in total: eight unsmoothed base series and eight
+corresponding smoothed series. The purpose of constructing multiple candidate formulations
+is to evaluate which aggregation method best reflects observable freight-market disruption
+while maintaining a theoretically defensible relationship between headline intensity, headline
+frequency, and market conditions.
+
+
+3.3.2 Selection of the Final Index
+The final disruption index is selected as the candidate formulation with the highest absolute
+Pearson correlation with log-SCFI. The selected formulation is:
+
+
+𝐷𝐼𝑡 = 𝐸𝑀𝐴3 [𝑠̅𝑡 × √𝑛𝑡 ]                                                                     (1)
+
+                                                   29
+In this formulation, 𝑠‾𝑡 denotes the mean disruption score of all headlines in month 𝑡, 𝑛𝑡 denotes
+the monthly headline count, and EMA3 denotes the three-month exponential moving average
+applied to reduce short-term fluctuations in the index.
+This formulation combines three components. The mean score term captures the average
+disruption intensity of the monthly news flow. The square-root volume term introduces
+sublinear scaling, allowing the index to account for headline volume while preventing high-
+volume months with weak disruption signals from dominating the index. The three-month
+EMA smooths temporary fluctuations and reduces the influence of short-term editorial noise.
+
+
+3.4 Stage 3: Econometric Validation
+3.4.1 Stationarity and Cointegration
+The econometric validation begins by examining the time-series properties of the disruption
+index and the freight benchmark. Augmented Dickey–Fuller tests(Dickey & Fuller, 1979)
+indicate that both the disruption index and log-SCFI are integrated of order one, I(1), in levels
+and become stationary after first differencing. The raw, non-logged SCFI series tests as
+stationary in levels, which motivates the use of log-SCFI in the bivariate econometric analysis
+so that both variables share the same integration order.
+
+
+3.4.2 VAR Specification
+Because the disruption index and log-SCFI are I(1) but not cointegrated, the study estimates a
+bivariate Vector Autoregression model in levels(Sims et al., 1990). The VAR framework treats
+both variables as potentially endogenous and allows the dynamic interaction between the
+disruption index and the freight benchmark to be examined without imposing a single
+dependent-independent variable structure(Sims, 1980).
+
+
+Lag length is selected using the Akaike Information Criterion(Burnham & Anderson, 2002),
+which selects a six-lag specification. The fitted VAR model satisfies the eigenvalue stability
+condition, indicating that the estimated system is dynamically stable. This specification is then
+used for Granger-causality testing, impulse-response analysis, and forecast error variance
+decomposition.
+
+
+
+
+                                               30
+3.4.3 Granger-Causality Analysis
+Granger-causality tests(Granger, 1969) are conducted in both directions across lags 1–6. The
+tests are performed using both level variables and first-differenced variables to assess whether
+the direction of predictive association is robust to specification choice.
+
+In the levels specification, log-SCFI Granger-causes the disruption index at lags 1–4, with p-
+values ranging from 0.0044 to 0.0443. In contrast, the disruption index does not Granger-cause
+log-SCFI at lags 1–5, although the smallest p-value appears at lag 6 with (p = 0.0857).
+
+
+3.4.4 Impulse Responses and Forecast Error Variance Decomposition
+Impulse response functions are estimated over a twelve-month horizon to examine the dynamic
+response of each variable to shocks in the VAR system(Lütkepohl, 2005). A forecast error
+variance decomposition is also conducted to quantify the proportion of each variable’s forecast
+error variance explained by shocks to itself and to the other variable.
+
+
+The orthogonalized variance decomposition uses Cholesky identification with the disruption
+index ordered first. Under this ordering, freight shocks explain an increasing share of the
+disruption index’s forecast error variance, rising from approximately 1% at horizon 1 to about
+20% at horizon 11. Similarly, disruption-index shocks explain an increasing share of freight
+variance, rising from approximately 4% at horizon 1 to about 36% at horizon 11.
+
+
+3.4.5 Diagnostic Tests and Regime Analysis
+Diagnostic tests are conducted to evaluate the adequacy of the estimated VAR model. The
+residuals satisfy the Durbin–Watson criterion, and the Ljung–Box test at lag 10 does not
+indicate residual autocorrelation. These results suggest that the six-lag VAR specification
+sufficiently captures the serial dependence structure of the data.
+
+
+However, the Jarque–Bera test rejects normality for the disruption-index equation residuals,
+which show skewness of 1.67 and excess kurtosis of 4.09. In contrast, normality is not rejected
+for the freight-equation residuals. This non-normality implies that analytical impulse-response
+confidence bands should be interpreted cautiously, and bootstrap-based confidence intervals
+would be preferable for robustness. Where heteroscedasticity or residual autocorrelation
+remains a concern, heteroscedasticity-and-autocorrelation-consistent covariance estimation
+provides an appropriate robustness extension.
+
+
+                                                31
+Finally, a rolling 24-month Pearson correlation is computed between the disruption index and
+the SCFI to examine regime dependence. The rolling correlation is strongly positive during the
+2021–2022 and 2023–2024 crisis windows, while it is near zero or negative during calmer
+periods.
+
+
+4 Results and Discussion
+The chapter introduces and describes the empirical findings of the construction and validation
+of the container shipping disruption index based on the LLM. The analysis will not merely
+demonstrate whether the recommended index follows the freight market conditions or not, but
+it will also analyze how the relationship will vary with time and whether the index further
+follows freight price trends or leads.
+
+
+The results are organized into six parts. To start with, the results of the headline level of the
+LLM classification are addressed. Second, the chosen monthly disruption index is compared
+to the Shanghai Containerized Freight Index (SCFI). Third, it reports its stationarity and
+cointegration findings as justifications to the time-series specification. Fourth, the results of the
+Granger-causality are analyzed to determine the predictive direction of disruption coverage on
+freight rates. The fifth one is that dynamic interactions between the two variables are explored
+with the help of impulse response functions and forecast error variance decomposition. Lastly,
+the results of rolling-correlation and diagnostic are explained to gauge regime dependence and
+model reliability.
+
+
+4.1 Headline-Level Classification Results
+The initial step of the research involved categorizing 5,586 news headings related to container-
+shipping with Qwen2.5-7B-Instruct. The disruption relevance scores of each headline were
+determined as 0 to 10: the lowest rating of 0 corresponds to absence of meaningful disruption
+relevance, and 10 is associated with a perfect overlap with events of disruption of container
+shipping. The model also attributed each headline to either a single or several disruption themes
+according to a taxonomy chosen in the methodology chapter.
+
+
+The output of the classification indicates that the majority of headlines were not closely
+connected with the disruption in container shipping. Out of 5,586 headlines, 4,222 headlines,
+or 75.6%, received a score of 0. Another 569 headlines or 10.2 were scored between 1 and 3,
+                                                 32
+meaning they were tangentially relevant. Headlines that had moderate relevance scores until
+269 or 4.8 were defined by a moderation score. There were only 526 high relevance headlines
+with scores 7-10 9.4% high relevance. Figure 2 shows the score distribution of LLM-Based
+headline classification.
+
+
+
+
+               Figure 2: Score Distribution of LLM-Based Headline Classification
+
+This distribution can be used to interpret the index. This large proportion of zero-score
+headlines implies that the original news corpus has a lot of noise. That is to say, numerous
+headlines do not directly state how container shipping has been disrupted, by stating that there
+is trade, shipping, markets, or that the economy is experiencing good or poor times. A plain
+count-based index would thus threaten the count of all items of news as being equally
+informative. An LLM-powered scoring process can decrease this issue by differentiating the
+most relevant headlines of disruption by outstanding or incidental news reports.
+
+
+In the same breath, a weakness is also present in the classification output. Because a majority
+of the headlines are rated at zero, any parsing error or padding of a zero introduced at the step
+of extracting the JSON can be hard to separate with a valid zero-score headline. Thus, the index
+can be seen as encoded machine-based measurement of disruption severity, rather than a
+completely human-validated set of disruption data. Benchmark Confidence in the accuracy of
+the classification would be enhanced with a benchmark developed by human coders in the
+future.
+
+
+
+
+                                               33
+4.2 Monthly Disruption Index
+The scores were grouped together into monthly series after headline-level classification. The
+number of evaluated candidate index formulations was sixteen, as they were based on eight
+base formulas and their three month (exponential moving average) versions. The last chosen
+formulation was:
+In which, (DIt) and (bar s t) denote the disruption index of month (t) and disruption mean score
+of the headlines respectively, (nt) denotes the outermost number of headlines in that month,
+and (EMA3) denotes the three months exponential movement interest.
+
+
+The following formulation has three properties that are useful. To begin with, the average score
+indicates the average disruption coverage strength. Second, the square-root of count of
+headlines will give the weight to months with larger news volumes, but will not give extremely
+high-volume months unreasonable control over the mechanical operation of the index. Third,
+the three-month EMA filters out short-term editorial noise and yields a more reliable monthly
+signal.
+
+
+The resulting consolidated data will have 119 monthly observations between January 2016 and
+December 2025. This time span includes the calm intervals as well as the major disruption
+incidences, such as the Red Sea/Houthi crisis period and the COVID-19 container shipping
+crisis. This renders this dataset appropriate to examine the nature of the index behavior in crisis
+and crisis free regimes.
+
+
+4.3 Association between the Disruption Index and the Freight Rates.
+The first validation result shows a strong positive association between the proposed disruption
+index and the SCFI. The last index reached the Pearson correlation of 0.7928 with the SCFI in
+levels and 0.8431 with the log-SCFI. The rank Spearman correlation stood at 0.8665 and this
+suggests that in addition to the relationship being linear, it is also very strong monotonic.
+
+
+This finding implies that the index powered by LLM is able to measure a signal of disruption
+that is best associated with freight market conditions. During shipping stress periods with a
+sharp increase in freight rates, the news coverage of disruption also tends to escalate. On the
+contrary, disruption coverage decreases when freight market pressure is less.
+
+
+
+
+                                                34
+This strong relationship is also confirmed by cross-correlations analysis. Figure 3 shows the
+cross-correlation between the disruption index and the freight index. The correlation is not only
+positive but is also statistically significant across lags-12, +12 months. The highest level
+correlation is found at lag +1 with (r = 0.7949) and the contemporaneous correlation equals (r
+= 0.7928) which is near to each other. The result of the difference between lag 0 and lag +1 is
+extremely low, thus the result may be interpreted as an almost contemporaneous relationship
+and not strong evidence on the basis of which the simple correlation one series obviously leads
+another. Figure 3 (below) illustrates the cross-correlation between the disruption index and
+freight rates.
+
+
+
+
+          Figure 3: Cross-Correlation Between the Disruption Index and Freight Index
+
+In general, evidence of correlation indicates that the proposed index is a valid measure.
+Correlation however, does not determine direction. It merely indicates the movement of the
+index and freight rates in the same direction. Hence, we need to take a closer look at the
+dynamic relationship with the help of Granger-causality, impulse response, and variance
+decomposition tests.
+
+
+4.4 Stationarity and Cointegration Results
+Prior to estimating the VAR model, there were tests on stationarity and cointegration. The
+Augmented Dickey-Fuller tests show that both the disruption index and log-SCFI can be
+identified as non-stationary at the levels, but they are stationary after the first difference. This
+implies that both variables may be considered to be integrated of order one, or (I(1)).
+
+                                                35
+Further, the model was tested on cointegration with the help of the Engle-Granger residual-
+based test and the Johansen trace test. The Engle-Granger test did not reject H0 : no
+cointegration, and even the Johansen test failed to establish a cointegrating relationship
+according to the specifications of the tests. Thus, the findings are inconclusive when it comes
+to the relation of stable long-run equilibrium between the disruption index and log-SCFI.
+
+
+There are two implications of this finding. First, the relationship of the disruption index and
+freight rates evolves concurrently during significant occurrences, but these variables are not
+interrelated significantly to be considered as a long-run equilibrium. Second, since the variables
+are (I(1)) and not cointegrated, a VAR in levels was fitted to make inferences about Granger-
+causality, according to the justification in terms of time-series, as justification of the
+methodology chapter. Akaike Information Criterion was used to pick the lag order and resulted
+in the selection of six lags. The stability condition is an estimated condition of the VAR(6)
+system, that is, the dynamic system can be analyzed with impulse response and variance
+decomposition.
+
+
+4.5 Granger-Causality Results
+The granger-causality findings elicit the best evidence regarding the direction of predictive
+influence in Figure 4 and Figure 5. In the levels specifications, Log(freight) Granger-causes
+the disruption index at lags 1 to 4. The p-values are 0.0044 at lag 1, 0.0120 at lag 2, 0.0334 at
+lag 3, and 0.0443 at lag 4. The values are important at 5 percent level, which implies the
+historical trends of the freight-rate will be used to forecast the current disruption index. The
+Granger-causality results (freight to DI) across different lag lengths are presented in Figure 4.
+
+                                    log(Freight) → Disruption (levels)
+                         0.16
+                         0.14
+                         0.12
+       Granger p-value
+
+
+
+
+                          0.1
+                         0.08
+                         0.06
+                         0.04
+                         0.02
+                           0
+                                1      2            3                  4   5            6
+                                                        Lag (months)
+
+
+
+      Figure 4: Granger-Causality Test Results Across Lags 1–6 (log(freight to Disruption)
+
+                                                   36
+The reverse direction is not significantly important at 5% levels of significance. The p-values
+are 0.4698, 0.1065, 0.3246, 0.4652, 0.1339, and 0.0857 across lags 1 to 6. The result is marginal
+even at lag 6 when the p-value is the smallest and it does not even hit the 5% level. The Granger-
+causality results (DI to freight) across different lag lengths are presented in Figure 5.
+
+                                              Disruption → log(Freight) (levels)
+                       0.5
+                      0.45
+                       0.4
+    Granger p-value
+
+
+
+
+                      0.35
+                       0.3
+                      0.25
+                       0.2
+                      0.15
+                       0.1
+                      0.05
+                         0
+                                 1             2             3                  4       5             6
+                                                                 Lag (months)
+
+
+
+                      Figure 5: Granger-Causality Test Results Across Lags 1–6 (Disruption to log(freight)
+
+
+So, here the interpretation is that, in levels, freight rates lead disruption coverage. The proposed
+index should therefore be presented as a disruption measurement and monitoring tool, not as a
+reliable forecasting tool for freight rates.
+
+
+4.6 Analysis of impulse response function.
+The estimations of an impulse response functions were performed with an interval of 12 months
+to understand the influence of one variable to the other in response to a shock. Figure 6 and
+Figure 7 show the impulse response functions from the VAR model in levels (log (freight to
+Disruption)) and (Disruption to log(freight)) respectively.
+
+
+Results indicate that a freight shock affects the disruption index in a positive way. The
+suitability of the response is distinctly positive starting with the second month and continuing
+with the majority of the 12-month horizon. This is in agreement with the findings of the
+Granger-causality. When freight rates increase unexpectedly, disruption-related media
+coverage tends to rise in the following months. This is economically justifiable. Port
+congestion, container shortage, demand spikes, or disruptions on route are common causes of
+freight rate spikes. These phenomena then manifest themselves in the open news media to the
+                                                                 37
+extent that the LLM-based index captures. Figure 6 shows the impulse response functions from
+the VAR model in levels (log (freight) to Disruption).
+
+                                                                               IRF (levels): log_freight → disruption
+                            25
+
+
+                            20
+   Response of disruption
+
+
+
+
+                            15
+
+
+                            10
+
+
+                            5
+
+
+                            0
+                                                           0       1       2      3         4       5         6        7       8       9       10      11   12
+                            -5
+                                                                                                Horizon (months)
+
+                                                                           Point estimate               95% CI upper               95% CI lower
+
+
+
+Figure 6: Impulse Response Functions from the VAR Model in Levels (log(freight to Disruption)
+
+The reverse impulse response, from disruption to log-freight, is smaller. The response is
+positive in a number of horizons, but it is not as strong as the response of the disruption index
+to freight shocks. It is again indicative of the fact that the index can be understood to be a
+reflection and demonstration of realized disruption conditions rather than a powerful source of
+freight prices. Figure 7 shows the impulse response functions from the VAR model in levels
+(log (Disruption to log(freight)).
+                                                                               IRF (levels): disruption → log_freight
+                                                            0.1
+                                                           0.09
+                                 Response of log_freight
+
+
+
+
+                                                           0.08
+                                                           0.07
+                                                           0.06
+                                                           0.05
+                                                           0.04
+                                                           0.03
+                                                           0.02
+                                                           0.01
+                                                               0
+                                                           -0.01       0   1      2         3   4         5       6        7       8       9      10   11   12
+                                                                                                         Horizon (months)
+                                                                           Point estimate               95% CI upper               95% CI lower
+
+Figure 7: Impulse Response Functions from the VAR Model in Levels (Disruption to log(freight)
+
+                                                                                                        38
+4.7 Forecast Error Variance Decomposition
+Forecast error variance decomposition, which quantifies the contribution of each variable to
+his forecast uncertainty, was employed to measure the contribution to the forecast uncertainty
+of each variable of shocks to itself and shocks to the other variable. Figure 8 and Figure 9
+shows Forecast Error Variance Decomposition of disruption and log-freight equations
+respectively. With the Cholesky ordering of the VAR model, the disruption index is explained
+to a large part by its own shocks, though after some time freight shocks are also contributing
+to the disruption index.At horizon 1, the log-freight shocks explain only 0.61% of the forecast-
+error variance of the disruption equation. By horizon 11, this share rises to 20.22%. This means
+that movement of freights market shocks increasingly gain importance in explaining future
+disruption index movement in longer horizons. To further examine the relative contribution of
+shocks from freight rates and the disruption index over time, the forecast error variance
+decomposition results for the disruption equation are presented in Figure 8.
+
+                                                                FEVD — Disruption equation
+                                       1
+   Share of forecast-error variance
+
+
+
+
+                                      0.9
+                                      0.8
+                                      0.7
+                                      0.6
+                                      0.5
+                                      0.4
+                                      0.3
+                                      0.2
+                                      0.1
+                                       0
+                                             0      1     2      3        4        5      6           7   8   9   10   11
+                                                                      Forecast horizon (months ahead)
+
+                                                                     disruption (own)   log_freight
+
+
+
+                                            Figure 8: Forecast Error Variance Decomposition of Disruption equation
+
+In case of the log-freight equation disruption shocks interpret 3.88% of forecast-error variance
+at horizon 0 and 35.59% of forecast-error variance at horizon 11. This value is big, but it has
+to be considered carefully since FEVD is sensitive to the order of variables in a Cholesky
+decomposition. The index of disruption may be ordered first, so some contemporaneous shared
+movement could be ascribed by the mechanical attribution that it was due to disruption shocks.
+Thus, the 35.59 percentage must be talked about as an ordering-dependent decomposition
+finding, rather than conclusive evidence of structurally supporting the view that disruption
+
+                                                                                 39
+news is the cause of freight-rate movements. Figure 9 (below) presents the forecast error
+variance decomposition of the log-freight equation, highlighting the dynamic influence of
+disruption shocks on freight rate variability.
+
+                                                                FEVD — log_freight equation
+   Share of forecast-error variance
+
+
+
+
+                                        1
+                                      0.9
+                                      0.8
+                                      0.7
+                                      0.6
+                                      0.5
+                                      0.4
+                                      0.3
+                                      0.2
+                                      0.1
+                                        0
+                                             0      1      2      3        4       5        6           7   8   9   10   11
+                                                                       Forecast horizon (months ahead)
+
+                                                                      disruption    log_freight (own)
+
+                                            Figure 9: Forecast Error Variance Decomposition of log-freight equation.
+
+
+Collectively, the outcomes of FEVD confirm the presence of strong dynamic relationship
+between the disruption index and freight rates. But causal interpretation is less strong as
+compared to descriptive ones. The most consistent finding is that the given index has a lot of
+information on freight market disruption regime, and the direction and the extent of structural
+impact now needs additional robustness testing.
+
+
+
+4.8 Time-Varying Timelike Correlation and Regime Dependence
+
+The rolling discontinuous correlation analysis in Figure 10 demonstrates that in the 24 months
+relation, the association between the index of disruption and freight rates is quite regime-
+sensitive. Even in rather quiet periods, the correlation is not very strong or even negative. As
+an example, in 2018 and 2019, the rolling correlation is largely negative, peaking to around -
+0.35 at the beginning of 2019.
+
+
+The correlation takes another turn at the time of the disruption because of COVID-19. The
+correlating rolling value becomes highly positive since 2020 and attains the value of 0.9294 in
+
+
+
+
+                                                                                   40
+        March 2022. This shows that throughout the COVID-19 container shipping crisis, the news
+        coverage and freight market conditions were rocket-tongued at a very high rate.
+        The second powerful episode of correlation is observed in the period of the disruption of 2023-
+        2024. The rolling correlation has a peak of 0.9604 in November 2023, and then it is high in
+        early 2024 and decreases slowly. This implies that the index not only is effectively capturing
+        the episode of COVID-19, but it is also highly responsive during subsequent disruptions
+        regimes. By 2025, the rolling correlation decreases to zero and then gets negative again. This
+        post-crisis normalization indicates that the index provides the most information when there is
+        real disruption episode. During tranquil times, freight rates can be influenced by other measures
+        like usual seasonal load, capacities or competition in the market which cannot be tracked by
+        news coverage of disruptions. Figure 10 illustrates the rolling 24-month correlation between
+        the disruption index and freight rates, revealing how their relationship evolves over different
+        periods.
+
+                                                                         Rolling 24-Month Correlation: Disruption Index vs Freight Index
+
+                                  0.9
+
+
+                                  0.7
+Rolling Pearson correlation (r)
+
+
+
+
+                                  0.5
+
+
+                                  0.3
+
+
+                                  0.1
+                                                                                                                         2020-01
+
+
+
+
+                                                                                                                                                                 2021-01
+                                         2018-01
+                                                   2018-04
+                                                             2018-07
+                                                                       2018-10
+                                                                                 2019-01
+                                                                                           2019-04
+                                                                                                     2019-07
+                                                                                                               2019-10
+
+
+                                                                                                                                   2020-04
+                                                                                                                                             2020-07
+                                                                                                                                                       2020-10
+
+
+                                                                                                                                                                           2021-04
+                                                                                                                                                                                     2021-07
+                                                                                                                                                                                               2021-10
+                                                                                                                                                                                                         2022-01
+                                                                                                                                                                                                                   2022-04
+                                                                                                                                                                                                                             2022-07
+                                                                                                                                                                                                                                       2022-10
+                                                                                                                                                                                                                                                 2023-01
+                                                                                                                                                                                                                                                           2023-04
+                                                                                                                                                                                                                                                                     2023-07
+                                                                                                                                                                                                                                                                               2023-10
+                                                                                                                                                                                                                                                                                         2024-01
+                                                                                                                                                                                                                                                                                                   2024-04
+                                                                                                                                                                                                                                                                                                             2024-07
+                                                                                                                                                                                                                                                                                                                       2024-10
+                                                                                                                                                                                                                                                                                                                                 2025-01
+                                                                                                                                                                                                                                                                                                                                           2025-04
+                                                                                                                                                                                                                                                                                                                                                     2025-07
+                                                                                                                                                                                                                                                                                                                                                               2025-10
+                                  -0.1
+
+
+                                  -0.3
+
+
+                                  -0.5
+                                                                                                                                                                           Month (year-month)
+
+
+
+                                   Figure 10: Rolling 24-Month Correlation Between the Disruption Index and Freight Index
+
+        This pattern, which depends on a regimen, is also one of the key results of the research. It
+        demonstrates the fact that the index cannot be taken as equally informative in all market
+        conditions. It is most valuable when problems related to disruption and freight market stress
+        are closely linked because we are in crisis periods.
+
+
+
+                                                                                                                                                                                     41
+4.9 VAR Diagnostic Results
+The diagnostic tests reveal that the VAR model is quite acceptable, but not ideal, in general.
+The equations have values near to 2 as the value of Durbin-Watson is 1.9975 in disruption
+equation and 2.0855 in log-freight equation. This indicates that there is no severe first-order
+autocorrelation issue.
+This is also given by the Ljung Box test lag 10. The p-values of the disruption equation and
+log-freight equation are 0.8511 and 0.7704, respectively, which implies that they have no
+evidence of residual serial correlation. The stability testing also reveals that the VAR system
+is steady with the maximum eigenvalue modulus of 0.8882, less than 1.
+Nonetheless, the findings of the residual normality are conflicting. Jarque-Bra test is non-
+significant to reject the normality test, and the p-value is 0.0000. The disruption residuals are
+both positively skewed and leptokurtic, with skew of 1.644 and excess kurtosis of 3.857. This
+is not because of coincidence, since disruption data are likely to display crisis-induced spikes,
+and not normal variation. The log-freight equation is much better and Jarque-Ber p-value is
+0.0544 which is a little above 5%.
+The diagnostic findings thus point to the idea that the VAR reflects the fundamental dynamic
+structure with no severe residual autocorrelation, although care should be taken with the
+inference on the basis of normality. Robustness checks that could help in the future would be
+bootstrap confidence intervals and the use of heteroscedasticity-robust inference.
+
+
+4.10 Overall Discussion
+The findings demonstrate that the proposed LLM-based disruption index can serve well as a
+market-aligned disruption measure of container shipping. This is well correlated to SCFI and
+log-SCFI, which shows that the index is a measure of a signal which is very close to freight
+market stress. The score distribution also helps understand why the LLM-based classification
+comes in handy: the majority of headlines presented in the corpus are not disruptive directly,
+hence simply count a keyword or count by volume is likely to be a noisy method.
+
+
+The econometric findings enhance this remark. The index should not be thought of as a major
+indicator of freight rates. In the levels based Granger-causality tests, the freight rate is the first
+to trigger the disruption index implying media disruption coverage is the product of realised
+freight market stress. This agrees with the fact that the news coverage regularly illustrates the
+state of the market as it is revealed but never leads to the creation of the conditions.
+
+
+                                                 42
+Simultaneously, the rolling correlation findings demonstrate that the index is very practical in
+the disruption regimes. In low volatility times, the connection between news disruption
+coverage and freight rates is weak. In periods of crisis, there is a very strong relationship. This
+implies that the index is particularly handy as a check-up tool in times of stress in the supply-
+chain.
+
+
+The disruption index predicting freight price thus is not the major contribution of this chapter.
+Instead, the input is that a focused, taxonomy-infused LLM pipeline can process a public news
+headline to become a continual monthly value that predictively predicts real-world episodes of
+container shipping disruption in the real world. This offers an interpretable and reproducible
+instrument to maritime economists, logistics managers, freight forwarders, and policymakers.
+The time-series tests established that both the disruption index and the log-SCFI were non-
+stationary at the level and stationary at the first differences but there are no signs of
+cointegration. There was estimation of a stable VAR (6) model. The results of Granger-
+causality indicated that log-SCFI Granger-causes the disruption index in level Granger-
+causalities at lags 1 to 4, whereas the other way is not significant in levels. The results of
+impulse response and FEVD justified a robust dynamic relationship, but structural
+interpretation is not feasible due to the limiting sensitivity of ordering.
+
+
+5 Conclusions and Recommendations
+5.1 Conclusions
+In this thesis, the disruption index for the container shipping was constructed based on monthly
+news information and validated with the Shanghai Containerized Freight Index (SCFI). The
+goal was to create a measurement tool that could be replicated and establish a meaningful way
+to quantify disruption to the container shipping industry from public news headlines.
+Qwen2.5-7B-Instruct is used to classify 5,586 news headlines related to container shipping
+from January 2015 to December 2025. Each headline was scored by level of disruption
+relevance based on the disruption taxonomy developed by Munim (2025) and plotted on the
+disruption themes. This is more than just a number count of keywords – the model was able to
+grasp the meaning of a headline in the context of the maritime supply-chain.
+The monthly index obtained from sixteen formulas was found to be:
+
+
+                                     𝐷𝐼𝑡 = 𝐸𝑀𝐴3 [𝑠̅𝑡 × √𝑛𝑡 ]
+
+
+                                                43
+with monthly mean disruption score 𝑠̅𝑡 , and monthly mean headline count 𝑛𝑡 . The square-root
+volume term(√𝑛𝑡 ) minimized the impact of any month with high volume and low signal news,
+and the three-month exponential moving average played a smoothing role to dampen the nearly
+daily editorial noise of Twitter and news.
+The empirical results show that the constructed disruption index has a strong association with
+freight-market conditions. Overall, the Pearson correlation was 0.7928 with the SCFI in levels,
+0.8431 for log-SCFI and the Spearman rank correlation was 0.8665. These findings suggest
+that the index is effective for capturing the large-scale trends in the intensity of disturbance in
+container shipping.
+
+
+The econometric validation also revealed that the indices (disruption index and log-SCFI) are
+both of order one, and that the results of the cointegration tests do not indicate a stable long-
+run relationship between the two. For this reason, a VAR in levels was applied to be able to
+carry out a dynamic analysis. According to the Granger-causality results, log-SCFI
+significantly Granger-causes the disruption index at lags 1-4 while the disruption index does
+not Granger-cause log-SCFI at the 5% significance level. This suggests that freight-rate
+developments in general, rather than the index itself, serve as a good indicator to the
+developments of media disruption coverage.
+The impulse response and variance decomposition findings are in line with this interpretation.
+Thus, the reaction of the disruption index to freight shocks is more like a standard one-step-
+ahead response of freight rates to disruption-index shocks. However, care needs to be taken in
+the interpretation of the results from FEVD as the orthogonalization decomposition is
+dependent on Cholesky ordering. The 24-month window correlation test also reveals that the
+correlation with freight rates is highest during major disruptions in particular: the 2021-2022
+shipping container crisis as well as the 2023-2024 Red Sea disruption period, while lower
+during more tranquil times.
+
+
+In summary this thesis can be regarded as a methodological advancement through the
+development of an LLM approach for measuring maritime disruption, as an empirical
+validation of the index to SCFI, and can be regarded as a practical suggestion for a low-cost
+tool to monitor the intensity of maritime disruption. The index should be used, however, as a
+
+
+
+
+                                                44
+tool to measure and be aware of the freight-rate regimes rather than to be treated as a single
+freight rate forecasting model.
+
+
+5.2 Recommendations
+There are a number of recommendations that will enhance the reliability and utility of this work
+for future research.
+First, the results should be used to validate the classification of the LLM-created texts. Among
+all of the above, it is recommended that the LLM scores be compared to human judgments by
+manually labelling a sample of headlines with domain experts and by calculating agreement
+measures like accuracy, correlation or interrater reliability. This will directly evaluate the
+accuracy of disruption relevance classification of the model. Second, in future research, cross
+model robustness tests are needed. Qwen2.5-7B-Instruct has been the sole size and model used
+in this thesis. Testing should also be done with other open source models to investigate whether
+the index is stable between different model families. Repeated runs keeping the settings for the
+decoding the same should also be used to test the consistency of the scoring. Third, index
+selection needs to be enriched using an out-of-sample validation process. Future studies should
+include a hold out period or other benchmarks to minimize their selection-on-outcome bias in
+the analyses of selecting the final index, as the index was partially selected according to its
+relationship with SCFI. This would increase the rigor in the validation. Fourth, future studies
+ought to incorporate other maritime signals like port congestion data, container availability
+data, schedule reliability, Drewry World Container Index, Freightos Baltic Index or regional
+freight indices. This would gauge how well the index reflects a shipping disruption in general,
+or just SCFI-related movements. Fifth, there should be greater econometric robustness. Future
+research will involve experiments with other VAR lag sizes, VAR in differences, impulse
+response confidence intervals using bootstraps, different ordering of the Cholesky and
+heteroscedasticity-autocorrelation-consistent standard errors. However such checks are
+particularly important since the residuals of the disruption-equation were found not to be
+normally distributed. Last, the index can be expanded from the headlines by using the full text
+of news articles, multilingual shipping news, port information and official maritime news. This
+would give more textual detail and could potentially enhance the detection of disruption
+narratives sooner, and more accurately, for the index. Finally, this study proposes a disruption
+index to help systematically measure disruption in container shipping based on the news and
+suggests it is a useful first step. The greatest benefit of it is in following-up on the intensity of
+disturbance, provision of information on crisis regimes and information for decision making in
+                                                 45
+shipping. Future research includes human validation and robustness of the models as well as
+more extensive benchmarks and out-of-sample testing.
+
+
+
+
+References
+Arratia, A., Avalos, G., & Renedo-Mirambell, M. (2021). Sentiment Analysis of Financial
+        News: Mechanics and Statistics. In Data Science for Economics and Finance (pp.
+        195-216). Springer. https://doi.org/10.1007/978-3-030-66891-4_9
+Baker, S. R., Bloom, N., & Davis, S. J. (2016a). Measuring Economic Policy Uncertainty.
+        Quarterly Journal of Economics, 131(4), 1593-1636.
+        https://doi.org/10.1093/qje/qjw024
+Baker, S. R., Bloom, N., & Davis, S. J. (2016b). Measuring Economic Policy Uncertainty.
+        The Quarterly Journal of Economics, 131(4), 1593-1636.
+        https://doi.org/10.1093/qje/qjw024
+Braun, V., & Clarke, V. (2006). Using Thematic Analysis in Psychology. Qualitative
+        Research in Psychology, 3(2), 77-101. https://doi.org/10.1191/1478088706qp063oa
+Burnham, K. P., & Anderson, D. R. (2002). Model Selection and Multimodel Inference: A
+        Practical Information-Theoretic Approach. Springer-Verlag.
+        https://doi.org/10.1007/b97636
+Dickey, D. A., & Fuller, W. A. (1979). Distribution of the Estimators for Autoregressive
+        Time Series with a Unit Root. Journal of the American Statistical Association,
+        74(366), 427-431. https://doi.org/10.1080/01621459.1979.10482531
+Durugbo, C. M., & Al-Balushi, Z. (2023). Supply Chain Management in Times of Crisis: A
+        Systematic Review. Management Review Quarterly, 73(3), 1179-1235.
+        https://doi.org/10.1007/s11301-022-00272-x
+Enders, W. (2015). Applied Econometric Time Series. John Wiley & Sons.
+        https://www.wiley.com/en-us/Applied+Econometric+Time+Series%2C+4th+Edition-
+        p-9781118808566
+Engle, R. F., & Granger, C. W. J. (1987). Co-Integration and Error Correction:
+        Representation, Estimation, and Testing. Econometrica, 55(2), 251-276.
+        https://doi.org/10.2307/1913236
+Fang, J., Su, B., Wang, S., & Wang, B. (2026). Uncovering the Risks of Digital Supply
+        Chains: A Large Language Model Framework for Semantic Identification and
+        Validation. International Journal of Production Economics, 291, 109839.
+        https://doi.org/10.1016/j.ijpe.2025.109839
+Garcia, D. (2013). Sentiment During Recessions. Journal of Finance, 68(3), 1267-1300.
+        https://doi.org/10.1111/jofi.12027
+Granger, C. W. J. (1969). Investigating Causal Relations by Econometric Models and Cross-
+        Spectral Methods. Econometrica, 37(3), 424-438. https://doi.org/10.2307/1912791
+Hamilton, J. D. (1994). Time Series Analysis. Princeton University Press.
+        https://press.princeton.edu/books/hardcover/9780691042893/time-series-analysis
+Johansen, S. (1991). Estimation and Hypothesis Testing of Cointegration Vectors in Gaussian
+        Vector Autoregressive Models. Econometrica, 59(6), 1551-1580.
+        https://doi.org/10.2307/2938278
+Khan, K., Su, C.-W., Khurshid, A., & Umar, M. (2022). The Dynamic Interaction Between
+        COVID-19 and Shipping Freight Rates: A Quantile on Quantile Analysis. European
+        Transport Research Review, 14, 43. https://doi.org/10.1186/s12544-022-00566-x
+
+
+                                            46
+Kim, A. G., Muhn, M., & Nikolaev, V. V. (2023). From Transcripts to Insights: Uncovering
+       Corporate Risks Using Generative AI (Chicago Booth Research Paper No. 23-26,
+       Issue. https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4603573
+Lopez-Lira, A., & Tang, Y. (2023). Can ChatGPT Forecast Stock Price Movements? Return
+       Predictability and Large Language Models (SSRN Working Paper, Issue.
+       https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4412788
+Loughran, T., & McDonald, B. (2011). When Is a Liability Not a Liability? Textual Analysis,
+       Dictionaries, and 10-Ks. Journal of Finance, 66(1), 35-65.
+       https://doi.org/10.1111/j.1540-6261.2010.01625.x
+Lütkepohl, H. (2005). New Introduction to Multiple Time Series Analysis. Springer-Verlag.
+       https://doi.org/10.1007/978-3-540-27752-1
+Manning, C. D., Raghavan, P., & Schütze, H. (2008). Introduction to Information Retrieval.
+       Cambridge University Press. https://doi.org/DOI: 10.1017/CBO9780511809071
+Munim, Z. H. (2025). The Container Shipping Crisis During COVID-19 Disruption:
+       Consequences and Lessons Learned from News Analysis. Journal of Shipping and
+       Trade, 10(1), 29. https://doi.org/10.1186/s41072-025-00220-4
+Newey, W. K., & West, K. D. (1987). A Simple, Positive Semi-Definite, Heteroscedasticity
+       and Autocorrelation Consistent Covariance Matrix. Econometrica, 55(3), 703-708.
+       https://doi.org/10.2307/1913610
+Sims, C. A. (1980). Macroeconomics and Reality. Econometrica, 48(1), 1-48.
+       https://doi.org/10.2307/1912017
+Sims, C. A., Stock, J. H., & Watson, M. W. (1990). Inference in Linear Time Series Models
+       with Some Unit Roots. Econometrica, 58(1), 113-144.
+       https://doi.org/10.2307/2938337
+Tetlock, P. C. (2007). Giving Content to Investor Sentiment: The Role of Media in the Stock
+       Market. Journal of Finance, 62(3), 1139-1168. https://doi.org/10.1111/j.1540-
+       6261.2007.01232.x
+Tetlock, P. C., Saar-Tsechansky, M., & Macskassy, S. (2008). More Than Words:
+       Quantifying Language to Measure Firms' Fundamentals. Journal of Finance, 63(3),
+       1437-1467. https://doi.org/10.1111/j.1540-6261.2008.01362.x
+Unctad. (2021). Container Shipping in Times of COVID-19: Why Freight Rates Have Surged,
+       and Implications for Policymakers (UNCTAD Policy Brief No. 84, Issue.
+       https://unctad.org/system/files/official-document/presspb2021d2_en.pdf
+Yang, A., & Qwen, T. (2024). Qwen2 Technical Report (arXiv preprint arXiv:2407.10671,
+       Issue. https://arxiv.org/abs/2407.10671
+Yazir, D., Şahin, B., Yip, T. L., & Tseng, P.-H. (2020). Effects of COVID-19 on maritime
+       industry: a review. International maritime health, 71(4), 253-264.
+       https://doi.org/10.5603/imh.2020.0044
+
+
+
+
+                                            47
+

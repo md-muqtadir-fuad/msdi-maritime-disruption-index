@@ -27,10 +27,12 @@ Quickstart
 	python scripts/01_ingest_sources.py
 	python scripts/02_enrich_full_text.py
 	python scripts/03_run_llm_scoring.py
+	python scripts/07b_llm_scfi_comparison.py
+	python scripts/07c_monthly_llm_scfi_comparison.py
 
 Testing
 
-	pytest -q
+	python -m unittest discover -s tests -v
 
 Notes
 - The `data/` directory is intentionally ignored from Git (large, sensitive files). Add only metadata or small examples if needed.

@@ -1,0 +1,6 @@
+horizon_weeks,models_checked,common_forecast_origins,first_origin_date,last_origin_date,origin_sets_identical
+1,49,362,2019-02-04,2026-01-05,True
+2,49,361,2019-02-11,2026-01-05,True
+4,49,359,2019-02-25,2026-01-05,True
+8,49,351,2019-03-25,2025-12-08,True
+12,49,343,2019-04-22,2025-11-10,True

@@ -1,0 +1,5 @@
+# Optional nonlinear forecasting layer (scripts/07d_nonlinear_forecasts.py).
+# Install into this repository's .venv only:
+#   .venv\Scripts\python.exe -m pip install -r requirements-forecasting.txt
+torch
+prophet

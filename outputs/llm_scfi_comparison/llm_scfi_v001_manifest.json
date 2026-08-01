@@ -1,0 +1,227 @@
+{
+  "version": "llm_scfi_v001",
+  "status": "provisional_pending_human_validation",
+  "inputs": {
+    "article_scores": {
+      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\05_indices\\article_level\\article_consensus_scores.csv",
+      "sha256": "f08d416e5e806d583339748f5cb84bc99336b1598e072ccc12096cac2c77033b",
+      "rows": 6542
+    },
+    "scfi_panel_non_msdi_fields_only": {
+      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\msdi_scfi_weekly_panel.csv",
+      "sha256": "3761cb49f7cbce5bd546a8868e4008a9800bf8cfbd91d3f91551bcd9f88f15dc",
+      "rows": 522
+    },
+    "model_registry": {
+      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\configs\\model_registry.yaml",
+      "sha256": "02db68a51d3c7eeab5712d7f40d52fe6e7fceac42c6f69d722e9660227a78882"
+    },
+    "code": {
+      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\scripts\\07b_llm_scfi_comparison.py",
+      "sha256": "cbd85ce0fdea8cfc951e8f66bf02c1fe1aebe8e431e8fa0dd9ae089edc6ab19b"
+    }
+  },
+  "common_article_cohort": {
+    "rows": 6542,
+    "unparseable_publication_dates": 3,
+    "common_complete_articles": 6481,
+    "expected_common_complete_articles": 6481,
+    "common_cohort_size_check_passed": true,
+    "excluded_from_common_cohort": 61,
+    "common_first_date": "2015-01-01T00:00:00",
+    "common_last_date": "2026-01-01T00:00:00",
+    "model_availability": {
+      "gemma_2_9b_it": {
+        "all_eight_scores": 6523,
+        "overall_score": 6523
+      },
+      "qwen_3_8b": {
+        "all_eight_scores": 6515,
+        "overall_score": 6515
+      },
+      "qwen_2_5_7b": {
+        "all_eight_scores": 6510,
+        "overall_score": 6510
+      }
+    }
+  },
+  "design": {
+    "model_aliases": [
+      "gemma_2_9b_it",
+      "qwen_3_8b",
+      "qwen_2_5_7b"
+    ],
+    "common_article_rule": "publication date plus overall and all seven dimension scores available for every one of the three LLMs",
+    "common_cohort_is_only_score_input": true,
+    "expected_common_articles": 6481,
+    "weekly_common_article_count_sum": 6481,
+    "broader_consensus_index_used_as_predictor": false,
+    "model_specific_unequal_coverage_indices_used": false,
+    "score_scale": [
+      0,
+      4
+    ],
+    "weekly_frequency": "W-FRI, right-labeled and right-closed",
+    "novelty_weighting": "input novelty_weight from duplicate penalty",
+    "media_correction": "novelty-weighted sum / log1p(common article count)",
+    "signals": [
+      "overall_disruption_max",
+      "dimension_mean7",
+      "port_disruption_score",
+      "global_container_movement_disruption_score",
+      "freight_cost_disruption_score",
+      "supply_disruption_score",
+      "production_disruption_score",
+      "covid19_related_disruption_score",
+      "demand_disruption_score"
+    ],
+    "primary_signals": [
+      "overall_disruption_max",
+      "dimension_mean7"
+    ],
+    "score_hybrids": {
+      "score_median": "article-level median across three LLMs; dimension_mean7 is equal mean of seven dimension-specific medians",
+      "score_mean": "article-level equal mean across three LLMs; dimension_mean7 is equal mean of seven dimension-specific means"
+    },
+    "forecast_hybrids": {
+      "equal_mean": "equal mean of the three individual LLM forecasts",
+      "past_only_nnls": "nonnegative weights estimated only from prior OOS forecasts whose target dates are observed by the current origin, normalized to sum one",
+      "minimum_stacking_history": 52
+    },
+    "target": "forward SCFI log change with reconstructed future SCFI level",
+    "horizons_weeks": [
+      1,
+      2,
+      4,
+      8,
+      12
+    ],
+    "forecast_evaluation": "expanding-window rolling-origin",
+    "minimum_training_rows": 156,
+    "refit_every_origins": 13,
+    "training_label_purge": "training row s allowed only when s + horizon <= origin",
+    "preprocessing_fit_inside_training_window": true,
+    "random_train_test_split": false,
+    "same_algorithm_and_controls_for_all_score_sources": true,
+    "algorithm": "Ridge",
+    "ridge_alpha": 1.0,
+    "common_forecast_origins_enforced": true,
+    "alignment": "backward Friday common signal to Monday SCFI",
+    "maximum_feature_age_days": 6,
+    "baseline_for_incremental_tests": "AR + Brent + common news coverage",
+    "primary_multiple_testing": "DM squared loss is the sole confirmatory statistic, Holm-adjusted within named primary families",
+    "sensitivity_forecast_tests": "DM absolute loss and Clark-West are Holm-adjusted sensitivity families",
+    "exploratory_dimension_multiple_testing": "Benjamini-Hochberg FDR within named test families",
+    "primary_llm_rank": "equal-weight mean RMSE rank over overall_disruption_max and dimension_mean7 across 1, 2, 4, 8, and 12 weeks",
+    "seed": 20260712
+  },
+  "alignment_audit": {
+    "rows": 522,
+    "matched_common_signal_weeks": 518,
+    "unmatched_common_signal_weeks": 4,
+    "future_matches": 0,
+    "stale_matches": 0,
+    "maximum_feature_age_days": 6,
+    "age_days_counts": {
+      "3.0": 518
+    },
+    "comparison_complete_rows": 518,
+    "first_complete_date": "2016-02-08T00:00:00",
+    "last_complete_date": "2026-01-05T00:00:00",
+    "raw_signal_columns": 45
+  },
+  "origin_audit": [
+    {
+      "horizon_weeks": 1,
+      "models_checked": 49,
+      "common_forecast_origins": 362,
+      "first_origin_date": "2019-02-04T00:00:00",
+      "last_origin_date": "2026-01-05T00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "horizon_weeks": 2,
+      "models_checked": 49,
+      "common_forecast_origins": 361,
+      "first_origin_date": "2019-02-11T00:00:00",
+      "last_origin_date": "2026-01-05T00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "horizon_weeks": 4,
+      "models_checked": 49,
+      "common_forecast_origins": 359,
+      "first_origin_date": "2019-02-25T00:00:00",
+      "last_origin_date": "2026-01-05T00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "horizon_weeks": 8,
+      "models_checked": 49,
+      "common_forecast_origins": 351,
+      "first_origin_date": "2019-03-25T00:00:00",
+      "last_origin_date": "2025-12-08T00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "horizon_weeks": 12,
+      "models_checked": 49,
+      "common_forecast_origins": 343,
+      "first_origin_date": "2019-04-22T00:00:00",
+      "last_origin_date": "2025-11-10T00:00:00",
+      "origin_sets_identical": true
+    }
+  ],
+  "best_llm_point_rank": {
+    "score_source": "qwen_3_8b",
+    "primary_comparison_cells": 10,
+    "mean_rmse_rank": 1.3,
+    "mean_mae_rank": 1.2,
+    "mean_skill_rank": 1.3,
+    "mean_rmse_log_change": 0.25904371301174145,
+    "mean_relative_rmse_vs_coverage": 1.200877857519408,
+    "mean_oos_r2_vs_coverage": -0.4530279797866078,
+    "mean_directional_accuracy": 0.5722208105308408,
+    "rmse_cell_wins": 7,
+    "adjusted_dm_squared_pairwise_wins": 0,
+    "adjusted_dm_squared_pairwise_losses": 0,
+    "predictive_point_rank": 1,
+    "ranking_scope": "equal-weight overall-max and dimension-mean7 RMSE ranks across five horizons"
+  },
+  "adjusted_significant_positive_primary_tests": 0,
+  "interpretation_limits": {
+    "best_predictive_llm_is_not_topsis_rank": true,
+    "best_predictive_llm_is_not_human_validity_rank": true,
+    "causal_claim": false,
+    "freight_cost_dimension_price_overlap_risk": true,
+    "dimension_paths_are_exploratory": true,
+    "past_only_stacker_has_a_shorter_native_evaluation_sample": true,
+    "point_ranking_does_not_by_itself_establish_statistical_superiority": true
+  },
+  "outputs": {
+    "common_article_cohort": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_common_article_cohort.csv",
+    "common_cohort_audit": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_common_cohort_audit.csv",
+    "weekly_common_signals": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_weekly_common_signals.csv",
+    "weekly_common_coverage": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_weekly_common_coverage.csv",
+    "signal_differences": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_signal_difference_summary.csv",
+    "aligned_panel": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\llm_specific_scfi_weekly_panel.csv",
+    "forecasts": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_forecast_predictions.csv",
+    "metrics": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_forecast_metrics.csv",
+    "statistical_tests": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_forecast_statistical_tests.csv",
+    "fit_audit": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_model_fit_audit.csv",
+    "origin_audit": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_common_origin_audit.csv",
+    "hybrid_weights": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_forecast_hybrid_weights.csv",
+    "llm_ranking": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_llm_predictive_ranking.csv",
+    "llm_ranking_cells": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_llm_ranking_by_horizon_signal.csv",
+    "primary_predictor_ranking": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_primary_predictor_ranking.csv",
+    "dimension_summary": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_dimension_predictive_summary.csv",
+    "feature_sets": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_feature_sets.json",
+    "manifest": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_manifest.json"
+  },
+  "log": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\logs\\07b_llm_scfi_comparison_llm_scfi_v001.log",
+  "software": {
+    "python": "3.11.9",
+    "pandas": "3.0.3",
+    "numpy": "2.4.6"
+  }
+}

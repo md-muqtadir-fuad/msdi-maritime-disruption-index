@@ -1,0 +1,285 @@
+2026-08-01 10:17:13,796 | INFO | Starting common-cohort LLM-to-SCFI comparison version=llm_scfi_v001
+2026-08-01 10:17:13,796 | INFO | Arguments: {'article_scores': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/05_indices/article_level/article_consensus_scores.csv'), 'panel': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/prediction/msdi_scfi_weekly_panel.csv'), 'panel_output': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/prediction/llm_specific_scfi_weekly_panel.csv'), 'model_config': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/configs/model_registry.yaml'), 'output_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/llm_scfi_comparison'), 'log_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/logs'), 'version': 'llm_scfi_v001', 'minimum_training_rows': 156, 'refit_every': 13, 'ridge_alpha': 1.0, 'minimum_stacking_history': 52, 'maximum_feature_age_days': 6, 'expected_common_articles': 6481, 'seed': 20260712}
+2026-08-01 10:17:13,796 | INFO | Model aliases in registry order: ['gemma_2_9b_it', 'qwen_3_8b', 'qwen_2_5_7b']
+2026-08-01 10:17:25,016 | INFO | Common article cohort=6,481 of 6,542; excluded=61; dates=2015-01-01 00:00:00 to 2026-01-01 00:00:00
+2026-08-01 10:17:25,016 | INFO | Availability before common restriction model=gemma_2_9b_it all_eight=6523 overall=6523; selected_common=6481
+2026-08-01 10:17:25,016 | INFO | Availability before common restriction model=qwen_3_8b all_eight=6515 overall=6515; selected_common=6481
+2026-08-01 10:17:25,016 | INFO | Availability before common restriction model=qwen_2_5_7b all_eight=6510 overall=6510; selected_common=6481
+2026-08-01 10:17:38,197 | INFO | Built 25,875 common-cohort weekly rows across 575 weeks, 5 sources, 9 signals
+2026-08-01 10:17:38,197 | INFO | Score difference signal=overall_disruption_max pair=gemma_2_9b_it-minus-qwen_3_8b n=6481 mean_signed=-0.109860 mean_absolute=0.434192 rmse=0.789923 spearman=0.791164
+2026-08-01 10:17:38,212 | INFO | Score difference signal=overall_disruption_max pair=gemma_2_9b_it-minus-qwen_2_5_7b n=6481 mean_signed=0.418608 mean_absolute=0.490819 rmse=0.869071 spearman=0.696580
+2026-08-01 10:17:38,212 | INFO | Score difference signal=overall_disruption_max pair=qwen_3_8b-minus-qwen_2_5_7b n=6481 mean_signed=0.528468 mean_absolute=0.563339 rmse=1.052620 spearman=0.738975
+2026-08-01 10:17:38,213 | INFO | Score difference signal=dimension_mean7 pair=gemma_2_9b_it-minus-qwen_3_8b n=6481 mean_signed=-0.051954 mean_absolute=0.165473 rmse=0.300733 spearman=0.830290
+2026-08-01 10:17:38,213 | INFO | Score difference signal=dimension_mean7 pair=gemma_2_9b_it-minus-qwen_2_5_7b n=6481 mean_signed=0.185289 mean_absolute=0.200454 rmse=0.364369 spearman=0.718851
+2026-08-01 10:17:38,213 | INFO | Score difference signal=dimension_mean7 pair=qwen_3_8b-minus-qwen_2_5_7b n=6481 mean_signed=0.237243 mean_absolute=0.243679 rmse=0.451834 spearman=0.768404
+2026-08-01 10:17:38,213 | INFO | Score difference signal=port_disruption_score pair=gemma_2_9b_it-minus-qwen_3_8b n=6481 mean_signed=-0.059404 mean_absolute=0.153526 rmse=0.483807 spearman=0.830148
+2026-08-01 10:17:38,213 | INFO | Score difference signal=port_disruption_score pair=gemma_2_9b_it-minus-qwen_2_5_7b n=6481 mean_signed=0.138867 mean_absolute=0.174973 rmse=0.527883 spearman=0.712577
+2026-08-01 10:17:38,213 | INFO | Score difference signal=port_disruption_score pair=qwen_3_8b-minus-qwen_2_5_7b n=6481 mean_signed=0.198272 mean_absolute=0.203209 rmse=0.599207 spearman=0.745609
+2026-08-01 10:17:38,213 | INFO | Score difference signal=global_container_movement_disruption_score pair=gemma_2_9b_it-minus-qwen_3_8b n=6481 mean_signed=-0.380188 mean_absolute=0.444376 rmse=0.881324 spearman=0.758993
+2026-08-01 10:17:38,213 | INFO | Score difference signal=global_container_movement_disruption_score pair=gemma_2_9b_it-minus-qwen_2_5_7b n=6481 mean_signed=0.182071 mean_absolute=0.226200 rmse=0.561315 spearman=0.629193
+2026-08-01 10:17:38,213 | INFO | Score difference signal=global_container_movement_disruption_score pair=qwen_3_8b-minus-qwen_2_5_7b n=6481 mean_signed=0.562259 mean_absolute=0.563493 rmse=1.122356 spearman=0.581998
+2026-08-01 10:17:38,213 | INFO | Score difference signal=freight_cost_disruption_score pair=gemma_2_9b_it-minus-qwen_3_8b n=6481 mean_signed=-0.041660 mean_absolute=0.224348 rmse=0.550490 spearman=0.765666
+2026-08-01 10:17:38,213 | INFO | Score difference signal=freight_cost_disruption_score pair=gemma_2_9b_it-minus-qwen_2_5_7b n=6481 mean_signed=0.215707 mean_absolute=0.245024 rmse=0.594165 spearman=0.613954
+2026-08-01 10:17:38,213 | INFO | Score difference signal=freight_cost_disruption_score pair=qwen_3_8b-minus-qwen_2_5_7b n=6481 mean_signed=0.257368 mean_absolute=0.271254 rmse=0.711403 spearman=0.682690
+2026-08-01 10:17:38,213 | INFO | Score difference signal=supply_disruption_score pair=gemma_2_9b_it-minus-qwen_3_8b n=6481 mean_signed=0.059096 mean_absolute=0.297331 rmse=0.632529 spearman=0.730225
+2026-08-01 10:17:38,213 | INFO | Score difference signal=supply_disruption_score pair=gemma_2_9b_it-minus-qwen_2_5_7b n=6481 mean_signed=0.376331 mean_absolute=0.400710 rmse=0.789434 spearman=0.555263
+2026-08-01 10:17:38,213 | INFO | Score difference signal=supply_disruption_score pair=qwen_3_8b-minus-qwen_2_5_7b n=6481 mean_signed=0.317235 mean_absolute=0.345008 rmse=0.786006 spearman=0.604325
+2026-08-01 10:17:38,213 | INFO | Score difference signal=production_disruption_score pair=gemma_2_9b_it-minus-qwen_3_8b n=6481 mean_signed=0.004012 mean_absolute=0.095047 rmse=0.343790 spearman=0.671909
+2026-08-01 10:17:38,213 | INFO | Score difference signal=production_disruption_score pair=gemma_2_9b_it-minus-qwen_2_5_7b n=6481 mean_signed=0.068662 mean_absolute=0.096127 rmse=0.348028 spearman=0.582899
+2026-08-01 10:17:38,213 | INFO | Score difference signal=production_disruption_score pair=qwen_3_8b-minus-qwen_2_5_7b n=6481 mean_signed=0.064651 mean_absolute=0.093041 rmse=0.387069 spearman=0.606152
+2026-08-01 10:17:38,213 | INFO | Score difference signal=covid19_related_disruption_score pair=gemma_2_9b_it-minus-qwen_3_8b n=6481 mean_signed=-0.122975 mean_absolute=0.188705 rmse=0.553983 spearman=0.776715
+2026-08-01 10:17:38,213 | INFO | Score difference signal=covid19_related_disruption_score pair=gemma_2_9b_it-minus-qwen_2_5_7b n=6481 mean_signed=0.040272 mean_absolute=0.104459 rmse=0.349355 spearman=0.683041
+2026-08-01 10:17:38,213 | INFO | Score difference signal=covid19_related_disruption_score pair=qwen_3_8b-minus-qwen_2_5_7b n=6481 mean_signed=0.163246 mean_absolute=0.182996 rmse=0.575432 spearman=0.750377
+2026-08-01 10:17:38,213 | INFO | Score difference signal=demand_disruption_score pair=gemma_2_9b_it-minus-qwen_3_8b n=6481 mean_signed=0.177442 mean_absolute=0.241012 rmse=0.599851 spearman=0.572611
+2026-08-01 10:17:38,213 | INFO | Score difference signal=demand_disruption_score pair=gemma_2_9b_it-minus-qwen_2_5_7b n=6481 mean_signed=0.275112 mean_absolute=0.286530 rmse=0.665805 spearman=0.475730
+2026-08-01 10:17:38,213 | INFO | Score difference signal=demand_disruption_score pair=qwen_3_8b-minus-qwen_2_5_7b n=6481 mean_signed=0.097670 mean_absolute=0.127295 rmse=0.459936 spearman=0.613027
+2026-08-01 10:17:38,480 | INFO | Aligned common signals: rows=522 matched=518 complete=518 age_counts={3.0: 518}
+2026-08-01 10:17:38,480 | INFO | Forecast design: direct configurations=45 baseline_features=24 challenger_features=[39]
+2026-08-01 10:17:38,480 | INFO | Running common-origin forecasts horizon=1w
+2026-08-01 10:17:41,363 | INFO | Completed h=1 model=ridge__ar_brent forecasts=362 fits=28
+2026-08-01 10:17:42,913 | INFO | Completed h=1 model=ridge__ar_brent_coverage forecasts=362 fits=28
+2026-08-01 10:17:44,430 | INFO | Completed h=1 source=gemma_2_9b_it signal=overall_disruption_max forecasts=362 fits=28
+2026-08-01 10:17:45,964 | INFO | Completed h=1 source=gemma_2_9b_it signal=dimension_mean7 forecasts=362 fits=28
+2026-08-01 10:17:47,480 | INFO | Completed h=1 source=gemma_2_9b_it signal=port_disruption_score forecasts=362 fits=28
+2026-08-01 10:17:48,980 | INFO | Completed h=1 source=gemma_2_9b_it signal=global_container_movement_disruption_score forecasts=362 fits=28
+2026-08-01 10:17:50,664 | INFO | Completed h=1 source=gemma_2_9b_it signal=freight_cost_disruption_score forecasts=362 fits=28
+2026-08-01 10:17:52,164 | INFO | Completed h=1 source=gemma_2_9b_it signal=supply_disruption_score forecasts=362 fits=28
+2026-08-01 10:17:53,664 | INFO | Completed h=1 source=gemma_2_9b_it signal=production_disruption_score forecasts=362 fits=28
+2026-08-01 10:17:55,247 | INFO | Completed h=1 source=gemma_2_9b_it signal=covid19_related_disruption_score forecasts=362 fits=28
+2026-08-01 10:17:56,747 | INFO | Completed h=1 source=gemma_2_9b_it signal=demand_disruption_score forecasts=362 fits=28
+2026-08-01 10:17:58,297 | INFO | Completed h=1 source=qwen_3_8b signal=overall_disruption_max forecasts=362 fits=28
+2026-08-01 10:17:59,814 | INFO | Completed h=1 source=qwen_3_8b signal=dimension_mean7 forecasts=362 fits=28
+2026-08-01 10:18:01,697 | INFO | Completed h=1 source=qwen_3_8b signal=port_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:04,258 | INFO | Completed h=1 source=qwen_3_8b signal=global_container_movement_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:06,316 | INFO | Completed h=1 source=qwen_3_8b signal=freight_cost_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:07,814 | INFO | Completed h=1 source=qwen_3_8b signal=supply_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:09,348 | INFO | Completed h=1 source=qwen_3_8b signal=production_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:10,848 | INFO | Completed h=1 source=qwen_3_8b signal=covid19_related_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:12,464 | INFO | Completed h=1 source=qwen_3_8b signal=demand_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:14,099 | INFO | Completed h=1 source=qwen_2_5_7b signal=overall_disruption_max forecasts=362 fits=28
+2026-08-01 10:18:15,664 | INFO | Completed h=1 source=qwen_2_5_7b signal=dimension_mean7 forecasts=362 fits=28
+2026-08-01 10:18:17,149 | INFO | Completed h=1 source=qwen_2_5_7b signal=port_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:18,648 | INFO | Completed h=1 source=qwen_2_5_7b signal=global_container_movement_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:20,115 | INFO | Completed h=1 source=qwen_2_5_7b signal=freight_cost_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:21,652 | INFO | Completed h=1 source=qwen_2_5_7b signal=supply_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:23,415 | INFO | Completed h=1 source=qwen_2_5_7b signal=production_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:25,298 | INFO | Completed h=1 source=qwen_2_5_7b signal=covid19_related_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:26,802 | INFO | Completed h=1 source=qwen_2_5_7b signal=demand_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:28,283 | INFO | Completed h=1 source=score_median signal=overall_disruption_max forecasts=362 fits=28
+2026-08-01 10:18:29,781 | INFO | Completed h=1 source=score_median signal=dimension_mean7 forecasts=362 fits=28
+2026-08-01 10:18:31,465 | INFO | Completed h=1 source=score_median signal=port_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:33,032 | INFO | Completed h=1 source=score_median signal=global_container_movement_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:34,548 | INFO | Completed h=1 source=score_median signal=freight_cost_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:36,048 | INFO | Completed h=1 source=score_median signal=supply_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:37,598 | INFO | Completed h=1 source=score_median signal=production_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:39,082 | INFO | Completed h=1 source=score_median signal=covid19_related_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:40,632 | INFO | Completed h=1 source=score_median signal=demand_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:43,015 | INFO | Completed h=1 source=score_mean signal=overall_disruption_max forecasts=362 fits=28
+2026-08-01 10:18:44,899 | INFO | Completed h=1 source=score_mean signal=dimension_mean7 forecasts=362 fits=28
+2026-08-01 10:18:47,299 | INFO | Completed h=1 source=score_mean signal=port_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:48,792 | INFO | Completed h=1 source=score_mean signal=global_container_movement_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:50,299 | INFO | Completed h=1 source=score_mean signal=freight_cost_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:51,799 | INFO | Completed h=1 source=score_mean signal=supply_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:53,299 | INFO | Completed h=1 source=score_mean signal=production_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:54,949 | INFO | Completed h=1 source=score_mean signal=covid19_related_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:56,432 | INFO | Completed h=1 source=score_mean signal=demand_disruption_score forecasts=362 fits=28
+2026-08-01 10:18:56,432 | INFO | Running common-origin forecasts horizon=2w
+2026-08-01 10:18:59,316 | INFO | Completed h=2 model=ridge__ar_brent forecasts=361 fits=28
+2026-08-01 10:19:00,799 | INFO | Completed h=2 model=ridge__ar_brent_coverage forecasts=361 fits=28
+2026-08-01 10:19:03,263 | INFO | Completed h=2 source=gemma_2_9b_it signal=overall_disruption_max forecasts=361 fits=28
+2026-08-01 10:19:04,781 | INFO | Completed h=2 source=gemma_2_9b_it signal=dimension_mean7 forecasts=361 fits=28
+2026-08-01 10:19:06,316 | INFO | Completed h=2 source=gemma_2_9b_it signal=port_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:07,832 | INFO | Completed h=2 source=gemma_2_9b_it signal=global_container_movement_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:09,316 | INFO | Completed h=2 source=gemma_2_9b_it signal=freight_cost_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:10,833 | INFO | Completed h=2 source=gemma_2_9b_it signal=supply_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:12,333 | INFO | Completed h=2 source=gemma_2_9b_it signal=production_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:13,799 | INFO | Completed h=2 source=gemma_2_9b_it signal=covid19_related_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:15,316 | INFO | Completed h=2 source=gemma_2_9b_it signal=demand_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:16,799 | INFO | Completed h=2 source=qwen_3_8b signal=overall_disruption_max forecasts=361 fits=28
+2026-08-01 10:19:18,399 | INFO | Completed h=2 source=qwen_3_8b signal=dimension_mean7 forecasts=361 fits=28
+2026-08-01 10:19:19,883 | INFO | Completed h=2 source=qwen_3_8b signal=port_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:21,366 | INFO | Completed h=2 source=qwen_3_8b signal=global_container_movement_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:22,883 | INFO | Completed h=2 source=qwen_3_8b signal=freight_cost_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:24,366 | INFO | Completed h=2 source=qwen_3_8b signal=supply_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:25,866 | INFO | Completed h=2 source=qwen_3_8b signal=production_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:27,365 | INFO | Completed h=2 source=qwen_3_8b signal=covid19_related_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:28,850 | INFO | Completed h=2 source=qwen_3_8b signal=demand_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:30,350 | INFO | Completed h=2 source=qwen_2_5_7b signal=overall_disruption_max forecasts=361 fits=28
+2026-08-01 10:19:31,883 | INFO | Completed h=2 source=qwen_2_5_7b signal=dimension_mean7 forecasts=361 fits=28
+2026-08-01 10:19:33,683 | INFO | Completed h=2 source=qwen_2_5_7b signal=port_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:35,533 | INFO | Completed h=2 source=qwen_2_5_7b signal=global_container_movement_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:37,302 | INFO | Completed h=2 source=qwen_2_5_7b signal=freight_cost_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:39,052 | INFO | Completed h=2 source=qwen_2_5_7b signal=supply_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:40,633 | INFO | Completed h=2 source=qwen_2_5_7b signal=production_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:42,167 | INFO | Completed h=2 source=qwen_2_5_7b signal=covid19_related_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:43,667 | INFO | Completed h=2 source=qwen_2_5_7b signal=demand_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:45,167 | INFO | Completed h=2 source=score_median signal=overall_disruption_max forecasts=361 fits=28
+2026-08-01 10:19:46,667 | INFO | Completed h=2 source=score_median signal=dimension_mean7 forecasts=361 fits=28
+2026-08-01 10:19:48,167 | INFO | Completed h=2 source=score_median signal=port_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:49,667 | INFO | Completed h=2 source=score_median signal=global_container_movement_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:51,184 | INFO | Completed h=2 source=score_median signal=freight_cost_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:52,700 | INFO | Completed h=2 source=score_median signal=supply_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:54,317 | INFO | Completed h=2 source=score_median signal=production_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:55,817 | INFO | Completed h=2 source=score_median signal=covid19_related_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:57,334 | INFO | Completed h=2 source=score_median signal=demand_disruption_score forecasts=361 fits=28
+2026-08-01 10:19:58,834 | INFO | Completed h=2 source=score_mean signal=overall_disruption_max forecasts=361 fits=28
+2026-08-01 10:20:02,117 | INFO | Completed h=2 source=score_mean signal=dimension_mean7 forecasts=361 fits=28
+2026-08-01 10:20:04,484 | INFO | Completed h=2 source=score_mean signal=port_disruption_score forecasts=361 fits=28
+2026-08-01 10:20:06,001 | INFO | Completed h=2 source=score_mean signal=global_container_movement_disruption_score forecasts=361 fits=28
+2026-08-01 10:20:07,601 | INFO | Completed h=2 source=score_mean signal=freight_cost_disruption_score forecasts=361 fits=28
+2026-08-01 10:20:09,101 | INFO | Completed h=2 source=score_mean signal=supply_disruption_score forecasts=361 fits=28
+2026-08-01 10:20:10,650 | INFO | Completed h=2 source=score_mean signal=production_disruption_score forecasts=361 fits=28
+2026-08-01 10:20:12,134 | INFO | Completed h=2 source=score_mean signal=covid19_related_disruption_score forecasts=361 fits=28
+2026-08-01 10:20:13,651 | INFO | Completed h=2 source=score_mean signal=demand_disruption_score forecasts=361 fits=28
+2026-08-01 10:20:13,651 | INFO | Running common-origin forecasts horizon=4w
+2026-08-01 10:20:16,534 | INFO | Completed h=4 model=ridge__ar_brent forecasts=359 fits=28
+2026-08-01 10:20:18,034 | INFO | Completed h=4 model=ridge__ar_brent_coverage forecasts=359 fits=28
+2026-08-01 10:20:19,584 | INFO | Completed h=4 source=gemma_2_9b_it signal=overall_disruption_max forecasts=359 fits=28
+2026-08-01 10:20:21,101 | INFO | Completed h=4 source=gemma_2_9b_it signal=dimension_mean7 forecasts=359 fits=28
+2026-08-01 10:20:22,668 | INFO | Completed h=4 source=gemma_2_9b_it signal=port_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:24,151 | INFO | Completed h=4 source=gemma_2_9b_it signal=global_container_movement_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:25,651 | INFO | Completed h=4 source=gemma_2_9b_it signal=freight_cost_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:27,135 | INFO | Completed h=4 source=gemma_2_9b_it signal=supply_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:28,601 | INFO | Completed h=4 source=gemma_2_9b_it signal=production_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:30,100 | INFO | Completed h=4 source=gemma_2_9b_it signal=covid19_related_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:31,601 | INFO | Completed h=4 source=gemma_2_9b_it signal=demand_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:33,152 | INFO | Completed h=4 source=qwen_3_8b signal=overall_disruption_max forecasts=359 fits=28
+2026-08-01 10:20:34,702 | INFO | Completed h=4 source=qwen_3_8b signal=dimension_mean7 forecasts=359 fits=28
+2026-08-01 10:20:36,287 | INFO | Completed h=4 source=qwen_3_8b signal=port_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:37,768 | INFO | Completed h=4 source=qwen_3_8b signal=global_container_movement_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:39,270 | INFO | Completed h=4 source=qwen_3_8b signal=freight_cost_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:40,768 | INFO | Completed h=4 source=qwen_3_8b signal=supply_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:42,253 | INFO | Completed h=4 source=qwen_3_8b signal=production_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:43,718 | INFO | Completed h=4 source=qwen_3_8b signal=covid19_related_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:45,185 | INFO | Completed h=4 source=qwen_3_8b signal=demand_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:46,685 | INFO | Completed h=4 source=qwen_2_5_7b signal=overall_disruption_max forecasts=359 fits=28
+2026-08-01 10:20:48,152 | INFO | Completed h=4 source=qwen_2_5_7b signal=dimension_mean7 forecasts=359 fits=28
+2026-08-01 10:20:49,635 | INFO | Completed h=4 source=qwen_2_5_7b signal=port_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:51,135 | INFO | Completed h=4 source=qwen_2_5_7b signal=global_container_movement_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:52,602 | INFO | Completed h=4 source=qwen_2_5_7b signal=freight_cost_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:54,469 | INFO | Completed h=4 source=qwen_2_5_7b signal=supply_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:55,941 | INFO | Completed h=4 source=qwen_2_5_7b signal=production_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:57,419 | INFO | Completed h=4 source=qwen_2_5_7b signal=covid19_related_disruption_score forecasts=359 fits=28
+2026-08-01 10:20:58,919 | INFO | Completed h=4 source=qwen_2_5_7b signal=demand_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:00,419 | INFO | Completed h=4 source=score_median signal=overall_disruption_max forecasts=359 fits=28
+2026-08-01 10:21:02,602 | INFO | Completed h=4 source=score_median signal=dimension_mean7 forecasts=359 fits=28
+2026-08-01 10:21:04,202 | INFO | Completed h=4 source=score_median signal=port_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:05,702 | INFO | Completed h=4 source=score_median signal=global_container_movement_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:07,202 | INFO | Completed h=4 source=score_median signal=freight_cost_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:08,669 | INFO | Completed h=4 source=score_median signal=supply_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:10,271 | INFO | Completed h=4 source=score_median signal=production_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:11,787 | INFO | Completed h=4 source=score_median signal=covid19_related_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:13,272 | INFO | Completed h=4 source=score_median signal=demand_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:15,668 | INFO | Completed h=4 source=score_mean signal=overall_disruption_max forecasts=359 fits=28
+2026-08-01 10:21:17,153 | INFO | Completed h=4 source=score_mean signal=dimension_mean7 forecasts=359 fits=28
+2026-08-01 10:21:18,636 | INFO | Completed h=4 source=score_mean signal=port_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:20,153 | INFO | Completed h=4 source=score_mean signal=global_container_movement_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:21,660 | INFO | Completed h=4 source=score_mean signal=freight_cost_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:23,320 | INFO | Completed h=4 source=score_mean signal=supply_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:24,920 | INFO | Completed h=4 source=score_mean signal=production_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:26,409 | INFO | Completed h=4 source=score_mean signal=covid19_related_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:27,970 | INFO | Completed h=4 source=score_mean signal=demand_disruption_score forecasts=359 fits=28
+2026-08-01 10:21:27,970 | INFO | Running common-origin forecasts horizon=8w
+2026-08-01 10:21:30,720 | INFO | Completed h=8 model=ridge__ar_brent forecasts=351 fits=27
+2026-08-01 10:21:32,238 | INFO | Completed h=8 model=ridge__ar_brent_coverage forecasts=351 fits=27
+2026-08-01 10:21:33,737 | INFO | Completed h=8 source=gemma_2_9b_it signal=overall_disruption_max forecasts=351 fits=27
+2026-08-01 10:21:35,225 | INFO | Completed h=8 source=gemma_2_9b_it signal=dimension_mean7 forecasts=351 fits=27
+2026-08-01 10:21:36,670 | INFO | Completed h=8 source=gemma_2_9b_it signal=port_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:38,120 | INFO | Completed h=8 source=gemma_2_9b_it signal=global_container_movement_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:39,587 | INFO | Completed h=8 source=gemma_2_9b_it signal=freight_cost_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:41,020 | INFO | Completed h=8 source=gemma_2_9b_it signal=supply_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:42,453 | INFO | Completed h=8 source=gemma_2_9b_it signal=production_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:43,940 | INFO | Completed h=8 source=gemma_2_9b_it signal=covid19_related_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:45,370 | INFO | Completed h=8 source=gemma_2_9b_it signal=demand_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:46,870 | INFO | Completed h=8 source=qwen_3_8b signal=overall_disruption_max forecasts=351 fits=27
+2026-08-01 10:21:48,320 | INFO | Completed h=8 source=qwen_3_8b signal=dimension_mean7 forecasts=351 fits=27
+2026-08-01 10:21:49,770 | INFO | Completed h=8 source=qwen_3_8b signal=port_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:51,239 | INFO | Completed h=8 source=qwen_3_8b signal=global_container_movement_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:52,704 | INFO | Completed h=8 source=qwen_3_8b signal=freight_cost_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:54,137 | INFO | Completed h=8 source=qwen_3_8b signal=supply_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:55,604 | INFO | Completed h=8 source=qwen_3_8b signal=production_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:57,037 | INFO | Completed h=8 source=qwen_3_8b signal=covid19_related_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:58,471 | INFO | Completed h=8 source=qwen_3_8b signal=demand_disruption_score forecasts=351 fits=27
+2026-08-01 10:21:59,941 | INFO | Completed h=8 source=qwen_2_5_7b signal=overall_disruption_max forecasts=351 fits=27
+2026-08-01 10:22:01,887 | INFO | Completed h=8 source=qwen_2_5_7b signal=dimension_mean7 forecasts=351 fits=27
+2026-08-01 10:22:03,637 | INFO | Completed h=8 source=qwen_2_5_7b signal=port_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:05,071 | INFO | Completed h=8 source=qwen_2_5_7b signal=global_container_movement_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:06,504 | INFO | Completed h=8 source=qwen_2_5_7b signal=freight_cost_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:07,988 | INFO | Completed h=8 source=qwen_2_5_7b signal=supply_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:09,421 | INFO | Completed h=8 source=qwen_2_5_7b signal=production_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:10,871 | INFO | Completed h=8 source=qwen_2_5_7b signal=covid19_related_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:12,371 | INFO | Completed h=8 source=qwen_2_5_7b signal=demand_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:13,804 | INFO | Completed h=8 source=score_median signal=overall_disruption_max forecasts=351 fits=27
+2026-08-01 10:22:15,338 | INFO | Completed h=8 source=score_median signal=dimension_mean7 forecasts=351 fits=27
+2026-08-01 10:22:16,804 | INFO | Completed h=8 source=score_median signal=port_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:18,256 | INFO | Completed h=8 source=score_median signal=global_container_movement_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:19,721 | INFO | Completed h=8 source=score_median signal=freight_cost_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:21,155 | INFO | Completed h=8 source=score_median signal=supply_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:22,605 | INFO | Completed h=8 source=score_median signal=production_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:24,105 | INFO | Completed h=8 source=score_median signal=covid19_related_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:25,705 | INFO | Completed h=8 source=score_median signal=demand_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:27,521 | INFO | Completed h=8 source=score_mean signal=overall_disruption_max forecasts=351 fits=27
+2026-08-01 10:22:29,988 | INFO | Completed h=8 source=score_mean signal=dimension_mean7 forecasts=351 fits=27
+2026-08-01 10:22:32,205 | INFO | Completed h=8 source=score_mean signal=port_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:33,946 | INFO | Completed h=8 source=score_mean signal=global_container_movement_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:35,705 | INFO | Completed h=8 source=score_mean signal=freight_cost_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:37,155 | INFO | Completed h=8 source=score_mean signal=supply_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:38,622 | INFO | Completed h=8 source=score_mean signal=production_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:40,088 | INFO | Completed h=8 source=score_mean signal=covid19_related_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:41,538 | INFO | Completed h=8 source=score_mean signal=demand_disruption_score forecasts=351 fits=27
+2026-08-01 10:22:41,538 | INFO | Running common-origin forecasts horizon=12w
+2026-08-01 10:22:44,257 | INFO | Completed h=12 model=ridge__ar_brent forecasts=343 fits=27
+2026-08-01 10:22:45,655 | INFO | Completed h=12 model=ridge__ar_brent_coverage forecasts=343 fits=27
+2026-08-01 10:22:47,306 | INFO | Completed h=12 source=gemma_2_9b_it signal=overall_disruption_max forecasts=343 fits=27
+2026-08-01 10:22:48,722 | INFO | Completed h=12 source=gemma_2_9b_it signal=dimension_mean7 forecasts=343 fits=27
+2026-08-01 10:22:50,155 | INFO | Completed h=12 source=gemma_2_9b_it signal=port_disruption_score forecasts=343 fits=27
+2026-08-01 10:22:51,589 | INFO | Completed h=12 source=gemma_2_9b_it signal=global_container_movement_disruption_score forecasts=343 fits=27
+2026-08-01 10:22:53,022 | INFO | Completed h=12 source=gemma_2_9b_it signal=freight_cost_disruption_score forecasts=343 fits=27
+2026-08-01 10:22:54,439 | INFO | Completed h=12 source=gemma_2_9b_it signal=supply_disruption_score forecasts=343 fits=27
+2026-08-01 10:22:55,889 | INFO | Completed h=12 source=gemma_2_9b_it signal=production_disruption_score forecasts=343 fits=27
+2026-08-01 10:22:57,322 | INFO | Completed h=12 source=gemma_2_9b_it signal=covid19_related_disruption_score forecasts=343 fits=27
+2026-08-01 10:22:58,756 | INFO | Completed h=12 source=gemma_2_9b_it signal=demand_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:00,227 | INFO | Completed h=12 source=qwen_3_8b signal=overall_disruption_max forecasts=343 fits=27
+2026-08-01 10:23:02,106 | INFO | Completed h=12 source=qwen_3_8b signal=dimension_mean7 forecasts=343 fits=27
+2026-08-01 10:23:03,793 | INFO | Completed h=12 source=qwen_3_8b signal=port_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:05,225 | INFO | Completed h=12 source=qwen_3_8b signal=global_container_movement_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:06,706 | INFO | Completed h=12 source=qwen_3_8b signal=freight_cost_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:08,172 | INFO | Completed h=12 source=qwen_3_8b signal=supply_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:09,589 | INFO | Completed h=12 source=qwen_3_8b signal=production_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:11,039 | INFO | Completed h=12 source=qwen_3_8b signal=covid19_related_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:12,472 | INFO | Completed h=12 source=qwen_3_8b signal=demand_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:13,906 | INFO | Completed h=12 source=qwen_2_5_7b signal=overall_disruption_max forecasts=343 fits=27
+2026-08-01 10:23:15,389 | INFO | Completed h=12 source=qwen_2_5_7b signal=dimension_mean7 forecasts=343 fits=27
+2026-08-01 10:23:16,806 | INFO | Completed h=12 source=qwen_2_5_7b signal=port_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:18,240 | INFO | Completed h=12 source=qwen_2_5_7b signal=global_container_movement_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:19,689 | INFO | Completed h=12 source=qwen_2_5_7b signal=freight_cost_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:21,106 | INFO | Completed h=12 source=qwen_2_5_7b signal=supply_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:22,556 | INFO | Completed h=12 source=qwen_2_5_7b signal=production_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:24,189 | INFO | Completed h=12 source=qwen_2_5_7b signal=covid19_related_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:25,840 | INFO | Completed h=12 source=qwen_2_5_7b signal=demand_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:27,440 | INFO | Completed h=12 source=score_median signal=overall_disruption_max forecasts=343 fits=27
+2026-08-01 10:23:28,856 | INFO | Completed h=12 source=score_median signal=dimension_mean7 forecasts=343 fits=27
+2026-08-01 10:23:30,292 | INFO | Completed h=12 source=score_median signal=port_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:31,773 | INFO | Completed h=12 source=score_median signal=global_container_movement_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:33,373 | INFO | Completed h=12 source=score_median signal=freight_cost_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:34,794 | INFO | Completed h=12 source=score_median signal=supply_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:36,227 | INFO | Completed h=12 source=score_median signal=production_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:37,640 | INFO | Completed h=12 source=score_median signal=covid19_related_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:39,073 | INFO | Completed h=12 source=score_median signal=demand_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:40,490 | INFO | Completed h=12 source=score_mean signal=overall_disruption_max forecasts=343 fits=27
+2026-08-01 10:23:42,173 | INFO | Completed h=12 source=score_mean signal=dimension_mean7 forecasts=343 fits=27
+2026-08-01 10:23:43,623 | INFO | Completed h=12 source=score_mean signal=port_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:45,090 | INFO | Completed h=12 source=score_mean signal=global_container_movement_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:46,524 | INFO | Completed h=12 source=score_mean signal=freight_cost_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:47,957 | INFO | Completed h=12 source=score_mean signal=supply_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:49,424 | INFO | Completed h=12 source=score_mean signal=production_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:51,057 | INFO | Completed h=12 source=score_mean signal=covid19_related_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:53,259 | INFO | Completed h=12 source=score_mean signal=demand_disruption_score forecasts=343 fits=27
+2026-08-01 10:23:55,490 | INFO | Identical direct origin counts: [{'horizon_weeks': 1, 'models_checked': 49, 'common_forecast_origins': 362, 'first_origin_date': Timestamp('2019-02-04 00:00:00'), 'last_origin_date': Timestamp('2026-01-05 00:00:00'), 'origin_sets_identical': True}, {'horizon_weeks': 2, 'models_checked': 49, 'common_forecast_origins': 361, 'first_origin_date': Timestamp('2019-02-11 00:00:00'), 'last_origin_date': Timestamp('2026-01-05 00:00:00'), 'origin_sets_identical': True}, {'horizon_weeks': 4, 'models_checked': 49, 'common_forecast_origins': 359, 'first_origin_date': Timestamp('2019-02-25 00:00:00'), 'last_origin_date': Timestamp('2026-01-05 00:00:00'), 'origin_sets_identical': True}, {'horizon_weeks': 8, 'models_checked': 49, 'common_forecast_origins': 351, 'first_origin_date': Timestamp('2019-03-25 00:00:00'), 'last_origin_date': Timestamp('2025-12-08 00:00:00'), 'origin_sets_identical': True}, {'horizon_weeks': 12, 'models_checked': 49, 'common_forecast_origins': 343, 'first_origin_date': Timestamp('2019-04-22 00:00:00'), 'last_origin_date': Timestamp('2025-11-10 00:00:00'), 'origin_sets_identical': True}]
+2026-08-01 10:26:27,806 | INFO | Forecast rows=116,454 direct=87,024 hybrids=29,430 fit events=6,486 statistical tests=1,125
+2026-08-01 10:26:27,806 | INFO | Point-ranked LLM=qwen_3_8b rank=1 mean_RMSE_rank=1.300 mean_relative_RMSE=1.200878 adjusted_pairwise_wins=0
+2026-08-01 10:26:27,806 | INFO | Adjusted significant positive primary tests=0; point rank alone is not superiority
+2026-08-01 10:26:27,806 | INFO | LLM ranking: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\llm_scfi_comparison\llm_scfi_v001_llm_predictive_ranking.csv
+2026-08-01 10:26:27,806 | INFO | Forecast metrics: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\llm_scfi_comparison\llm_scfi_v001_forecast_metrics.csv
+2026-08-01 10:26:27,806 | INFO | Statistical tests: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\llm_scfi_comparison\llm_scfi_v001_forecast_statistical_tests.csv
+2026-08-01 10:26:27,806 | INFO | Common-cohort LLM-to-SCFI comparison completed successfully

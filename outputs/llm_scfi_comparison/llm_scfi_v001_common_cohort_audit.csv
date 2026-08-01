@@ -1,0 +1,6 @@
+score_source,source_type,articles_with_all_eight_source_scores,articles_selected_for_comparison,same_common_cohort_enforced,total_article_universe,articles_excluded_by_common_cohort_rule
+gemma_2_9b_it,llm,6523,6481,True,6542,61
+qwen_3_8b,llm,6515,6481,True,6542,61
+qwen_2_5_7b,llm,6510,6481,True,6542,61
+score_median,score_hybrid,6481,6481,True,6542,61
+score_mean,score_hybrid,6481,6481,True,6542,61
