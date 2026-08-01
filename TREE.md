@@ -7,7 +7,8 @@ sc-disrupt/
 │   ├── research_config.yaml
 │   ├── taxonomy.yaml
 │   ├── scoring_rubric.yaml
-│   └── model_registry.yaml
+│   ├── model_registry.yaml
+│   └── nonlinear_forecasting.yaml      # fixed parameters + opt-in tuning candidates
 ├── data/
 │   ├── 00_legacy/
 │   ├── 01_raw/
@@ -72,6 +73,7 @@ sc-disrupt/
 ├── outputs/
 │   ├── prediction_benchmarks/           # rolling forecasts and DM/Clark-West tests
 │   ├── llm_scfi_comparison/             # common-cohort LLM and hybrid forecast comparison
+│   ├── nonlinear_forecasts/             # RF/XGBoost/LSTM/Prophet weekly + monthly outputs
 │   ├── time_series_causality/           # VAR/VARX, Granger, PCMCI, local projections
 │   ├── causal_ml/                       # DML and heterogeneous-effect outputs
 │   ├── robustness/                      # ablation and sensitivity outputs
@@ -100,6 +102,7 @@ sc-disrupt/
 │   ├── 07_prediction_benchmarks.py      # statistical + time-series ML forecasts
 │   ├── 07b_llm_scfi_comparison.py       # common-cohort LLM/dimension/hybrid forecasts
 │   ├── 07c_monthly_llm_scfi_comparison.py # dual-construction monthly robustness forecasts
+│   ├── 07d_nonlinear_forecasts.py       # leakage-safe RF/XGBoost/LSTM/Prophet forecasts
 │   ├── 08_causality_analysis.py         # VAR/VARX, Granger, PCMCI, local projections
 │   ├── 08b_causal_ml.py                 # time-aware DML/causal forests
 │   ├── 09_robustness_checks.py          # ablation and sensitivity
@@ -110,6 +113,7 @@ sc-disrupt/
 ├── README.md
 ├── TREE.md
 ├── requirements.txt
+├── requirements-forecasting.txt         # optional heavy forecasting dependencies
 ├── environment.yml
 ├── pyproject.toml
 └── Makefile

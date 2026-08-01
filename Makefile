@@ -1,4 +1,4 @@
-.PHONY: setup audit ingest enrich score validate index panel predict compare-llms-weekly compare-llms-monthly causality causal-ml robustness diagnostics significance figures analysis all
+.PHONY: setup setup-forecasting audit ingest enrich score validate index panel predict compare-llms-weekly compare-llms-monthly forecast-nonlinear forecast-nonlinear-tuned causality causal-ml robustness diagnostics significance figures analysis all
 
 ifeq ($(OS),Windows_NT)
 PYTHON ?= .venv/Scripts/python.exe
@@ -8,6 +8,9 @@ endif
 
 setup:
 	$(PYTHON) -m pip install -r requirements.txt
+
+setup-forecasting:
+	$(PYTHON) -m pip install -r requirements-forecasting.txt
 
 audit:
 	$(PYTHON) scripts/00_audit_legacy_project.py
@@ -38,6 +41,12 @@ compare-llms-weekly:
 
 compare-llms-monthly: compare-llms-weekly
 	$(PYTHON) scripts/07c_monthly_llm_scfi_comparison.py
+
+forecast-nonlinear: compare-llms-monthly
+	$(PYTHON) scripts/07d_nonlinear_forecasts.py --frequency both
+
+forecast-nonlinear-tuned: compare-llms-monthly
+	$(PYTHON) scripts/07d_nonlinear_forecasts.py --frequency both --tune
 
 causality:
 	$(PYTHON) scripts/08_causality_analysis.py

@@ -1,0 +1,375 @@
+{
+  "version": "nonlinear_scfi_smoke_v001",
+  "status": "debug_smoke_not_for_publication",
+  "inputs": {
+    "configuration": {
+      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\configs\\nonlinear_forecasting.yaml",
+      "sha256": "22e717760e5bc3c32bbb1a06c07042aaaa1df4195a4f6cd4b8b7c6121e5ad790"
+    },
+    "model_registry": {
+      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\configs\\model_registry.yaml",
+      "sha256": "02db68a51d3c7eeab5712d7f40d52fe6e7fceac42c6f69d722e9660227a78882"
+    },
+    "weekly": {
+      "panel": {
+        "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\llm_specific_scfi_weekly_panel.csv",
+        "sha256": "faeab464efecf9ffb8fb4f65adf60ccc1c989844555b35177013c5a7d872d524",
+        "rows": 522,
+        "complete_rows": 518,
+        "first_date": "2016-02-08 00:00:00",
+        "last_date": "2026-02-02 00:00:00"
+      },
+      "feature_sets": {
+        "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_feature_sets.json",
+        "sha256": "8790ad42c66c818712221e5ea09058adac7f0d64885667a4dfebfb0fd35f5734"
+      },
+      "upstream_manifest": {
+        "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_manifest.json",
+        "sha256": "bf5e0590cf1d49c0eac7ebc606ed480c649d02ece691cdbbba40c5b952ab7437",
+        "status": "provisional_pending_human_validation",
+        "frozen_common_articles": 6481,
+        "panel_path_verified": true
+      }
+    },
+    "monthly": {
+      "panel": {
+        "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\llm_specific_scfi_monthly_panel.csv",
+        "sha256": "c0c1a79272471336c4d2b44302922815a5790d4688aeb8a39b3bceb812f01fb6",
+        "rows": 121,
+        "complete_rows": 118,
+        "first_date": "2016-02-29 00:00:00",
+        "last_date": "2026-02-28 00:00:00"
+      },
+      "feature_sets": {
+        "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_monthly_v001_feature_sets.json",
+        "sha256": "701f2b109c7feaf173d4851c6a039f3cffe00343f167e8c1e6f4e46c7ce1ddfc"
+      },
+      "upstream_manifest": {
+        "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_monthly_v001_manifest.json",
+        "sha256": "5a251216250966dbcd4c7655cadfcec8f8eaab3066a789fd31b85c64564b6eee",
+        "status": "provisional_pending_human_validation",
+        "frozen_common_articles": 6481,
+        "panel_path_verified": true
+      }
+    }
+  },
+  "design": {
+    "weekly_analysis_is_primary": true,
+    "monthly_analysis_role": "frequency robustness and slower dynamics",
+    "selected_frequencies": [
+      "weekly",
+      "monthly"
+    ],
+    "requested_algorithms": [
+      "random_forest"
+    ],
+    "executed_algorithms": [
+      "random_forest"
+    ],
+    "skipped_algorithms": [],
+    "full_requested_model_set_complete": true,
+    "signals_scope": "primary",
+    "primary_signals": [
+      "overall_disruption_max",
+      "dimension_mean7"
+    ],
+    "dimension_signals_are_exploratory": true,
+    "score_sources": [
+      "gemma_2_9b_it",
+      "qwen_3_8b",
+      "qwen_2_5_7b",
+      "score_median",
+      "score_mean"
+    ],
+    "configuration_counts": {
+      "weekly": {
+        "challengers": 1,
+        "baselines": 1,
+        "constructions": [
+          "weekly_log_volume"
+        ]
+      },
+      "monthly": {
+        "challengers": 2,
+        "baselines": 2,
+        "constructions": [
+          "mean_safe_weekly",
+          "adapted_pdf_sqrt_ema3"
+        ]
+      }
+    },
+    "target": "direct forward SCFI log change; future level reconstructed",
+    "same_algorithm_baseline": "AR + Brent + common news coverage",
+    "training_label_purge": "endpoint s allowed only when s + horizon <= fit origin",
+    "outer_evaluation": "purged expanding-window rolling origin",
+    "preprocessing_fit_inside_training_window": true,
+    "random_train_test_split": false,
+    "common_origins_enforced": true,
+    "tuning_enabled": false,
+    "tuning_protocol": "fixed pre-specified parameters; no search",
+    "predefined_parameter_source": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\configs\\nonlinear_forecasting.yaml",
+    "inner_splits": 3,
+    "forecast_hybrids": {
+      "equal_mean": "equal mean of three individual-LLM forecasts",
+      "past_only_nnls": "nonnegative weights learned only from prior OOS forecasts whose target dates are observed by the current origin"
+    },
+    "seed": 20260712,
+    "smoke_test": true,
+    "maximum_configurations_per_construction": 1,
+    "maximum_origins_per_horizon": 2
+  },
+  "origin_design": [
+    {
+      "frequency": "weekly",
+      "horizon_steps": 1,
+      "eligible_origins": 2,
+      "first_origin_date": "2019-02-04 00:00:00",
+      "last_origin_date": "2019-02-11 00:00:00",
+      "minimum_training_rows": 156,
+      "refit_every": 13
+    },
+    {
+      "frequency": "weekly",
+      "horizon_steps": 2,
+      "eligible_origins": 2,
+      "first_origin_date": "2019-02-11 00:00:00",
+      "last_origin_date": "2019-02-18 00:00:00",
+      "minimum_training_rows": 156,
+      "refit_every": 13
+    },
+    {
+      "frequency": "weekly",
+      "horizon_steps": 4,
+      "eligible_origins": 2,
+      "first_origin_date": "2019-02-25 00:00:00",
+      "last_origin_date": "2019-03-04 00:00:00",
+      "minimum_training_rows": 156,
+      "refit_every": 13
+    },
+    {
+      "frequency": "weekly",
+      "horizon_steps": 8,
+      "eligible_origins": 2,
+      "first_origin_date": "2019-03-25 00:00:00",
+      "last_origin_date": "2019-04-01 00:00:00",
+      "minimum_training_rows": 156,
+      "refit_every": 13
+    },
+    {
+      "frequency": "weekly",
+      "horizon_steps": 12,
+      "eligible_origins": 2,
+      "first_origin_date": "2019-04-22 00:00:00",
+      "last_origin_date": "2019-04-29 00:00:00",
+      "minimum_training_rows": 156,
+      "refit_every": 13
+    },
+    {
+      "frequency": "monthly",
+      "horizon_steps": 1,
+      "eligible_origins": 2,
+      "first_origin_date": "2021-03-31 00:00:00",
+      "last_origin_date": "2021-04-30 00:00:00",
+      "minimum_training_rows": 60,
+      "refit_every": 3
+    },
+    {
+      "frequency": "monthly",
+      "horizon_steps": 3,
+      "eligible_origins": 2,
+      "first_origin_date": "2021-05-31 00:00:00",
+      "last_origin_date": "2021-06-30 00:00:00",
+      "minimum_training_rows": 60,
+      "refit_every": 3
+    },
+    {
+      "frequency": "monthly",
+      "horizon_steps": 6,
+      "eligible_origins": 2,
+      "first_origin_date": "2021-08-31 00:00:00",
+      "last_origin_date": "2021-09-30 00:00:00",
+      "minimum_training_rows": 60,
+      "refit_every": 3
+    }
+  ],
+  "common_origin_audit": [
+    {
+      "frequency": "monthly",
+      "algorithm": "random_forest",
+      "index_construction": "adapted_pdf_sqrt_ema3",
+      "horizon_steps": 1,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2021-03-31 00:00:00",
+      "last_origin_date": "2021-04-30 00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "frequency": "monthly",
+      "algorithm": "random_forest",
+      "index_construction": "adapted_pdf_sqrt_ema3",
+      "horizon_steps": 3,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2021-05-31 00:00:00",
+      "last_origin_date": "2021-06-30 00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "frequency": "monthly",
+      "algorithm": "random_forest",
+      "index_construction": "adapted_pdf_sqrt_ema3",
+      "horizon_steps": 6,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2021-08-31 00:00:00",
+      "last_origin_date": "2021-09-30 00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "frequency": "monthly",
+      "algorithm": "random_forest",
+      "index_construction": "mean_safe_weekly",
+      "horizon_steps": 1,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2021-03-31 00:00:00",
+      "last_origin_date": "2021-04-30 00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "frequency": "monthly",
+      "algorithm": "random_forest",
+      "index_construction": "mean_safe_weekly",
+      "horizon_steps": 3,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2021-05-31 00:00:00",
+      "last_origin_date": "2021-06-30 00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "frequency": "monthly",
+      "algorithm": "random_forest",
+      "index_construction": "mean_safe_weekly",
+      "horizon_steps": 6,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2021-08-31 00:00:00",
+      "last_origin_date": "2021-09-30 00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "frequency": "weekly",
+      "algorithm": "random_forest",
+      "index_construction": "weekly_log_volume",
+      "horizon_steps": 1,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2019-02-04 00:00:00",
+      "last_origin_date": "2019-02-11 00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "frequency": "weekly",
+      "algorithm": "random_forest",
+      "index_construction": "weekly_log_volume",
+      "horizon_steps": 2,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2019-02-11 00:00:00",
+      "last_origin_date": "2019-02-18 00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "frequency": "weekly",
+      "algorithm": "random_forest",
+      "index_construction": "weekly_log_volume",
+      "horizon_steps": 4,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2019-02-25 00:00:00",
+      "last_origin_date": "2019-03-04 00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "frequency": "weekly",
+      "algorithm": "random_forest",
+      "index_construction": "weekly_log_volume",
+      "horizon_steps": 8,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2019-03-25 00:00:00",
+      "last_origin_date": "2019-04-01 00:00:00",
+      "origin_sets_identical": true
+    },
+    {
+      "frequency": "weekly",
+      "algorithm": "random_forest",
+      "index_construction": "weekly_log_volume",
+      "horizon_steps": 12,
+      "models_checked": 2,
+      "common_forecast_origins": 2,
+      "first_origin_date": "2019-04-22 00:00:00",
+      "last_origin_date": "2019-04-29 00:00:00",
+      "origin_sets_identical": true
+    }
+  ],
+  "counts": {
+    "direct_forecasts": 44,
+    "forecast_hybrids": 0,
+    "total_forecasts": 44,
+    "outer_fits": 22,
+    "nested_tuning_rows": 0,
+    "statistical_tests": 22,
+    "adjusted_significant_positive_primary_tests": 0
+  },
+  "interpretation_limits": {
+    "causal_claim": false,
+    "best_predictive_llm_is_separate_from_algorithm_rank": true,
+    "point_rank_does_not_establish_statistical_superiority": true,
+    "weekly_is_primary": true,
+    "monthly_small_sample_overfit_risk": true,
+    "lstm_and_prophet_are_sensitivity_models": true,
+    "overlapping_horizons_use_hac_inference": true,
+    "explicit_missing_model_skip_invalidates_publication_run": false
+  },
+  "outputs": {
+    "predictions": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_forecast_predictions.csv",
+    "metrics": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_forecast_metrics.csv",
+    "statistical_tests": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_forecast_statistical_tests.csv",
+    "fit_audit": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_model_fit_audit.csv",
+    "tuning_audit": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_tuning_audit.csv",
+    "dependency_audit": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_dependency_audit.csv",
+    "origin_audit": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_common_origin_audit.csv",
+    "loss_differences": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_loss_differences.csv",
+    "hybrid_weights": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_forecast_hybrid_weights.csv",
+    "llm_ranking": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_llm_predictive_ranking.csv",
+    "algorithm_ranking": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_algorithm_ranking.csv",
+    "feature_sets": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_feature_sets.json",
+    "manifest": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\nonlinear_forecasts\\nonlinear_scfi_smoke_v001_manifest.json"
+  },
+  "log": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\logs\\07d_nonlinear_forecasts_nonlinear_scfi_smoke_v001.log",
+  "software": {
+    "python": "3.11.9",
+    "python_executable": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\.venv\\Scripts\\python.exe",
+    "sys_prefix": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\.venv",
+    "project_venv_enforced": true,
+    "pandas": "3.0.3",
+    "numpy": "2.4.6",
+    "dependencies": [
+      {
+        "algorithm": "random_forest",
+        "package": "scikit-learn",
+        "available": true,
+        "version": "1.9.0",
+        "missing_dependency_policy": "error",
+        "action": "selected"
+      }
+    ]
+  },
+  "code": {
+    "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\scripts\\07d_nonlinear_forecasts.py",
+    "sha256": "3e554f8ad2f4084ec83495e650afdf0fdbac4cea51f09eb6d290d196fae8fe95"
+  }
+}

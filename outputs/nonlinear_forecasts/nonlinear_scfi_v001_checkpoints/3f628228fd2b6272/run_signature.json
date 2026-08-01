@@ -1,0 +1,41 @@
+{
+  "version": "nonlinear_scfi_v001",
+  "code_sha256": "71840b8b8707e35b2497e74bbbb72fdb9ef36f177884c6fcb82d416fd0a8be3c",
+  "configuration_sha256": "22e717760e5bc3c32bbb1a06c07042aaaa1df4195a4f6cd4b8b7c6121e5ad790",
+  "model_registry_sha256": "02db68a51d3c7eeab5712d7f40d52fe6e7fceac42c6f69d722e9660227a78882",
+  "input_hashes": {
+    "weekly": {
+      "panel_sha256": "faeab464efecf9ffb8fb4f65adf60ccc1c989844555b35177013c5a7d872d524",
+      "manifest_sha256": "bf5e0590cf1d49c0eac7ebc606ed480c649d02ece691cdbbba40c5b952ab7437",
+      "feature_sets_sha256": "8790ad42c66c818712221e5ea09058adac7f0d64885667a4dfebfb0fd35f5734"
+    },
+    "monthly": {
+      "panel_sha256": "c0c1a79272471336c4d2b44302922815a5790d4688aeb8a39b3bceb812f01fb6",
+      "manifest_sha256": "5a251216250966dbcd4c7655cadfcec8f8eaab3066a789fd31b85c64564b6eee",
+      "feature_sets_sha256": "701f2b109c7feaf173d4851c6a039f3cffe00343f167e8c1e6f4e46c7ce1ddfc"
+    }
+  },
+  "frequencies": [
+    "weekly",
+    "monthly"
+  ],
+  "requested_algorithms": [
+    "random_forest",
+    "xgboost",
+    "lstm",
+    "prophet"
+  ],
+  "executed_algorithms": [
+    "random_forest",
+    "xgboost",
+    "lstm",
+    "prophet"
+  ],
+  "signals": "primary",
+  "tune": false,
+  "inner_splits": 3,
+  "seed": 20260712,
+  "smoke_test": false,
+  "maximum_configurations_per_construction": null,
+  "maximum_origins_per_horizon": null
+}

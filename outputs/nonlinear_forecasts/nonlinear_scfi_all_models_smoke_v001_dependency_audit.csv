@@ -1,0 +1,5 @@
+algorithm,package,available,version,missing_dependency_policy,action
+random_forest,scikit-learn,True,1.9.0,skip,selected
+xgboost,xgboost,True,3.2.0,skip,selected
+lstm,torch,True,2.12.1,skip,selected
+prophet,prophet,False,,skip,skipped_explicitly

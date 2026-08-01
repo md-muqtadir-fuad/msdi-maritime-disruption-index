@@ -1,0 +1,4 @@
+frequency,index_construction,algorithm,evaluation_cells,mean_algorithm_rmse_rank,mean_rmse,mean_relative_rmse,algorithm_point_rank,point_rank_is_not_significance
+monthly,adapted_pdf_sqrt_ema3,random_forest,3,1.0,0.1593474409821383,2.0003641188279455,1.0,True
+monthly,mean_safe_weekly,random_forest,3,1.0,0.1255556566694703,2.022895810227672,1.0,True
+weekly,weekly_log_volume,random_forest,5,1.0,0.07412773333042734,0.9776835058162238,1.0,True

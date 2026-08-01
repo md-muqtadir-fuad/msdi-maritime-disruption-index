@@ -1,0 +1,63 @@
+2026-08-01 15:46:58,626 | INFO | Starting nonlinear SCFI forecasts version=nonlinear_scfi_smoke_v001
+2026-08-01 15:46:58,626 | INFO | Python executable=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\.venv\Scripts\python.exe sys.prefix=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\.venv
+2026-08-01 15:46:58,626 | INFO | Arguments={'frequency': 'both', 'models': 'random_forest', 'signals': 'primary', 'tune': False, 'missing_dependency': 'error', 'smoke_test': True, 'max_configurations': 1, 'max_origins_per_horizon': 2, 'config': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/configs/nonlinear_forecasting.yaml'), 'model_registry': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/configs/model_registry.yaml'), 'weekly_panel': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/prediction/llm_specific_scfi_weekly_panel.csv'), 'monthly_panel': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/prediction/llm_specific_scfi_monthly_panel.csv'), 'weekly_manifest': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/llm_scfi_comparison/llm_scfi_v001_manifest.json'), 'monthly_manifest': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/llm_scfi_comparison/llm_scfi_monthly_v001_manifest.json'), 'weekly_feature_sets': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/llm_scfi_comparison/llm_scfi_v001_feature_sets.json'), 'monthly_feature_sets': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/llm_scfi_comparison/llm_scfi_monthly_v001_feature_sets.json'), 'output_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/nonlinear_forecasts'), 'log_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/logs'), 'version': 'nonlinear_scfi_smoke_v001', 'seed': None}
+2026-08-01 15:46:58,656 | INFO | Dependency preflight requested=['random_forest'] selected=['random_forest'] skipped=[]
+2026-08-01 15:46:58,674 | WARNING | Smoke-test limits active: challenger configurations per construction=1 origins per horizon=2; outputs are not for publication
+2026-08-01 15:46:58,948 | INFO | Loaded weekly panel rows=522 complete=518 challengers=1 constructions=['weekly_log_volume']
+2026-08-01 15:47:00,159 | INFO | Running weekly horizon=1weeks common_origins=2 first=2019-02-04 00:00:00 last=2019-02-11 00:00:00
+2026-08-01 15:47:00,390 | INFO | fit=rf__weekly__weekly_log_volume__ar_brent_coverage__h1__origin156__2019-02-04 train=156 label_end=2019-02-04 block=2 params=d8d1d12542f1e03e runtime=0.197s
+2026-08-01 15:47:00,391 | INFO | Completed frequency=weekly h=1 algorithm=random_forest model=rf__weekly__weekly_log_volume__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:00,525 | INFO | fit=rf__weekly__weekly_log_volume__llm__gemma_2_9b_it__overall_disruption_max__h1__origin156__2019-02-04 train=156 label_end=2019-02-04 block=2 params=d8d1d12542f1e03e runtime=0.110s
+2026-08-01 15:47:00,525 | INFO | Completed frequency=weekly h=1 algorithm=random_forest model=rf__weekly__weekly_log_volume__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:02,133 | INFO | Running weekly horizon=2weeks common_origins=2 first=2019-02-11 00:00:00 last=2019-02-18 00:00:00
+2026-08-01 15:47:02,210 | INFO | fit=rf__weekly__weekly_log_volume__ar_brent_coverage__h2__origin157__2019-02-11 train=156 label_end=2019-02-11 block=2 params=d8d1d12542f1e03e runtime=0.066s
+2026-08-01 15:47:02,210 | INFO | Completed frequency=weekly h=2 algorithm=random_forest model=rf__weekly__weekly_log_volume__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:02,308 | INFO | fit=rf__weekly__weekly_log_volume__llm__gemma_2_9b_it__overall_disruption_max__h2__origin157__2019-02-11 train=156 label_end=2019-02-11 block=2 params=d8d1d12542f1e03e runtime=0.082s
+2026-08-01 15:47:02,308 | INFO | Completed frequency=weekly h=2 algorithm=random_forest model=rf__weekly__weekly_log_volume__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:03,211 | INFO | Running weekly horizon=4weeks common_origins=2 first=2019-02-25 00:00:00 last=2019-03-04 00:00:00
+2026-08-01 15:47:03,306 | INFO | fit=rf__weekly__weekly_log_volume__ar_brent_coverage__h4__origin159__2019-02-25 train=156 label_end=2019-02-25 block=2 params=d8d1d12542f1e03e runtime=0.076s
+2026-08-01 15:47:03,306 | INFO | Completed frequency=weekly h=4 algorithm=random_forest model=rf__weekly__weekly_log_volume__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:03,444 | INFO | fit=rf__weekly__weekly_log_volume__llm__gemma_2_9b_it__overall_disruption_max__h4__origin159__2019-02-25 train=156 label_end=2019-02-25 block=2 params=d8d1d12542f1e03e runtime=0.125s
+2026-08-01 15:47:03,444 | INFO | Completed frequency=weekly h=4 algorithm=random_forest model=rf__weekly__weekly_log_volume__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:04,357 | INFO | Running weekly horizon=8weeks common_origins=2 first=2019-03-25 00:00:00 last=2019-04-01 00:00:00
+2026-08-01 15:47:04,439 | INFO | fit=rf__weekly__weekly_log_volume__ar_brent_coverage__h8__origin163__2019-03-25 train=156 label_end=2019-03-25 block=2 params=d8d1d12542f1e03e runtime=0.066s
+2026-08-01 15:47:04,439 | INFO | Completed frequency=weekly h=8 algorithm=random_forest model=rf__weekly__weekly_log_volume__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:04,525 | INFO | fit=rf__weekly__weekly_log_volume__llm__gemma_2_9b_it__overall_disruption_max__h8__origin163__2019-03-25 train=156 label_end=2019-03-25 block=2 params=d8d1d12542f1e03e runtime=0.073s
+2026-08-01 15:47:04,525 | INFO | Completed frequency=weekly h=8 algorithm=random_forest model=rf__weekly__weekly_log_volume__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:05,460 | INFO | Running weekly horizon=12weeks common_origins=2 first=2019-04-22 00:00:00 last=2019-04-29 00:00:00
+2026-08-01 15:47:05,536 | INFO | fit=rf__weekly__weekly_log_volume__ar_brent_coverage__h12__origin167__2019-04-22 train=156 label_end=2019-04-22 block=2 params=d8d1d12542f1e03e runtime=0.061s
+2026-08-01 15:47:05,536 | INFO | Completed frequency=weekly h=12 algorithm=random_forest model=rf__weekly__weekly_log_volume__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:05,623 | INFO | fit=rf__weekly__weekly_log_volume__llm__gemma_2_9b_it__overall_disruption_max__h12__origin167__2019-04-22 train=156 label_end=2019-04-22 block=2 params=d8d1d12542f1e03e runtime=0.071s
+2026-08-01 15:47:05,623 | INFO | Completed frequency=weekly h=12 algorithm=random_forest model=rf__weekly__weekly_log_volume__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:05,858 | INFO | Loaded monthly panel rows=121 complete=118 challengers=2 constructions=['mean_safe_weekly', 'adapted_pdf_sqrt_ema3']
+2026-08-01 15:47:06,059 | INFO | Running monthly horizon=1months common_origins=2 first=2021-03-31 00:00:00 last=2021-04-30 00:00:00
+2026-08-01 15:47:06,143 | INFO | fit=rf__monthly__mean_safe_weekly__ar_brent_coverage__h1__origin61__2021-03-31 train=60 label_end=2021-03-31 block=2 params=d8d1d12542f1e03e runtime=0.057s
+2026-08-01 15:47:06,143 | INFO | Completed frequency=monthly h=1 algorithm=random_forest model=rf__monthly__mean_safe_weekly__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:06,222 | INFO | fit=rf__monthly__mean_safe_weekly__llm__gemma_2_9b_it__overall_disruption_max__h1__origin61__2021-03-31 train=60 label_end=2021-03-31 block=2 params=d8d1d12542f1e03e runtime=0.061s
+2026-08-01 15:47:06,222 | INFO | Completed frequency=monthly h=1 algorithm=random_forest model=rf__monthly__mean_safe_weekly__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:06,321 | INFO | fit=rf__monthly__adapted_pdf_sqrt_ema3__ar_brent_coverage__h1__origin61__2021-03-31 train=60 label_end=2021-03-31 block=2 params=d8d1d12542f1e03e runtime=0.083s
+2026-08-01 15:47:06,321 | INFO | Completed frequency=monthly h=1 algorithm=random_forest model=rf__monthly__adapted_pdf_sqrt_ema3__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:06,441 | INFO | fit=rf__monthly__adapted_pdf_sqrt_ema3__llm__gemma_2_9b_it__overall_disruption_max__h1__origin61__2021-03-31 train=60 label_end=2021-03-31 block=2 params=d8d1d12542f1e03e runtime=0.089s
+2026-08-01 15:47:06,441 | INFO | Completed frequency=monthly h=1 algorithm=random_forest model=rf__monthly__adapted_pdf_sqrt_ema3__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:06,735 | INFO | Running monthly horizon=3months common_origins=2 first=2021-05-31 00:00:00 last=2021-06-30 00:00:00
+2026-08-01 15:47:06,837 | INFO | fit=rf__monthly__mean_safe_weekly__ar_brent_coverage__h3__origin63__2021-05-31 train=60 label_end=2021-05-31 block=2 params=d8d1d12542f1e03e runtime=0.081s
+2026-08-01 15:47:06,837 | INFO | Completed frequency=monthly h=3 algorithm=random_forest model=rf__monthly__mean_safe_weekly__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:06,961 | INFO | fit=rf__monthly__mean_safe_weekly__llm__gemma_2_9b_it__overall_disruption_max__h3__origin63__2021-05-31 train=60 label_end=2021-05-31 block=2 params=d8d1d12542f1e03e runtime=0.085s
+2026-08-01 15:47:06,962 | INFO | Completed frequency=monthly h=3 algorithm=random_forest model=rf__monthly__mean_safe_weekly__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:07,058 | INFO | fit=rf__monthly__adapted_pdf_sqrt_ema3__ar_brent_coverage__h3__origin63__2021-05-31 train=60 label_end=2021-05-31 block=2 params=d8d1d12542f1e03e runtime=0.077s
+2026-08-01 15:47:07,058 | INFO | Completed frequency=monthly h=3 algorithm=random_forest model=rf__monthly__adapted_pdf_sqrt_ema3__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:07,122 | INFO | fit=rf__monthly__adapted_pdf_sqrt_ema3__llm__gemma_2_9b_it__overall_disruption_max__h3__origin63__2021-05-31 train=60 label_end=2021-05-31 block=2 params=d8d1d12542f1e03e runtime=0.055s
+2026-08-01 15:47:07,122 | INFO | Completed frequency=monthly h=3 algorithm=random_forest model=rf__monthly__adapted_pdf_sqrt_ema3__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:07,309 | INFO | Running monthly horizon=6months common_origins=2 first=2021-08-31 00:00:00 last=2021-09-30 00:00:00
+2026-08-01 15:47:07,369 | INFO | fit=rf__monthly__mean_safe_weekly__ar_brent_coverage__h6__origin66__2021-08-31 train=60 label_end=2021-08-31 block=2 params=d8d1d12542f1e03e runtime=0.055s
+2026-08-01 15:47:07,369 | INFO | Completed frequency=monthly h=6 algorithm=random_forest model=rf__monthly__mean_safe_weekly__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:07,436 | INFO | fit=rf__monthly__mean_safe_weekly__llm__gemma_2_9b_it__overall_disruption_max__h6__origin66__2021-08-31 train=60 label_end=2021-08-31 block=2 params=d8d1d12542f1e03e runtime=0.057s
+2026-08-01 15:47:07,436 | INFO | Completed frequency=monthly h=6 algorithm=random_forest model=rf__monthly__mean_safe_weekly__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:07,519 | INFO | fit=rf__monthly__adapted_pdf_sqrt_ema3__ar_brent_coverage__h6__origin66__2021-08-31 train=60 label_end=2021-08-31 block=2 params=d8d1d12542f1e03e runtime=0.053s
+2026-08-01 15:47:07,519 | INFO | Completed frequency=monthly h=6 algorithm=random_forest model=rf__monthly__adapted_pdf_sqrt_ema3__ar_brent_coverage forecasts=2 fits=1
+2026-08-01 15:47:07,590 | INFO | fit=rf__monthly__adapted_pdf_sqrt_ema3__llm__gemma_2_9b_it__overall_disruption_max__h6__origin66__2021-08-31 train=60 label_end=2021-08-31 block=2 params=d8d1d12542f1e03e runtime=0.055s
+2026-08-01 15:47:07,590 | INFO | Completed frequency=monthly h=6 algorithm=random_forest model=rf__monthly__adapted_pdf_sqrt_ema3__llm__gemma_2_9b_it__overall_disruption_max forecasts=2 fits=1
+2026-08-01 15:47:08,105 | INFO | Completed forecasts=44 direct=44 hybrids=0 fits=22 tests=22 status=debug_smoke_not_for_publication
+2026-08-01 15:47:08,119 | INFO | Predictions=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\nonlinear_forecasts\nonlinear_scfi_smoke_v001_forecast_predictions.csv
+2026-08-01 15:47:08,119 | INFO | Metrics=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\nonlinear_forecasts\nonlinear_scfi_smoke_v001_forecast_metrics.csv
+2026-08-01 15:47:08,119 | INFO | Manifest=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\nonlinear_forecasts\nonlinear_scfi_smoke_v001_manifest.json
