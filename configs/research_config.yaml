@@ -75,14 +75,20 @@ dynamic_time_series:
   interpretation: dynamic_association_not_automatic_causality
 
 causal_ml:
-  treatment: msdi_innovation
+  treatment: current_msdi_level_innovation_via_stationary_change_reparameterization
+  primary_treatment_path: peak
+  secondary_treatment_path: breadth
+  outcome: impact_inclusive_log_scfi_t_plus_h_minus_log_scfi_t_minus_1
   outcomes_weeks: [1, 2, 4, 8, 12]
+  primary_nuisance_learner: elastic_net
   methods:
     - time_aware_double_ml
-    - causal_forest_after_average_effect_validation
+    - pre_specified_gate_blp_heterogeneity
   optional_methods:
     - dml_iv_when_instrument_is_defensible
+    - causal_forest_after_identification_data_overlap_and_dependency_gates
   cross_fitting: blocked_or_expanding_with_horizon_gap
+  causal_claim_allowed_with_current_panels: false
   required_diagnostics:
     - overlap
     - nuisance_out_of_fold_performance

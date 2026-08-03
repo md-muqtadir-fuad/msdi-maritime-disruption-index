@@ -8,7 +8,8 @@ sc-disrupt/
 │   ├── taxonomy.yaml
 │   ├── scoring_rubric.yaml
 │   ├── model_registry.yaml
-│   └── nonlinear_forecasting.yaml      # fixed parameters + opt-in tuning candidates
+│   ├── nonlinear_forecasting.yaml      # fixed parameters + opt-in tuning candidates
+│   └── causal_ml.yaml                  # frozen DML estimand, folds, learners, inference
 ├── data/
 │   ├── 00_legacy/
 │   ├── 01_raw/
@@ -37,7 +38,7 @@ sc-disrupt/
 │   └── 06_model_ready/
 │       ├── prediction/
 │       ├── causality/
-│       ├── causal_ml/                   # planned DML/causal-forest panels
+│       ├── causal_ml/                   # reserved for future route/IV panels
 │       └── robustness/
 ├── prompts/
 │   ├── 00_relevance/
@@ -57,7 +58,7 @@ sc-disrupt/
 │   ├── modeling/
 │   │   ├── prediction/
 │   │   ├── causality/
-│   │   └── causal_ml/                   # planned DML and heterogeneous effects
+│   │   └── causal_ml/                   # reusable causal-ML package namespace
 │   ├── robustness/
 │   └── visualization/
 ├── docs/
@@ -65,7 +66,8 @@ sc-disrupt/
 │   ├── codebook/
 │   ├── methodology/
 │   │   ├── methodology_overview.md
-│   │   └── q1_research_blueprint.md
+│   │   ├── q1_research_blueprint.md
+│   │   └── causal_ml.md
 │   └── reproducibility/
 ├── annotation/
 ├── experiments/
@@ -104,7 +106,7 @@ sc-disrupt/
 │   ├── 07c_monthly_llm_scfi_comparison.py # dual-construction monthly robustness forecasts
 │   ├── 07d_nonlinear_forecasts.py       # leakage-safe RF/XGBoost/LSTM/Prophet forecasts
 │   ├── 08_causality_analysis.py         # VAR/VARX, Granger, PCMCI, local projections
-│   ├── 08b_causal_ml.py                 # time-aware DML/causal forests
+│   ├── 08b_causal_ml.py                 # time-aware DML + guarded GATE/BLP heterogeneity
 │   ├── 09_robustness_checks.py          # ablation and sensitivity
 │   ├── 09b_error_diagnostics.py         # residual, regime, event, influence errors
 │   ├── 09c_significance_analysis.py     # CIs, effect sizes, p-value correction
@@ -140,8 +142,9 @@ News ingestion and full-text enrichment
                 │   └── Event-study or IV identification
                 ├── Causal machine learning
                 │   ├── Time-aware Double/Debiased ML
+                │   ├── Pre-specified GATE/BLP heterogeneous effects
                 │   ├── DML-IV when an instrument is defensible
-                │   └── Causal forests and heterogeneous effects
+                │   └── Causal forests only after identification/data gates
                 └── Publication-validity audit
                     ├── Component ablation
                     ├── Frequency/specification sensitivity

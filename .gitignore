@@ -17,8 +17,7 @@ __pycache__/
 *.7z
 
 # LLM/API sensitive logs
-outputs/logs/llm_calls/*.jsonl
-outputs/logs/llm_calls/*.csv
+/outputs
 
 # OS/editor
 .DS_Store

@@ -1,0 +1,187 @@
+version: robustness_v001
+
+# Stage 09 evaluates matched ablations and sensitivity specifications. These
+# are observational and predictive checks; they cannot create identification.
+identification:
+  causal_claim_allowed: false
+  interpretation: predictive_robustness_and_conditional_temporal_association
+  instrument_available: false
+  route_panel_available: false
+
+analysis:
+  primary_frequency: weekly
+  monthly_role: robustness
+  frozen_common_article_cohort: 6481
+  common_cohort_required: true
+  score_scale: [0, 4]
+  matched_origins_required: true
+  matched_targets_required: true
+  reference_peak_variant: reference_peak_median
+  reference_breadth_variant: reference_breadth_median7
+
+inputs:
+  article_scores: data/05_indices/article_level/article_consensus_scores.csv
+  weekly_panel: data/06_model_ready/prediction/msdi_scfi_weekly_panel.csv
+  monthly_panel: data/06_model_ready/prediction/llm_specific_scfi_monthly_panel.csv
+  monthly_causality_panel: data/06_model_ready/causality/msdi_scfi_monthly_panel.csv
+  prediction_manifest: outputs/prediction_benchmarks/forecast_v001_manifest.json
+  weekly_llm_manifest: outputs/llm_scfi_comparison/llm_scfi_v001_manifest.json
+  monthly_llm_manifest: outputs/llm_scfi_comparison/llm_scfi_monthly_v001_manifest.json
+  nonlinear_manifest: outputs/nonlinear_forecasts/nonlinear_scfi_v001_manifest.json
+  causality_manifest: outputs/time_series_causality/causality_v001_manifest.json
+  causal_ml_manifest: outputs/causal_ml/causal_ml_v001_manifest.json
+
+models:
+  aliases:
+    - gemma_2_9b_it
+    - qwen_3_8b
+    - qwen_2_5_7b
+
+measurement_variants:
+  # The two references retain the frozen primary definitions: model median of
+  # overall_disruption_max and equal mean of seven dimension medians.
+  equal_model_mean: true
+  individual_llms: true
+  leave_one_llm_out: true
+  leave_one_dimension_out: true
+  media_corrections: [sqrt, mean, none]
+  duplicate_penalties: [inverse, none]
+  article_filters:
+    - exclude_freight_price_only
+    - exclude_low_model_support
+    - exclude_top_ten_sources
+  leave_top_sources_out: true
+  top_source_count: 10
+  standardization: [expanding, rolling_52]
+  permuted_article_dates: true
+  weekly_resampling_frequency: W-FRI
+  primary_duplicate_penalty: sqrt
+  primary_media_correction: log
+  formulas:
+    duplicate_sqrt: one_over_sqrt_duplicate_group_size
+    duplicate_inverse: one_over_duplicate_group_size
+    media_log: weighted_sum_over_log1p_article_count
+    media_mean: weighted_sum_over_article_count
+    media_sqrt: weighted_sum_over_sqrt_effective_article_count
+
+forecast:
+  estimator: ridge
+  ridge_alpha: 1.0
+  target: scfi_log_change
+  loss_functions: [absolute_error, squared_error]
+  weekly:
+    role: primary
+    horizons: [1, 2, 4, 8, 12]
+    lag_sets:
+      primary: [1, 2, 4, 8, 12]
+      short: [1, 2, 4]
+      long: [1, 2, 4, 8, 12, 16]
+    rolling_window_sets:
+      primary: [4, 13, 26, 52]
+      short: [4, 13, 26]
+      long: [4, 13, 26, 52, 104]
+    minimum_training_rows: 156
+    refit_every: 13
+    training_windows: [156, 260]
+    alternative_refit_every: [1, 26]
+  monthly:
+    role: robustness
+    horizons: [1, 3, 6]
+    constructions: [mean_safe_weekly, adapted_pdf_sqrt_ema3]
+    lag_sets:
+      primary: [1, 2, 3, 6, 12]
+      short: [1, 2, 3, 6]
+      long: [1, 2, 3, 6, 12, 18]
+    rolling_window_sets:
+      primary: [3, 6, 12]
+      short: [3, 6]
+      long: [3, 6, 12, 24]
+    minimum_training_rows: 60
+    refit_every: 3
+    training_windows: [60, 84]
+    alternative_refit_every: [1, 6]
+  leakage_contract:
+    features_are_past_only: true
+    training_label_endpoint_must_not_exceed_origin: true
+    imputation_and_scaling_fit_on_training_only: true
+    variant_pairs_use_identical_origin_target_dates: true
+
+dynamic_sensitivity:
+  interpretation: dynamic_association_not_structural_causality
+  transformations: stationary_first_differences
+  var_granger:
+    lag_selection_criterion: bic
+    weekly_max_lag_specs: [4, 8, 12, 16]
+    monthly_max_lag_specs: [2, 3, 6]
+    include_var: true
+    include_varx_with_brent: true
+    residual_diagnostics_required: true
+  pcmci:
+    conditional_independence_test: ParCorr
+    pc_alpha: 0.20
+    final_alpha: 0.05
+    weekly_tau_max_specs: [4, 8, 12]
+    monthly_tau_max_specs: [2, 3, 6]
+    variable_sets: [full_available_four_variable_system]
+    multiplicity: benjamini_hochberg
+    report_link_stability: true
+  ardl_ecm:
+    weekly_lags: [1, 2, 4, 8]
+    monthly_lags: [1, 2, 3, 6]
+    deterministic_terms: [constant, constant_trend]
+  local_projection:
+    weekly_lags: [1, 2, 4, 8, 12]
+    monthly_lags: [1, 2, 3, 6]
+    weekly_maximum_horizon: 12
+    monthly_maximum_horizon: 6
+    treatment_scaling: one_specification_specific_innovation_sd
+  sample_contract:
+    forecast_ablation_samples_matched: true
+    dynamic_lag_effective_samples_matched: false
+    dynamic_lag_sample_caveat_required: true
+
+causal_sensitivity:
+  interpretation: orthogonalized_predictive_effect_not_structural_causality
+  treatment_paths: [peak, breadth]
+  nuisance_learners: [elastic_net, histogram_gradient_boosting, random_forest]
+  weekly_horizons: [1, 2, 4, 8, 12]
+  monthly_horizons: [1, 3, 6]
+  future_treatment_lead_placebo:
+    enabled: true
+    lead_offset_beyond_outcome: 1
+    lead_steps_formula: horizon_plus_one
+    require_lead_strictly_greater_than_outcome_horizon: true
+    use_larger_lead_embargo: true
+    nuisance_learner: elastic_net
+  inference_concordance: [hac, moving_block_bootstrap]
+
+inference:
+  alpha: 0.05
+  confidence_level: 0.95
+  bootstrap_repetitions: 999
+  random_seed: 20260803
+  block_length_rule: max_horizon_and_ceil_cube_root_n
+  paired_loss_difference: baseline_loss_minus_variant_loss
+  positive_loss_difference_interpretation: variant_challenger_performs_better
+  primary_family_correction: holm
+  exploratory_family_correction: benjamini_hochberg
+  report_raw_p_values: true
+  report_adjusted_p_values: true
+  report_effect_sizes: true
+
+regime_sensitivity:
+  split_name: operational_shipping_disruption_period
+  disruption_period_start: "2020-03-01"
+  disruption_period_end: "2022-06-30"
+  official_pandemic_dates: false
+  interpretation: pre_specified_operational_split_not_official_pandemic_dating
+
+skipped_specifications:
+  event_date_assignment: no_extracted_event_date_in_frozen_article_panel
+  revision_real_time_vintage: no_historical_data_vintages_available
+  winsorized_scores: frozen_severity_scores_are_already_bounded_zero_to_four
+  human_performance_weighted_ensemble: no_frozen_human_performance_weights
+  formal_negative_control_category: no_pre_specified_negative_control_article_category
+  dml_iv: no_defensible_instrument_encoded
+  causal_forest: identification_and_route_panel_gates_not_met
+  route_heterogeneity: no_route_by_time_panel

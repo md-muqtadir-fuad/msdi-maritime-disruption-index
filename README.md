@@ -31,6 +31,8 @@ extension.
 .venv\Scripts\python.exe scripts/07b_llm_scfi_comparison.py
 .venv\Scripts\python.exe scripts/07c_monthly_llm_scfi_comparison.py
 .venv\Scripts\python.exe scripts/07d_nonlinear_forecasts.py --frequency both
+.venv\Scripts\python.exe scripts/08_causality_analysis.py
+.venv\Scripts\python.exe scripts/08b_causal_ml.py
 ```
 
 `07d` runs leakage-safe Random Forest, XGBoost, LSTM, and Prophet forecasts at
@@ -49,6 +51,11 @@ is computationally expensive.
 
 See [the nonlinear forecasting method](docs/methodology/nonlinear_forecasting.md)
 for targets, purge rules, score paths, outputs, and interpretation limits.
+
+Script `08b` uses past-only expanding cross-fitting for DML, with weekly peak
+MSDI primary and monthly estimates as robustness only. Its outputs remain
+orthogonalized predictive effects, not structural causal estimates. See
+[the causal-ML method](docs/methodology/causal_ml.md).
 
 ## Testing
 
