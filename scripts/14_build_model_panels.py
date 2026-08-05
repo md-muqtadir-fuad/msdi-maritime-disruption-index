@@ -30,6 +30,13 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MSDI = PROJECT_ROOT / "data/05_indices/weekly/msdi_weekly.csv"
 DEFAULT_SCFI = PROJECT_ROOT / "data/01_raw/freight/scfi/freight_index_data_legacy.xlsx"
 DEFAULT_BRENT = PROJECT_ROOT / "data/01_raw/controls/brent/brent_weekly_legacy.csv"
+DEFAULT_EXTERNAL_CONTROLS = PROJECT_ROOT / "data/02_interim/controls/external_controls_clean_long.csv"
+EXTERNAL_CONTROL_COLUMNS = (
+    "cpb_world_trade_volume",
+    "gscpi",
+    "unctad_china_core_lane_lsbci",
+    "imf_portwatch_global_container_calls",
+)
 DEFAULT_WEEKLY_OUTPUT = (
     PROJECT_ROOT / "data/06_model_ready/prediction/msdi_scfi_weekly_panel.csv"
 )
@@ -79,6 +86,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--scfi", type=Path, default=DEFAULT_SCFI)
     parser.add_argument("--scfi-sheet", default="Sheet1")
     parser.add_argument("--brent", type=Path, default=DEFAULT_BRENT)
+    parser.add_argument("--external-controls", type=Path, default=DEFAULT_EXTERNAL_CONTROLS)
     parser.add_argument("--weekly-output", type=Path, default=DEFAULT_WEEKLY_OUTPUT)
     parser.add_argument("--monthly-output", type=Path, default=DEFAULT_MONTHLY_OUTPUT)
     parser.add_argument("--audit-dir", type=Path, default=DEFAULT_AUDIT_DIR)
@@ -282,6 +290,41 @@ def safe_log(series: pd.Series) -> pd.Series:
     return np.log(numeric.where(numeric.gt(0)))
 
 
+def load_external_controls(path: Path) -> tuple[pd.DataFrame, dict[str, Any]]:
+    raw = pd.read_csv(require_file(path, "Cleaned external controls"), low_memory=False)
+    required = {"variable", "availability_date", "value", "source_frequency"}
+    missing = required - set(raw.columns)
+    if missing:
+        raise ValueError(f"External controls lack required columns: {sorted(missing)}")
+    raw["availability_date"] = pd.to_datetime(raw["availability_date"], errors="coerce")
+    raw["value"] = pd.to_numeric(raw["value"], errors="coerce")
+    raw = raw.loc[raw["variable"].isin(EXTERNAL_CONTROL_COLUMNS)].dropna(subset=["availability_date", "value"])
+    absent = sorted(set(EXTERNAL_CONTROL_COLUMNS) - set(raw["variable"]))
+    if absent:
+        raise ValueError(f"External controls missing expected variables: {absent}")
+    if raw.duplicated(["variable", "availability_date"]).any():
+        raise ValueError("External controls have duplicate variable/availability-date keys")
+    return raw.sort_values(["variable", "availability_date"]), {"rows": len(raw), "variables": sorted(raw.variable.unique().tolist()), "first_available": str(raw.availability_date.min().date()), "last_available": str(raw.availability_date.max().date())}
+
+
+def attach_external_controls(panel: pd.DataFrame, controls: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Attach only released values; current values are retained for audit, model sets use lags."""
+    result = panel.sort_values("observation_date").copy(); audit: dict[str, Any] = {}
+    maximum_age = {"daily": 7, "monthly": 75, "quarterly": 180}
+    for variable, group in controls.groupby("variable", sort=True):
+        source = group[["availability_date", "value", "source_frequency"]].sort_values("availability_date")
+        joined = pd.merge_asof(result[["observation_date"]], source, left_on="observation_date", right_on="availability_date", direction="backward", allow_exact_matches=True)
+        age = (result["observation_date"] - joined["availability_date"]).dt.days
+        threshold = int(maximum_age[str(group["source_frequency"].iloc[0])])
+        stale = joined["availability_date"].notna() & age.gt(threshold)
+        if stale.any(): joined.loc[stale, "value"] = np.nan
+        future = joined["availability_date"].notna() & joined["availability_date"].gt(result["observation_date"])
+        if future.any(): raise AssertionError(f"Future external-control match: {variable}")
+        result[variable] = joined["value"].to_numpy(); result[f"{variable}_availability_date"] = joined["availability_date"].to_numpy(); result[f"{variable}_age_days"] = age.to_numpy()
+        audit[variable] = {"frequency": str(group["source_frequency"].iloc[0]), "maximum_age_days": threshold, "matched": int(joined["availability_date"].notna().sum()), "stale_rejected": int(stale.sum()), "future_matches": int(future.sum())}
+    return result, audit
+
+
 def add_calendar_features(panel: pd.DataFrame) -> pd.DataFrame:
     result = panel.copy()
     iso_week = result["observation_date"].dt.isocalendar().week.astype(float)
@@ -330,6 +373,9 @@ def add_weekly_features(panel: pd.DataFrame) -> tuple[pd.DataFrame, list[dict[st
             dictionary.append(
                 feature_entry(column, "MSDI predictor", f"{predictor} lagged {lag} rows/weeks", f"t-{lag}")
             )
+        for control in EXTERNAL_CONTROL_COLUMNS:
+            column = f"{control}_lag_{lag}w"; result[column] = result[control].shift(lag)
+            dictionary.append(feature_entry(column, "external control", f"Released {control} lagged {lag} weeks", f"t-{lag}"))
 
     for horizon in (1, 4, 13):
         result[f"scfi_log_change_{horizon}w"] = result["scfi_log"].diff(horizon)
@@ -405,6 +451,7 @@ def add_weekly_features(panel: pd.DataFrame) -> tuple[pd.DataFrame, list[dict[st
             feature_entry("msdi_age_days", "provenance", "Days from MSDI source date to SCFI date", "nonnegative"),
             feature_entry("brent_observation_date", "provenance", "Matched Brent source date", "<= t"),
             feature_entry("brent_age_days", "provenance", "Days from Brent source date to SCFI date", "nonnegative"),
+            *[feature_entry(control, "external control", "Released external control; retained for provenance, not used contemporaneously", "available at or before t") for control in EXTERNAL_CONTROL_COLUMNS],
         ]
     )
     result = add_calendar_features(result)
@@ -434,6 +481,7 @@ def build_weekly_panel(
     scfi: pd.DataFrame,
     msdi: pd.DataFrame,
     brent: pd.DataFrame,
+    external_controls: pd.DataFrame,
     maximum_age_days: int,
 ) -> tuple[pd.DataFrame, list[dict[str, Any]], dict[str, Any]]:
     panel, msdi_join = backward_join(
@@ -452,6 +500,7 @@ def build_weekly_panel(
         maximum_age_days,
         "brent",
     )
+    panel, external_join = attach_external_controls(panel, external_controls)
     panel, dictionary = add_weekly_features(panel)
     panel["has_msdi_predictors"] = panel[PRIMARY_PREDICTORS].notna().all(axis=1)
     panel["has_brent_control"] = panel["brent_price"].notna()
@@ -460,7 +509,7 @@ def build_weekly_panel(
     ].notna().all(axis=1)
     report = {
         "msdi_join": msdi_join,
-        "brent_join": brent_join,
+        "brent_join": brent_join, "external_control_join": external_join,
         "weekly_rows": len(panel),
         "rows_with_both_msdi_paths": int(panel["has_msdi_predictors"].sum()),
         "base_model_complete_rows": int(panel["base_model_complete_case"].sum()),
@@ -491,6 +540,8 @@ def build_monthly_panel(weekly: pd.DataFrame) -> tuple[pd.DataFrame, list[dict[s
         "weeks_observed_flag": "sum",
         "msdi_available_flag": "sum",
     }
+    for control in EXTERNAL_CONTROL_COLUMNS:
+        aggregations[control] = "last"
     for column in MSDI_BASE_COLUMNS:
         if column.endswith("_media_corrected") and column not in aggregations:
             aggregations[column] = "mean"
@@ -509,6 +560,7 @@ def build_monthly_panel(weekly: pd.DataFrame) -> tuple[pd.DataFrame, list[dict[s
             "brent_price_last": "brent_month_end",
             "weeks_observed_flag_sum": "weekly_observations_in_month",
             "msdi_available_flag_sum": "msdi_available_weeks",
+            **{f"{control}_last": control for control in EXTERNAL_CONTROL_COLUMNS},
         }
     )
     no_msdi = monthly["msdi_available_weeks"].eq(0)
@@ -525,6 +577,8 @@ def build_monthly_panel(weekly: pd.DataFrame) -> tuple[pd.DataFrame, list[dict[s
     monthly["scfi_monthly_mean_log_change_1m"] = monthly["scfi_monthly_mean_log"].diff()
     monthly["scfi_month_end_log_change_1m"] = monthly["scfi_month_end_log"].diff()
     monthly["brent_monthly_mean_log_change_1m"] = monthly["brent_monthly_mean_log"].diff()
+    for control in EXTERNAL_CONTROL_COLUMNS:
+        monthly[f"{control}_lag_1m"] = monthly[control].shift(1)
 
     dictionary: list[dict[str, Any]] = [
         feature_entry("month_ending", "key", "Calendar month end", "t"),
@@ -601,15 +655,17 @@ def main() -> None:
     scfi_path = require_file(args.scfi, "SCFI workbook")
     msdi_path = require_file(args.msdi, "Weekly MSDI file")
     brent_path = require_file(args.brent, "Brent file")
+    external_controls_path = require_file(args.external_controls, "Cleaned external controls")
     scfi, scfi_report = load_scfi(scfi_path, args.scfi_sheet)
     msdi, msdi_report = load_msdi(msdi_path)
     brent, brent_report = load_brent(brent_path)
+    external_controls, external_controls_report = load_external_controls(external_controls_path)
     logger.info("SCFI: rows=%s range=%s to %s", len(scfi), scfi.observation_date.min(), scfi.observation_date.max())
     logger.info("MSDI: rows=%s range=%s to %s", len(msdi), msdi.msdi_week_ending.min(), msdi.msdi_week_ending.max())
     logger.info("Brent: rows=%s range=%s to %s", len(brent), brent.brent_observation_date.min(), brent.brent_observation_date.max())
 
     weekly, weekly_dictionary, panel_report = build_weekly_panel(
-        scfi, msdi, brent, args.maximum_feature_age_days
+        scfi, msdi, brent, external_controls, args.maximum_feature_age_days
     )
     monthly, monthly_dictionary = build_monthly_panel(weekly)
 
@@ -642,6 +698,7 @@ def main() -> None:
                 & weekly["brent_observation_date"].gt(weekly["observation_date"])
             ).sum()
         ),
+        "external_controls": int(sum(panel_report["external_control_join"][name]["future_matches"] for name in EXTERNAL_CONTROL_COLUMNS)),
     }
     if any(future_feature_violations.values()):
         raise AssertionError(f"Future feature-date violations detected: {future_feature_violations}")
@@ -653,6 +710,7 @@ def main() -> None:
             "scfi": {"path": str(scfi_path), "sha256": sha256_file(scfi_path), "report": scfi_report},
             "msdi": {"path": str(msdi_path), "sha256": sha256_file(msdi_path), "report": msdi_report},
             "brent": {"path": str(brent_path), "sha256": sha256_file(brent_path), "report": brent_report},
+            "external_controls": {"path": str(external_controls_path), "sha256": sha256_file(external_controls_path), "report": external_controls_report},
         },
         "alignment": {
             "method": "backward-only merge_asof",

@@ -787,6 +787,8 @@ def build_weekly_context(
         "observation_date",
         "scfi_log_change_1w",
         "brent_log_change_1w",
+        "cpb_world_trade_volume_lag_1w",
+        "unctad_china_core_lane_lsbci_lag_1w",
     ]
     panel = pd.read_csv(panel_path, usecols=usecols)
     panel["origin_date"] = pd.to_datetime(panel.pop("observation_date"))
@@ -804,7 +806,7 @@ def build_weekly_context(
     )
     panel = pd.concat([panel, volatility], axis=1)
     panel["past_only_target_scale"] = panel["volatility"]
-    panel["control_missing_count"] = panel[["brent_log_change"]].isna().sum(axis=1)
+    panel["control_missing_count"] = panel[["brent_log_change", "cpb_world_trade_volume_lag_1w", "unctad_china_core_lane_lsbci_lag_1w"]].isna().sum(axis=1)
     panel["frequency"] = "weekly"
     panel["index_construction"] = "weekly_log_volume"
     source_start = article_aggregate["origin_date"].min()

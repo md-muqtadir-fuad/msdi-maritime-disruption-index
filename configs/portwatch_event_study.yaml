@@ -1,0 +1,10 @@
+version: portwatch_event_study_v001
+role: descriptive_2019_plus_robustness_not_primary_forecast_control
+portwatch_column: imf_portwatch_global_container_calls
+events:
+  covid_initial_shock: 2020-03-09
+  suez_ever_given: 2021-03-22
+  shanghai_lockdown: 2022-03-28
+  red_sea_rerouting: 2023-12-04
+pre_weeks: 8
+post_weeks: 12

@@ -99,6 +99,11 @@ BRENT_FEATURES = (
     *[f"brent_monthly_mean_log_lag_{lag}m" for lag in LAGS],
     *[f"brent_monthly_mean_log_change_{lag}m" for lag in BACKWARD_CHANGES],
 )
+EXTERNAL_CONTROL_RAW_COLUMNS = SUPPORT.EXTERNAL_CONTROL_RAW_COLUMNS
+EXTERNAL_CONTROL_FEATURES = (
+    "cpb_world_trade_volume_lag_1m",
+    "unctad_china_core_lane_lsbci_lag_1m",
+)
 
 
 @dataclass(frozen=True)
@@ -520,6 +525,8 @@ def aggregate_complete_months(
                 group["llm_signal_age_days"].max() if llm_complete else math.nan
             ),
         }
+        for control in EXTERNAL_CONTROL_RAW_COLUMNS:
+            row[control] = group[control].iloc[-1] if dates_complete and control in group else math.nan
         for column in raw_signal_columns:
             source, signal = column.removeprefix("llm_signal__").split("__", maxsplit=1)
             mean_column = monthly_signal_column(MEAN_SAFE_WEEKLY, source, signal)
@@ -694,6 +701,8 @@ def prepare_monthly_model_panel(
         panel[f"brent_monthly_mean_log_change_{lag}m"] = panel[
             "brent_monthly_mean_log"
         ].diff(lag)
+    for control in EXTERNAL_CONTROL_RAW_COLUMNS:
+        panel[f"{control}_lag_1m"] = panel[control].shift(1)
     calendar_month = panel["month_ending"].dt.month.astype(float)
     panel["calendar_month_sin"] = np.sin(2 * np.pi * calendar_month / 12)
     panel["calendar_month_cos"] = np.cos(2 * np.pi * calendar_month / 12)
@@ -721,6 +730,7 @@ def prepare_monthly_model_panel(
         "brent_monthly_mean_log",
         *COVERAGE_FEATURES,
         *raw_signal_columns,
+        *EXTERNAL_CONTROL_FEATURES,
     ]
     panel["llm_monthly_comparison_complete_case"] = (
         panel["monthly_analysis_complete_case"].astype(bool)
@@ -824,7 +834,7 @@ def build_feature_sets(
 ) -> dict[str, list[str]]:
     available = set(panel.columns)
     base = [*AR_FEATURES, *BRENT_FEATURES]
-    coverage = [*base, *COVERAGE_FEATURES]
+    coverage = [*base, *COVERAGE_FEATURES, *EXTERNAL_CONTROL_FEATURES]
     missing_base = [column for column in coverage if column not in available]
     if missing_base:
         raise ValueError(f"Monthly panel lacks baseline features: {missing_base}")

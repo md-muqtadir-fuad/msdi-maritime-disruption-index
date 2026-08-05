@@ -82,6 +82,8 @@ OPTIONAL_COLUMN_MAP = {
         "supply_disruption": "supply_disruption_media_corrected",
         "production_disruption": "production_disruption_media_corrected",
         "demand_disruption": "demand_disruption_media_corrected",
+        "cpb_world_trade_volume": "cpb_world_trade_volume",
+        "unctad_china_core_lane_lsbci": "unctad_china_core_lane_lsbci",
     },
     "monthly": {
         "peak_model_disagreement": "peak_model_disagreement_mean_mean",
@@ -93,6 +95,8 @@ OPTIONAL_COLUMN_MAP = {
         "supply_disruption": "supply_disruption_media_corrected_mean",
         "production_disruption": "production_disruption_media_corrected_mean",
         "demand_disruption": "demand_disruption_media_corrected_mean",
+        "cpb_world_trade_volume": "cpb_world_trade_volume",
+        "unctad_china_core_lane_lsbci": "unctad_china_core_lane_lsbci",
     },
 }
 HETEROGENEITY_MODIFIERS = (
@@ -2376,7 +2380,7 @@ def main() -> None:
                 "negative_control_article_category",
                 "route_exposure_panel",
                 "human_validated_final_index",
-                "complete_external_confounder_set_including_gscpi_and_trade_demand",
+                "complete_external_confounder_set_including_trade_demand_and_route_connectivity",
             ],
             "permitted_language": (
                 "orthogonalized predictive effect or conditional dynamic association"

@@ -98,6 +98,11 @@ BRENT_FEATURES = (
     "brent_log_change_13w",
 )
 COVERAGE_FEATURES = ("llm_common_article_count", "llm_common_effective_article_count")
+EXTERNAL_CONTROL_FEATURES = (
+    *[f"cpb_world_trade_volume_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
+    *[f"unctad_china_core_lane_lsbci_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
+)
+EXTERNAL_CONTROL_RAW_COLUMNS = ("cpb_world_trade_volume", "unctad_china_core_lane_lsbci")
 BASELINE_MODEL_IDS = {
     "naive_zero_change",
     "historical_mean_change",
@@ -508,6 +513,7 @@ def load_base_panel(path: Path) -> pd.DataFrame:
         *BRENT_FEATURES,
         *[f"target_scfi_log_change_h{horizon}w" for horizon in HORIZONS],
         *[f"target_scfi_level_h{horizon}w" for horizon in HORIZONS],
+        *EXTERNAL_CONTROL_FEATURES,
     }
     missing = sorted(required - set(raw.columns))
     if missing:
@@ -525,6 +531,8 @@ def load_base_panel(path: Path) -> pd.DataFrame:
         *BRENT_FEATURES,
         *[f"target_scfi_log_change_h{horizon}w" for horizon in HORIZONS],
         *[f"target_scfi_level_h{horizon}w" for horizon in HORIZONS],
+        *EXTERNAL_CONTROL_FEATURES,
+        *EXTERNAL_CONTROL_RAW_COLUMNS,
     ]
     selected = list(dict.fromkeys(selected))
     panel = raw[selected].copy()
@@ -620,6 +628,7 @@ def build_aligned_panel(
         "brent_log",
         *COVERAGE_FEATURES,
         *raw_signal_columns,
+        *EXTERNAL_CONTROL_FEATURES,
     ]
     panel["llm_comparison_complete_case"] = panel[current_requirements].notna().all(axis=1)
     report = {
@@ -673,7 +682,7 @@ def build_feature_sets(
 ) -> dict[str, list[str]]:
     available = set(panel.columns)
     base = [*AR_FEATURES, *BRENT_FEATURES]
-    coverage = [*base, *COVERAGE_FEATURES]
+    coverage = [*base, *COVERAGE_FEATURES, *EXTERNAL_CONTROL_FEATURES]
     missing_base = [column for column in coverage if column not in available]
     if missing_base:
         raise ValueError(f"Aligned panel lacks baseline features: {missing_base}")

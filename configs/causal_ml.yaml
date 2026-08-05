@@ -75,6 +75,8 @@ features:
     - supply_disruption
     - production_disruption
     - demand_disruption
+    - cpb_world_trade_volume
+    - unctad_china_core_lane_lsbci
   deterministic_controls:
     - season_sin
     - season_cos

@@ -160,6 +160,14 @@ def build_feature_sets(columns: list[str]) -> dict[str, list[str]]:
         available,
         "Brent",
     )
+    external_controls = unique_existing(
+        [
+            *[f"cpb_world_trade_volume_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
+            *[f"unctad_china_core_lane_lsbci_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
+        ],
+        available,
+        "released external controls",
+    )
     shared_news = unique_existing(
         [
             "article_count",
@@ -221,10 +229,10 @@ def build_feature_sets(columns: list[str]) -> dict[str, list[str]]:
     )
     feature_sets = {
         "ar": ar,
-        "ar_brent": [*ar, *brent],
-        "ar_brent_peak": list(dict.fromkeys([*ar, *brent, *peak])),
-        "ar_brent_breadth": list(dict.fromkeys([*ar, *brent, *breadth])),
-        "ar_brent_both": list(dict.fromkeys([*ar, *brent, *peak, *breadth])),
+        "ar_brent": [*ar, *brent, *external_controls],
+        "ar_brent_peak": list(dict.fromkeys([*ar, *brent, *external_controls, *peak])),
+        "ar_brent_breadth": list(dict.fromkeys([*ar, *brent, *external_controls, *breadth])),
+        "ar_brent_both": list(dict.fromkeys([*ar, *brent, *external_controls, *peak, *breadth])),
     }
     for name, features in feature_sets.items():
         forbidden = [feature for feature in features if feature.startswith("target_")]

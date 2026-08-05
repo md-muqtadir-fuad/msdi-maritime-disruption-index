@@ -137,6 +137,11 @@ MONTHLY_BRENT_FEATURES = (
     *[f"brent_monthly_mean_log_lag_{lag}m" for lag in MONTHLY_LAGS],
     *[f"brent_monthly_mean_log_change_{lag}m" for lag in (1, 3, 6, 12)],
 )
+WEEKLY_EXTERNAL_CONTROL_FEATURES = (
+    *[f"cpb_world_trade_volume_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
+    *[f"unctad_china_core_lane_lsbci_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
+)
+MONTHLY_EXTERNAL_CONTROL_FEATURES = ("cpb_world_trade_volume_lag_1m", "unctad_china_core_lane_lsbci_lag_1m")
 
 PREDICTION_KEY_COLUMNS = (
     "frequency",
@@ -1082,6 +1087,7 @@ def load_weekly_base_panel(path: Path) -> pd.DataFrame:
         "scfi",
         *WEEKLY_AR_FEATURES,
         *WEEKLY_BRENT_FEATURES,
+        *WEEKLY_EXTERNAL_CONTROL_FEATURES,
         *[f"target_scfi_log_change_h{h}w" for h in (1, 2, 4, 8, 12)],
         *[f"target_scfi_level_h{h}w" for h in (1, 2, 4, 8, 12)],
     }
@@ -1110,6 +1116,7 @@ def load_monthly_base_panel(path: Path) -> pd.DataFrame:
         "scfi_monthly_mean",
         *MONTHLY_AR_FEATURES,
         *MONTHLY_BRENT_FEATURES,
+        *MONTHLY_EXTERNAL_CONTROL_FEATURES,
         *[f"target_scfi_monthly_log_change_h{h}m" for h in (1, 3, 6)],
         *[f"target_scfi_monthly_mean_h{h}m" for h in (1, 3, 6)],
     }
@@ -2011,6 +2018,7 @@ def forecast_feature_columns(
         unit = "w"
         base = list(WEEKLY_AR_FEATURES)
         brent = list(WEEKLY_BRENT_FEATURES)
+        external_controls = list(WEEKLY_EXTERNAL_CONTROL_FEATURES)
         raw = [
             _variant_column("signal", variant)
             for variant in specification.signal_variants
@@ -2025,6 +2033,7 @@ def forecast_feature_columns(
         unit = "m"
         base = list(MONTHLY_AR_FEATURES)
         brent = list(MONTHLY_BRENT_FEATURES)
+        external_controls = list(MONTHLY_EXTERNAL_CONTROL_FEATURES)
         raw = [
             _variant_column("signal", variant, construction)
             for variant in specification.signal_variants
@@ -2042,6 +2051,7 @@ def forecast_feature_columns(
     features = list(base)
     if specification.include_brent:
         features.extend(brent)
+        features.extend(external_controls)
     if specification.include_coverage:
         features.extend(coverage)
     for column in raw:

@@ -81,6 +81,14 @@ Republic of Korea, and Singapore), not an all-pairs mean. Correlation and
 lagged-association outputs report HAC/FDR inference; ordinary IID correlation
 p-values are descriptive only.
 
+The integrated primary-control set is deliberately limited to released, lagged
+CPB global trade demand and China-core-lane UNCTAD connectivity. Stage 14
+attaches every external source by its `availability_date` using a backward-only
+join, records source age, and downstream model sets use only lags. GSCPI is
+retained for benchmark/convergent-validity analysis, never as a primary model
+control. PortWatch is retained only for the separate 2019+ event-study and
+robustness module.
+
 After placing the four downloads in those folders, run the optional control
 extension in order:
 
@@ -88,6 +96,7 @@ extension in order:
 .venv\Scripts\python.exe scripts\25_clean_external_controls.py
 .venv\Scripts\python.exe scripts\26_external_controls_eda.py
 .venv\Scripts\python.exe scripts\27_external_controls_statistical_analysis.py
+.venv\Scripts\python.exe scripts\30_portwatch_event_study.py
 ```
 
 Stage 25 leaves raw files unchanged and writes the standardized, availability-
@@ -97,6 +106,10 @@ exports FDR-adjusted Pearson/Spearman tests, lagged one-to-one SCFI
 associations, and VIF multicollinearity diagnostics. These optional scripts do
 not alter the existing `00`â€“`24` publication pipeline until the controls are
 explicitly incorporated into Stage 14 and the downstream models are rerun.
+
+After the cleaner has completed, use the normal runner from Stage 14 so the
+forecasting, dynamic-association, causal-ML, robustness, diagnostics,
+significance, and publication stages all consume the rebuilt panels.
 
 ## Temporary pseudo annotations
 

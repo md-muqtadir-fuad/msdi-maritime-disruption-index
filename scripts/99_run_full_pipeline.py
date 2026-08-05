@@ -49,6 +49,7 @@ OPTIONAL_EXTENSION_SCRIPTS = (
     "27_external_controls_statistical_analysis.py",
     "28_create_pseudo_annotations.py",
     "29_inter_annotator_agreement.py",
+    "30_portwatch_event_study.py",
 )
 
 
@@ -293,6 +294,7 @@ CONFIG_PATHS = (
     "configs/causal_ml.yaml",
     "configs/error_diagnostics.yaml",
     "configs/external_controls.yaml",
+    "configs/portwatch_event_study.yaml",
     "configs/model_registry.yaml",
     "configs/nonlinear_forecasting.yaml",
     "configs/paths.yaml",

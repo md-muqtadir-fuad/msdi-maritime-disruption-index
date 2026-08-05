@@ -54,6 +54,11 @@ ENDOGENOUS_VARIABLES = (
     "news_volume_change",
 )
 SEASONAL_CONTROLS = ("season_sin", "season_cos")
+EXTERNAL_CONTROL_COLUMNS = ("cpb_world_trade_volume", "unctad_china_core_lane_lsbci")
+
+
+def exogenous_controls(frame: pd.DataFrame) -> list[str]:
+    return [*SEASONAL_CONTROLS, *[f"{column}_lag_1" for column in EXTERNAL_CONTROL_COLUMNS if f"{column}_lag_1" in frame]]
 
 
 @dataclass(frozen=True)
@@ -240,6 +245,10 @@ def prepare_analysis_frame(
     frame["brent_return"] = frame["brent_log"].diff()
     frame["msdi_change"] = frame["msdi_level"].diff()
     frame["news_volume_change"] = frame["log_news_volume"].diff()
+    for column in EXTERNAL_CONTROL_COLUMNS:
+        if column not in panel.columns:
+            raise ValueError(f"{spec.frequency} panel lacks required released external control: {column}")
+        frame[f"{column}_lag_1"] = pd.to_numeric(panel[column], errors="coerce").shift(1)
 
     if spec.frequency == "weekly":
         cycle = frame["date"].dt.isocalendar().week.astype(float)
@@ -455,7 +464,7 @@ def fit_varx(
     alpha: float = 0.05,
 ) -> tuple[Any, pd.DataFrame]:
     endog = frame[list(ENDOGENOUS_VARIABLES)].astype(float)
-    exog = frame[list(SEASONAL_CONTROLS)].astype(float)
+    exog = frame[exogenous_controls(frame)].astype(float)
     model = VAR(endog=endog, exog=exog)
     rows: list[dict[str, Any]] = []
     fitted: dict[int, Any] = {}
@@ -611,7 +620,7 @@ def hac_conditional_granger_tests(
     for variable in ENDOGENOUS_VARIABLES:
         for lag in range(1, maximum_lag + 1):
             design[f"{variable}_lag_{lag}"] = frame[variable].shift(lag)
-    for control in SEASONAL_CONTROLS:
+    for control in exogenous_controls(frame):
         design[control] = frame[control]
     directions = [
         ("msdi_change", "scfi_return"),
@@ -1533,7 +1542,7 @@ def main() -> None:
             )
             analysis_frame, sample_audit = select_longest_complete_block(
                 prepared,
-                [*ENDOGENOUS_VARIABLES, *SEASONAL_CONTROLS, "scfi_log"],
+                [*ENDOGENOUS_VARIABLES, *exogenous_controls(analysis_frame), "scfi_log"],
                 spec.frequency,
             )
             sample_audit.update(
