@@ -80,8 +80,8 @@ DEFAULT_CAUSAL_ML_CONFIG = PROJECT_ROOT / "configs/causal_ml.yaml"
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs/robustness"
 DEFAULT_LOG_DIR = PROJECT_ROOT / "outputs/logs"
 
-SCRIPT_08 = PROJECT_ROOT / "scripts/08_causality_analysis.py"
-SCRIPT_08B = PROJECT_ROOT / "scripts/08b_causal_ml.py"
+SCRIPT_08 = PROJECT_ROOT / "scripts/19_time_series_causality.py"
+SCRIPT_08B = PROJECT_ROOT / "scripts/20_causal_ml.py"
 
 DIMENSION_COLUMNS = (
     "port_disruption_score",
@@ -332,7 +332,7 @@ def assert_project_venv() -> Path:
     if expected not in executable.parents:
         raise RuntimeError(
             "Run this stage with the project environment: "
-            ".venv\\Scripts\\python.exe scripts\\09_robustness_checks.py"
+            ".venv\\Scripts\\python.exe scripts\\21_ablation_sensitivity_checks.py"
         )
     return executable
 
@@ -4081,12 +4081,16 @@ def selected_dynamic_lags_from_manifest(
 
 
 def nonlinear_forecast_robustness_from_manifest(
-    manifest_path: Path, selected_frequencies: Sequence[str]
+    manifest_path: Path,
+    selected_frequencies: Sequence[str],
+    expected_algorithm_names: Sequence[str],
 ) -> tuple[dict[str, pd.DataFrame], pd.DataFrame]:
     path = require_file(manifest_path, "Stage-07d nonlinear manifest")
     manifest = json.loads(path.read_text(encoding="utf-8"))
     design = manifest.get("design", {})
-    expected_algorithms = {"random_forest", "xgboost", "lstm", "prophet"}
+    expected_algorithms = set(expected_algorithm_names)
+    if len(expected_algorithms) != len(tuple(expected_algorithm_names)):
+        raise ValueError("Configured extended algorithms must be unique")
     requested = set(design.get("requested_algorithms", []))
     executed = set(design.get("executed_algorithms", []))
     if (
@@ -4879,7 +4883,9 @@ def main() -> int:
 
         nonlinear_outputs, nonlinear_source_audit = (
             nonlinear_forecast_robustness_from_manifest(
-                args.nonlinear_manifest, selected_frequencies
+                args.nonlinear_manifest,
+                selected_frequencies,
+                config["forecast"]["extended_algorithms"],
             )
         )
         logger.info(
@@ -5158,10 +5164,7 @@ def main() -> int:
                 "positive_loss_difference_favors": "variant_challenger",
                 "forecast_estimator": "ridge_fixed_alpha",
                 "nonlinear_algorithms_consolidated_not_refit": [
-                    "random_forest",
-                    "xgboost",
-                    "lstm",
-                    "prophet",
+                    *config["forecast"]["extended_algorithms"],
                 ],
                 "nonlinear_evidence_role": "secondary_predictive_algorithm_robustness",
                 "dynamic_effective_samples_matched_across_lag_specs": False,

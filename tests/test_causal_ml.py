@@ -15,7 +15,7 @@ import statsmodels.api as sm
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = PROJECT_ROOT / "scripts/08b_causal_ml.py"
+SCRIPT = PROJECT_ROOT / "scripts/20_causal_ml.py"
 SPEC = importlib.util.spec_from_file_location("causal_ml", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)

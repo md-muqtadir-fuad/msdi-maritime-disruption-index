@@ -10,7 +10,7 @@ import pandas as pd
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = PROJECT_ROOT / "scripts/09_robustness_checks.py"
+SCRIPT = PROJECT_ROOT / "scripts/21_ablation_sensitivity_checks.py"
 SPEC = importlib.util.spec_from_file_location("robustness_checks", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -53,6 +53,10 @@ class RobustnessChecksTests(unittest.TestCase):
         self.assertTrue(config["analysis"]["common_cohort_required"])
         self.assertEqual(config["analysis"]["score_scale"], [0, 4])
         self.assertEqual(config["forecast"]["ridge_alpha"], 1.0)
+        self.assertEqual(
+            config["forecast"]["extended_algorithms"],
+            ["glm", "lstm", "prophet", "random_forest", "xgboost"],
+        )
         self.assertEqual(config["inference"]["bootstrap_repetitions"], 999)
         self.assertEqual(
             config["causal_sensitivity"]["future_treatment_lead_placebo"]

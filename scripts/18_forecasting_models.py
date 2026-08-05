@@ -1,9 +1,10 @@
-"""Leakage-safe nonlinear weekly and monthly SCFI forecasts.
+"""Leakage-safe extended weekly and monthly SCFI forecasts.
 
 This stage extends the frozen common-cohort panels produced by 07b and 07c.
-Random forests, XGBoost, a small PyTorch LSTM, and Prophet all predict the same
-direct target: the forward SCFI log change known only after the forecast
-origin.  Weekly results are primary; monthly results are robustness evidence.
+A Gaussian identity-link GLM, random forests, XGBoost, a small PyTorch LSTM,
+and Prophet all predict the same direct target: the forward SCFI log change
+known only after the forecast origin.  Weekly results are primary; monthly
+results are robustness evidence.
 
 The normal run uses the fixed, pre-specified parameters in
 ``configs/nonlinear_forecasting.yaml``.  ``--tune`` is deliberately opt-in and
@@ -37,6 +38,7 @@ from scipy.optimize import nnls
 from scipy.stats import norm
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.impute import SimpleImputer
+from sklearn.linear_model import TweedieRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -69,14 +71,16 @@ DEFAULT_MONTHLY_FEATURES = (
     / "outputs/llm_scfi_comparison/llm_scfi_monthly_v001_feature_sets.json"
 )
 
-ALGORITHMS = ("random_forest", "xgboost", "lstm", "prophet")
+ALGORITHMS = ("glm", "random_forest", "xgboost", "lstm", "prophet")
 SHORT_ALGORITHM_NAMES = {
+    "glm": "glm",
     "random_forest": "rf",
     "xgboost": "xgboost",
     "lstm": "lstm",
     "prophet": "prophet",
 }
 DEPENDENCY_PACKAGES = {
+    "glm": "scikit-learn",
     "random_forest": "scikit-learn",
     "xgboost": "xgboost",
     "lstm": "torch",
@@ -232,8 +236,9 @@ class ProphetArtifact:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Leakage-safe RF, XGBoost, LSTM, and Prophet forecasts for weekly "
-            "and monthly SCFI. Fixed parameters are used unless --tune is set."
+            "Leakage-safe Gaussian GLM, RF, XGBoost, LSTM, and Prophet forecasts "
+            "for weekly and monthly SCFI. Fixed parameters are used unless "
+            "--tune is set."
         )
     )
     parser.add_argument(
@@ -242,7 +247,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--models",
         default=",".join(ALGORITHMS),
-        help="Comma-separated subset of random_forest,xgboost,lstm,prophet.",
+        help="Comma-separated subset of glm,random_forest,xgboost,lstm,prophet.",
     )
     parser.add_argument("--signals", choices=("primary", "all"), default="primary")
     parser.add_argument(
@@ -351,7 +356,7 @@ def assert_project_venv() -> Path:
         raise RuntimeError(
             "This project must run from its .venv. Use "
             f"{PROJECT_ROOT / '.venv/Scripts/python.exe'} "
-            "scripts/07d_nonlinear_forecasts.py ...; "
+            "scripts/18_forecasting_models.py ...; "
             f"current sys.prefix is {actual}."
         )
     return Path(sys.executable).resolve()
@@ -488,7 +493,16 @@ def dependency_audit(
 def probe_algorithm_dependency(algorithm: str) -> None:
     """Import the actual adapter and initialize lightweight backend state."""
 
-    if algorithm == "random_forest":
+    if algorithm == "glm":
+        TweedieRegressor(
+            power=0,
+            link="identity",
+            alpha=0.01,
+            solver="lbfgs",
+            max_iter=5_000,
+            tol=1e-8,
+        )
+    elif algorithm == "random_forest":
         RandomForestRegressor(n_estimators=1, n_jobs=1)
     elif algorithm == "xgboost":
         from xgboost import XGBRegressor
@@ -545,7 +559,10 @@ def resolve_parameter_candidates(
 
 def smoke_parameters(algorithm: str, parameters: dict[str, Any]) -> dict[str, Any]:
     result = dict(parameters)
-    if algorithm == "random_forest":
+    if algorithm == "glm":
+        # The Gaussian GLM is already cheap; retain the exact fixed specification.
+        pass
+    elif algorithm == "random_forest":
         result.update(n_estimators=20, n_jobs=1)
     elif algorithm == "xgboost":
         result.update(n_estimators=20, n_jobs=1)
@@ -740,7 +757,7 @@ def build_configurations(
     if len({(item.index_construction, item.upstream_feature_key) for item in configurations}) != len(
         configurations
     ):
-        raise AssertionError(f"{spec.name} nonlinear configurations are not unique")
+        raise AssertionError(f"{spec.name} forecasting configurations are not unique")
     return configurations
 
 
@@ -940,24 +957,29 @@ def fit_tabular_predictor(
     fit_seed: int,
 ) -> tuple[TabularArtifact, dict[str, Any]]:
     estimator_parameters = dict(parameters)
-    estimator_parameters["random_state"] = int(fit_seed)
-    if algorithm == "random_forest":
+    if algorithm == "glm":
+        # TweedieRegressor is deterministic and does not accept random_state.
+        estimator = TweedieRegressor(**estimator_parameters)
+    elif algorithm == "random_forest":
+        estimator_parameters["random_state"] = int(fit_seed)
         estimator = RandomForestRegressor(**estimator_parameters)
     elif algorithm == "xgboost":
         from xgboost import XGBRegressor
 
+        estimator_parameters["random_state"] = int(fit_seed)
         estimator = XGBRegressor(**estimator_parameters)
     else:
         raise ValueError(f"Unsupported tabular algorithm: {algorithm}")
-    pipeline = Pipeline(
-        [
-            (
-                "imputer",
-                SimpleImputer(strategy="median", keep_empty_features=True),
-            ),
-            ("estimator", estimator),
-        ]
-    )
+    steps: list[tuple[str, Any]] = [
+        (
+            "imputer",
+            SimpleImputer(strategy="median", keep_empty_features=True),
+        )
+    ]
+    if algorithm == "glm":
+        steps.append(("scaler", StandardScaler()))
+    steps.append(("estimator", estimator))
+    pipeline = Pipeline(steps)
     pipeline.fit(
         panel.loc[training, list(features)],
         panel.loc[training, target_column].to_numpy(dtype=float),
@@ -1136,7 +1158,7 @@ def fit_predictor(
     fit_seed: int,
 ) -> tuple[Any, dict[str, Any]]:
     started = time.perf_counter()
-    if algorithm in {"random_forest", "xgboost"}:
+    if algorithm in {"glm", "random_forest", "xgboost"}:
         artifact, metadata = fit_tabular_predictor(
             algorithm,
             panel,
@@ -1298,8 +1320,8 @@ def inference_tier(
     if configuration.signal_name not in PRIMARY_SIGNALS:
         return "exploratory_dimension"
     # The frozen Q1 blueprint pre-specifies the Ridge comparison as primary.
-    # All newly added nonlinear estimators remain secondary robustness paths,
-    # even at the primary weekly frequency.
+    # All estimators in this extended forecasting stage remain secondary
+    # robustness paths, even at the primary weekly frequency.
     return "secondary_predictive_robustness"
 
 
@@ -1797,7 +1819,7 @@ def validate_common_origin_sets(forecasts: pd.DataFrame) -> pd.DataFrame:
     if duplicate.any():
         examples = forecasts.loc[duplicate, duplicate_keys].head(10)
         raise AssertionError(
-            "Duplicate nonlinear forecast origins are not allowed:\n"
+            "Duplicate extended-forecast origins are not allowed:\n"
             f"{examples.to_string(index=False)}"
         )
     rows: list[dict[str, Any]] = []
@@ -2157,6 +2179,7 @@ def build_pipeline_ranking(metrics: pd.DataFrame) -> pd.DataFrame:
         ["frequency", "index_construction"]
     )["mean_algorithm_rmse_rank"].rank(method="min", ascending=True)
     representations = {
+        "glm": "full_upstream_tabular_lag_features",
         "random_forest": "full_upstream_tabular_lag_features",
         "xgboost": "full_upstream_tabular_lag_features",
         "lstm": "reduced_origin_features_plus_sequence",
@@ -2332,7 +2355,7 @@ def main() -> None:
     np.random.seed(seed)
 
     logger, log_path = configure_logging(args.log_dir.resolve(), args.version)
-    logger.info("Starting nonlinear SCFI forecasts version=%s", args.version)
+    logger.info("Starting extended SCFI forecasts version=%s", args.version)
     logger.info("Python executable=%s sys.prefix=%s", executable, Path(sys.prefix).resolve())
     logger.info("Arguments=%s", vars(args))
     requested_algorithms = parse_model_selection(args.models)
@@ -2528,7 +2551,9 @@ def main() -> None:
                     "feature_count": len(features),
                     "features": features,
                     "preprocessing": (
-                        "training-only median imputer"
+                        "training-only median imputer and standard scaler"
+                        if algorithm == "glm"
+                        else "training-only median imputer"
                         if algorithm in {"random_forest", "xgboost"}
                         else "training-only sequence median imputer and standard scaler"
                         if algorithm == "lstm"
@@ -2654,7 +2679,7 @@ def main() -> None:
     fits = pd.DataFrame(all_fit_rows)
     tuning_audit = pd.DataFrame(all_tuning_rows, columns=TUNING_AUDIT_COLUMNS)
     if direct.empty or fits.empty:
-        raise ValueError("No nonlinear forecasts or fits were produced")
+        raise ValueError("No extended forecasts or fits were produced")
     date_columns = [
         "origin_date",
         "target_date",
@@ -2747,6 +2772,27 @@ def main() -> None:
     paths["feature_sets"].write_text(
         json.dumps(feature_audit, indent=2, default=json_default), encoding="utf-8"
     )
+    output_frames = {
+        "predictions": forecasts,
+        "metrics": metrics,
+        "statistical_tests": tests,
+        "fit_audit": fits,
+        "tuning_audit": tuning_audit,
+        "dependency_audit": dependencies,
+        "origin_audit": origin_audit,
+        "loss_differences": loss_differences,
+        "hybrid_weights": hybrid_weights,
+        "llm_ranking": llm_ranking,
+        "pipeline_ranking": pipeline_ranking,
+    }
+    contract_output_keys = [*output_frames, "feature_sets"]
+    output_sha256 = {
+        key: sha256_file(paths[key]) for key in contract_output_keys
+    }
+    output_row_counts = {
+        **{key: int(len(frame)) for key, frame in output_frames.items()},
+        "feature_sets": 1,
+    }
 
     status, canonical_scope = determine_run_status(
         smoke_test=args.smoke_test,
@@ -2840,7 +2886,8 @@ def main() -> None:
             "weekly_is_primary": True,
             "monthly_small_sample_overfit_risk": True,
             "lstm_and_prophet_are_sensitivity_models": True,
-            "all_07d_nonlinear_models_are_secondary_to_frozen_ridge_design": True,
+            "glm_is_gaussian_identity_link_with_l2_regularization": True,
+            "all_07d_extended_models_are_secondary_to_frozen_ridge_design": True,
             "pipeline_rank_compares_different_feature_representations": True,
             "overlapping_horizons_use_hac_inference": True,
             "explicit_missing_model_skip_invalidates_publication_run": bool(
@@ -2849,6 +2896,8 @@ def main() -> None:
             "any_partial_frequency_model_configuration_or_origin_scope_invalidates_publication_run": True,
         },
         "outputs": {key: str(value) for key, value in paths.items()},
+        "output_sha256": output_sha256,
+        "output_row_counts": output_row_counts,
         "log": str(log_path),
         "software": {
             "python": platform.python_version(),

@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts/05_build_disruption_index.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts/13_build_disruption_index.py"
 SPEC = importlib.util.spec_from_file_location("build_disruption_index", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)

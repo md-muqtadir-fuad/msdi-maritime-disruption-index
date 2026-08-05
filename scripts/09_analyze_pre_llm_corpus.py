@@ -21,10 +21,10 @@ Default output:
         figures/*.png
 
 Run from the project root:
-    python scripts/02e_analyze_pre_llm_kept.py
+    python scripts/09_analyze_pre_llm_corpus.py
 
 Or specify paths:
-    python scripts/02e_analyze_pre_llm_kept.py \
+    python scripts/09_analyze_pre_llm_corpus.py \
         --input path/to/pre_llm_kept.csv \
         --output-dir outputs/pre_llm_kept_analysis
 """

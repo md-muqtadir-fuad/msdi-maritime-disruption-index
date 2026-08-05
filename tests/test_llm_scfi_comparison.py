@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts/07b_llm_scfi_comparison.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts/16_llm_scfi_comparison_weekly.py"
 SPEC = importlib.util.spec_from_file_location("llm_scfi_comparison", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)

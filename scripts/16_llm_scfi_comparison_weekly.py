@@ -1950,6 +1950,32 @@ def main() -> None:
     paths["feature_sets"].write_text(
         json.dumps(feature_sets, indent=2), encoding="utf-8"
     )
+    output_frames = {
+        "common_article_cohort": common_articles,
+        "common_cohort_audit": cohort_audit,
+        "weekly_common_signals": weekly_long,
+        "weekly_common_coverage": weekly_coverage,
+        "signal_differences": signal_differences,
+        "aligned_panel": panel,
+        "forecasts": forecasts,
+        "metrics": metrics,
+        "statistical_tests": statistical_tests,
+        "fit_audit": fits,
+        "origin_audit": origin_audit,
+        "hybrid_weights": hybrid_weights,
+        "llm_ranking": llm_ranking,
+        "llm_ranking_cells": llm_ranking_cells,
+        "primary_predictor_ranking": primary_predictor_ranking,
+        "dimension_summary": dimension_summary,
+    }
+    output_sha256 = {
+        key: sha256_file(path)
+        for key, path in paths.items()
+        if key != "manifest" and path.is_file()
+    }
+    output_row_counts = {
+        key: int(len(frame)) for key, frame in output_frames.items()
+    }
 
     best_llm = llm_ranking.iloc[0].to_dict()
     significant_primary = statistical_tests[
@@ -2059,6 +2085,8 @@ def main() -> None:
             "point_ranking_does_not_by_itself_establish_statistical_superiority": True,
         },
         "outputs": {key: str(value) for key, value in paths.items()},
+        "output_sha256": output_sha256,
+        "output_row_counts": output_row_counts,
         "log": str(log_path),
         "software": {
             "python": platform.python_version(),

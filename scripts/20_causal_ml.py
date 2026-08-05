@@ -5,7 +5,7 @@ expanding-window cross-fitting and a horizon purge. Weekly estimates are
 primary; monthly estimates are robustness checks. The treatment nuisance is
 learned from the raw first difference of each MSDI path, so the resulting
 innovation is genuinely out of fold. Full-sample innovations produced by
-``08_causality_analysis.py`` are used only for a transparent comparison audit.
+``19_time_series_causality.py`` are used only for a transparent comparison audit.
 
 These are observational estimates. Unless an independent identification design
 is supplied and defended, outputs are labelled orthogonalized predictive

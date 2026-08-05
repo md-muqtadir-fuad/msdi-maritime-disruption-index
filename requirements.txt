@@ -11,6 +11,7 @@ python-dotenv
 pydantic
 requests
 beautifulsoup4
+newspaper4k
 trafilatura
 tqdm
 joblib

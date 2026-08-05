@@ -10,7 +10,7 @@ import pandas as pd
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = PROJECT_ROOT / "scripts/09b_error_diagnostics.py"
+SCRIPT = PROJECT_ROOT / "scripts/22_error_diagnostics.py"
 SPEC = importlib.util.spec_from_file_location("error_diagnostics", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -19,19 +19,31 @@ SPEC.loader.exec_module(MODULE)
 
 
 class ErrorDiagnosticsTests(unittest.TestCase):
-    def test_canonical_config_and_legacy_nonlinear_freeze_are_pinned(self) -> None:
+    def test_canonical_config_and_manifest_native_glm_scope_are_pinned(self) -> None:
         config = MODULE.load_yaml(MODULE.DEFAULT_CONFIG)
         self.assertEqual(
             MODULE.sha256_file(MODULE.DEFAULT_CONFIG),
             MODULE.CANONICAL_CONFIG_SHA256,
         )
         contracts = config["upstream_contracts"]
+        self.assertNotIn("trusted_stage07d_nonlinear_predictions_rows", contracts)
+        self.assertNotIn("trusted_stage07d_nonlinear_predictions_sha256", contracts)
+        self.assertTrue(contracts["require_stage07d_output_hashes"])
+        self.assertTrue(contracts["require_stage07d_output_row_counts"])
         self.assertEqual(
-            contracts["trusted_stage07d_nonlinear_predictions_rows"], 125760
+            config["analysis"]["nonlinear_algorithms"],
+            ["glm", "lstm", "prophet", "random_forest", "xgboost"],
         )
         self.assertEqual(
-            len(contracts["trusted_stage07d_nonlinear_predictions_sha256"]), 64
+            config["analysis"]["nonlinear_selected_algorithm_cells"], 55
         )
+        self.assertEqual(config["analysis"]["nonlinear_models_per_cell"], 3)
+        self.assertEqual(
+            config["analysis"]["nonlinear_selected_prediction_rows"], 31440
+        )
+        expected = config["output_contract"]["expected_full_row_counts"]
+        self.assertEqual(expected["forecast_error_summary"], 960)
+        self.assertEqual(expected["raw_significance_handoff"], 6910)
 
     def test_config_freezes_frequency_cohort_constructions_and_regime(self) -> None:
         config = MODULE.load_yaml(MODULE.DEFAULT_CONFIG)

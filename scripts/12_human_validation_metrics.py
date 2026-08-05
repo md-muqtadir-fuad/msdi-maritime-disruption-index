@@ -9,8 +9,8 @@ The script has two modes:
 
 Examples
 --------
-python scripts/04_human_validation_metrics.py sample
-python scripts/04_human_validation_metrics.py evaluate \
+python scripts/12_human_validation_metrics.py sample
+python scripts/12_human_validation_metrics.py evaluate \
     --annotations annotator_1_completed.csv annotator_2_completed.csv
 """
 

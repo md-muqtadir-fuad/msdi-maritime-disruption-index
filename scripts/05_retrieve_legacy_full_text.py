@@ -13,13 +13,13 @@ Install dependency:
     pip install newspaper4k
 
 Run from project root:
-    python scripts/02_retrieve_full_text_news4k.py
+    python scripts/05_retrieve_legacy_full_text.py
 
 Useful test run:
-    python scripts/02_retrieve_full_text_news4k.py --max-rows 50 --sleep 1
+    python scripts/05_retrieve_legacy_full_text.py --max-rows 50 --sleep 1
 
 Resume after interruption:
-    python scripts/02_retrieve_full_text_news4k.py --resume
+    python scripts/05_retrieve_legacy_full_text.py --resume
 """
 from __future__ import annotations
 

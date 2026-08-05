@@ -9,7 +9,7 @@ import numpy as np
 import pandas as pd
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts/08_causality_analysis.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts/19_time_series_causality.py"
 SPEC = importlib.util.spec_from_file_location("causality_analysis", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)

@@ -19,6 +19,16 @@ analysis:
     - adapted_pdf_sqrt_ema3
   weekly_horizons: [1, 2, 4, 8, 12]
   monthly_horizons: [1, 3, 6]
+  nonlinear_algorithms:
+    - glm
+    - lstm
+    - prophet
+    - random_forest
+    - xgboost
+  nonlinear_frequency_construction_horizon_cells: 11
+  nonlinear_selected_algorithm_cells: 55
+  nonlinear_models_per_cell: 3
+  nonlinear_selected_prediction_rows: 31440
   required_reference_specifications:
     - no_msdi
     - peak_only
@@ -44,10 +54,11 @@ upstream_contracts:
   require_nonlinear_common_origins_passed: true
   require_causal_ml_causal_claim_allowed_false: true
   fail_closed: true
-  # Stage 07d predates output-hash manifests. Stage 09b freezes the completed
-  # full-scope prediction artifact here so later mutations fail closed.
-  trusted_stage07d_nonlinear_predictions_sha256: a00d241c9229a796f435efe5576ea1d71de5cf8ebdcfc138e85bc79e0651b598
-  trusted_stage07d_nonlinear_predictions_rows: 125760
+  # Stage 07d must now publish its own prediction hash and row count. This
+  # keeps the integrity contract tied to the run manifest while allowing the
+  # pre-specified five-model set (including GLM) to change the artifact size.
+  require_stage07d_output_hashes: true
+  require_stage07d_output_row_counts: true
 
 forecast_error:
   sign_convention: actual_minus_predicted
@@ -276,6 +287,22 @@ output_contract:
   atomic_writes: true
   publication_run_rejects_debug_limits: true
   manifest_causal_claim_allowed: false
+  # Design-derived row counts for the canonical five-algorithm diagnostic run.
+  # Debug/subset runs are never compared with these publication-scope counts.
+  expected_full_row_counts:
+    forecast_error_observations: 187040
+    forecast_error_summary: 960
+    forecast_error_by_operational_regime: 513
+    forecast_error_by_volatility_regime: 418
+    forecast_error_by_disruption_type: 1330
+    forecast_residual_tests: 1463
+    mincer_zarnowitz_calibration: 209
+    forecast_stability: 627
+    forecast_influence_summary: 209
+    error_driver_coefficients: 2508
+    error_driver_performance: 418
+    extreme_forecast_cases: 880
+    raw_significance_handoff: 6910
   tables:
     - forecast_error_summary
     - forecast_error_by_operational_regime

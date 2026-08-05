@@ -12,7 +12,7 @@ import pandas as pd
 
 SCRIPT = (
     Path(__file__).resolve().parents[1]
-    / "scripts/07c_monthly_llm_scfi_comparison.py"
+    / "scripts/17_llm_scfi_comparison_monthly.py"
 )
 SPEC = importlib.util.spec_from_file_location("monthly_llm_scfi_comparison", SCRIPT)
 assert SPEC and SPEC.loader

@@ -3,13 +3,14 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 import sys
+from types import SimpleNamespace
 import unittest
 
 import numpy as np
 import pandas as pd
 
 
-SCRIPT = Path(__file__).resolve().parents[1] / "scripts/07_prediction_benchmarks.py"
+SCRIPT = Path(__file__).resolve().parents[1] / "scripts/15_prediction_benchmarks.py"
 SPEC = importlib.util.spec_from_file_location("prediction_benchmarks", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -53,6 +54,40 @@ class PredictionBenchmarkTests(unittest.TestCase):
         self.assertGreater(mean, 0)
         self.assertGreater(statistic, 0)
         self.assertGreater(standard_error, 0)
+
+    def test_gaussian_identity_glm_uses_matched_sets_and_safe_preprocessing(self) -> None:
+        configurations = MODULE.model_configurations()
+        glm_sets = {
+            item.feature_set for item in configurations if item.model_name == "glm"
+        }
+        self.assertEqual(
+            glm_sets,
+            {
+                "ar_brent",
+                "ar_brent_peak",
+                "ar_brent_breadth",
+                "ar_brent_both",
+            },
+        )
+        estimator = MODULE.make_estimator(
+            MODULE.ModelConfiguration("glm", "ar_brent"),
+            SimpleNamespace(glm_alpha=0.01),
+        )
+        pipeline = estimator.regressor
+        self.assertEqual(list(pipeline.named_steps), ["imputer", "scaler", "regressor"])
+        glm = pipeline.named_steps["regressor"]
+        self.assertEqual(glm.power, 0)
+        self.assertEqual(glm.link, "identity")
+        self.assertEqual(glm.alpha, 0.01)
+        self.assertEqual(glm.max_iter, 5_000)
+        self.assertEqual(glm.tol, 1e-8)
+
+        features = pd.DataFrame(
+            {"x1": [0.0, 1.0, np.nan, 3.0, 4.0], "x2": [5.0, 4.0, 3.0, 2.0, 1.0]}
+        )
+        target = np.array([-0.2, -0.1, 0.0, 0.1, 0.2])
+        estimator.fit(features, target)
+        self.assertTrue(np.isfinite(estimator.predict(features)).all())
 
     def test_comparison_uses_algorithm_matched_baseline(self) -> None:
         dates = pd.date_range("2024-01-01", periods=8, freq="W-MON")

@@ -29,13 +29,13 @@ Install Newspaper4k:
     pip install newspaper4k
 
 Run from the project root:
-    python scripts/02b_retrieve_llm_full_text.py
+    python scripts/06_retrieve_llm_full_text.py
 
 Small test run:
-    python scripts/02b_retrieve_llm_full_text.py --max-rows 20 --sleep 1 --overwrite
+    python scripts/06_retrieve_llm_full_text.py --max-rows 20 --sleep 1 --overwrite
 
 Resume after interruption:
-    python scripts/02b_retrieve_llm_full_text.py --resume
+    python scripts/06_retrieve_llm_full_text.py --resume
 """
 
 from __future__ import annotations

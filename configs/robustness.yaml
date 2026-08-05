@@ -67,6 +67,12 @@ measurement_variants:
 forecast:
   estimator: ridge
   ridge_alpha: 1.0
+  extended_algorithms:
+    - glm
+    - lstm
+    - prophet
+    - random_forest
+    - xgboost
   target: scfi_log_change
   loss_functions: [absolute_error, squared_error]
   weekly:

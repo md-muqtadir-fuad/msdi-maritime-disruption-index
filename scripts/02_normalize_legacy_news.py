@@ -2,10 +2,10 @@
 """Normalize legacy headline/news datasets into one clean table.
 
 Run from project root:
-    python scripts/01_normalize_legacy_news.py
+    python scripts/02_normalize_legacy_news.py
 
 Optional:
-    python scripts/01_normalize_legacy_news.py --project-root . --include-backup
+    python scripts/02_normalize_legacy_news.py --project-root . --include-backup
 
 Inputs expected, if present:
     data/01_raw/news/headlines/final_dataset_with_links_legacy.xlsx
@@ -38,7 +38,7 @@ import pandas as pd
 # -----------------------------
 
 def default_project_root() -> Path:
-    # scripts/01_normalize_legacy_news.py -> project root
+    # scripts/02_normalize_legacy_news.py -> project root
     return Path(__file__).resolve().parents[1]
 
 

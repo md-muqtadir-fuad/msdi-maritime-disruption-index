@@ -42,6 +42,7 @@ prediction:
   statistical_models:
     - naive_zero_change
     - historical_mean
+    - glm_gaussian_identity
     - ridge
     - elastic_net
   time_series_ml_models:

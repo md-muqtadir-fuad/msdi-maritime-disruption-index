@@ -67,7 +67,7 @@ DEFAULT_MONTHLY_PANEL = (
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs/diagnostics"
 DEFAULT_LOG_DIR = PROJECT_ROOT / "outputs/logs"
 CANONICAL_CONFIG_SHA256 = (
-    "b792264add35ddded3d925079a2da8165e8daa9fdba811d41ca1071b1a68ce1f"
+    "ee40a1a0d611d4e388d0463b5bab6adb0ee4dd82fa148f0455b43def26df21e8"
 )
 
 PRIMARY_SCORE = "overall_disruption_max"
@@ -222,7 +222,7 @@ def assert_project_venv() -> Path:
     if expected not in executable.parents:
         raise RuntimeError(
             "Run this stage with .venv\\Scripts\\python.exe "
-            "scripts\\09b_error_diagnostics.py"
+            "scripts\\22_error_diagnostics.py"
         )
     return executable
 
@@ -376,6 +376,7 @@ def audit_manifest_outputs(
     manifest_path: Path,
     stage: str,
     required_outputs: Sequence[str],
+    require_output_contract: bool = False,
 ) -> tuple[dict[str, Any], dict[str, Path], list[dict[str, Any]]]:
     manifest_path = require_file(manifest_path, f"{stage} manifest")
     manifest = read_json(manifest_path)
@@ -398,6 +399,13 @@ def audit_manifest_outputs(
     ]
     recorded_hashes = manifest.get("output_sha256", {})
     recorded_counts = manifest.get("output_row_counts", {})
+    if require_output_contract and (
+        not isinstance(recorded_hashes, dict)
+        or not isinstance(recorded_counts, dict)
+    ):
+        raise ValueError(
+            f"{stage} manifest must provide output_sha256 and output_row_counts"
+        )
     for key in required_outputs:
         if key not in outputs:
             raise ValueError(f"{stage} manifest lacks required output: {key}")
@@ -423,6 +431,12 @@ def audit_manifest_outputs(
         expected_rows = (
             recorded_counts.get(key) if isinstance(recorded_counts, dict) else None
         )
+        if require_output_contract and (
+            expected_hash is None or expected_rows is None
+        ):
+            raise ValueError(
+                f"{stage}:{key} lacks a manifest-declared hash or row count"
+            )
         count_passed = expected_rows is None or int(expected_rows) == row_count
         if not count_passed:
             raise ValueError(
@@ -505,6 +519,21 @@ def validate_upstream_contracts(
     if failed:
         raise ValueError(f"Stage 09 upstream audit gates failed: {failed}")
     nonlinear_design = nonlinear_manifest.get("design", {})
+    expected_algorithms = set(config["analysis"]["nonlinear_algorithms"])
+    requested_algorithms = set(nonlinear_design.get("requested_algorithms", []))
+    executed_algorithms = set(nonlinear_design.get("executed_algorithms", []))
+    if requested_algorithms != expected_algorithms:
+        raise ValueError(
+            "Nonlinear requested algorithm set changed: "
+            f"expected={sorted(expected_algorithms)} "
+            f"observed={sorted(requested_algorithms)}"
+        )
+    if executed_algorithms != expected_algorithms:
+        raise ValueError(
+            "Nonlinear executed algorithm set changed: "
+            f"expected={sorted(expected_algorithms)} "
+            f"observed={sorted(executed_algorithms)}"
+        )
     if not bool(nonlinear_design.get("full_canonical_scope_complete")):
         raise ValueError("Nonlinear forecast stage is not full canonical scope")
     if not bool(nonlinear_design.get("common_origins_enforced")):
@@ -2726,6 +2755,22 @@ def validate_output_keys(tables: Mapping[str, pd.DataFrame]) -> None:
         assert_unique_keys(frame, keys, name)
 
 
+def validate_full_output_row_counts(
+    tables: Mapping[str, pd.DataFrame], config: Mapping[str, Any]
+) -> None:
+    """Fail closed when a canonical five-algorithm run changes design counts."""
+    expected = config["output_contract"]["expected_full_row_counts"]
+    for name, expected_rows in expected.items():
+        if name not in tables:
+            raise ValueError(f"Expected canonical output is missing: {name}")
+        actual_rows = len(tables[name])
+        if actual_rows != int(expected_rows):
+            raise ValueError(
+                f"Canonical output row count changed for {name}: "
+                f"expected={expected_rows} observed={actual_rows}"
+            )
+
+
 def output_frame_columns(frame: pd.DataFrame) -> pd.DataFrame:
     preferred = [
         "analysis_source",
@@ -2852,20 +2897,9 @@ def main() -> None:
             arguments.nonlinear_manifest,
             "stage07d_nonlinear",
             nonlinear_required,
+            require_output_contract=True,
         )
         source_rows.extend(nonlinear_rows)
-        trusted_nonlinear_hash = str(
-            config["upstream_contracts"]
-            ["trusted_stage07d_nonlinear_predictions_sha256"]
-        )
-        source_rows.append(
-            audit_plain_file(
-                nonlinear_paths["predictions"],
-                "stage09b_trusted_artifact_freeze",
-                "stage07d_nonlinear_predictions",
-                trusted_nonlinear_hash,
-            )
-        )
         causal_required = (
             "oof_predictions",
             "nuisance_fold_audit",
@@ -2997,12 +3031,6 @@ def main() -> None:
             if row["artifact"] == "predictions"
         )
         expected_nonlinear_rows = int(nonlinear_manifest["counts"]["total_forecasts"])
-        trusted_nonlinear_rows = int(
-            config["upstream_contracts"]
-            ["trusted_stage07d_nonlinear_predictions_rows"]
-        )
-        if trusted_nonlinear_rows != expected_nonlinear_rows:
-            raise ValueError("Trusted nonlinear row count differs from manifest")
         if nonlinear_total_rows != expected_nonlinear_rows:
             raise ValueError(
                 "Nonlinear prediction row count differs from its manifest count"
@@ -3014,10 +3042,48 @@ def main() -> None:
             ["frequency", "index_construction", "horizon", "algorithm"],
             observed=True,
         )["model_id"].nunique()
-        if len(nonlinear_cell_counts) != 44 or not nonlinear_cell_counts.eq(3).all():
+        expected_algorithms = set(config["analysis"]["nonlinear_algorithms"])
+        observed_algorithms = set(nonlinear_predictions_full["algorithm"].unique())
+        expected_algorithm_cells = int(
+            config["analysis"]["nonlinear_selected_algorithm_cells"]
+        )
+        expected_models_per_cell = int(
+            config["analysis"]["nonlinear_models_per_cell"]
+        )
+        base_cells = nonlinear_predictions_full[
+            ["frequency", "index_construction", "horizon"]
+        ].drop_duplicates()
+        expected_base_cells = int(
+            config["analysis"]["nonlinear_frequency_construction_horizon_cells"]
+        )
+        if observed_algorithms != expected_algorithms:
+            raise ValueError(
+                "Secondary nonlinear algorithms changed: "
+                f"expected={sorted(expected_algorithms)} "
+                f"observed={sorted(observed_algorithms)}"
+            )
+        if len(base_cells) != expected_base_cells:
+            raise ValueError(
+                "Secondary nonlinear frequency/construction/horizon scope changed: "
+                f"expected={expected_base_cells} observed={len(base_cells)}"
+            )
+        if (
+            len(nonlinear_cell_counts) != expected_algorithm_cells
+            or not nonlinear_cell_counts.eq(expected_models_per_cell).all()
+        ):
             raise ValueError(
                 "Secondary nonlinear diagnostic selection must contain exactly "
-                "baseline, median peak, and median breadth in all 44 cells"
+                "baseline, median peak, and median breadth in all "
+                f"{expected_algorithm_cells} algorithm cells"
+            )
+        expected_selected_rows = int(
+            config["analysis"]["nonlinear_selected_prediction_rows"]
+        )
+        if len(nonlinear_predictions_full) != expected_selected_rows:
+            raise ValueError(
+                "Secondary nonlinear selected prediction-row count changed: "
+                f"expected={expected_selected_rows} "
+                f"observed={len(nonlinear_predictions_full)}"
             )
         origin_audit = pd.read_csv(nonlinear_paths["origin_audit"])
         if not origin_audit["origin_sets_identical"].astype(bool).all():
@@ -3142,6 +3208,15 @@ def main() -> None:
             "reference_index_reconstruction_audit": reconstruction_audit,
         }
         validate_output_keys(tables)
+        canonical_output_request = bool(
+            not arguments.smoke_test
+            and arguments.maximum_rows is None
+            and not arguments.skip_article_trace
+            and canonical_config
+            and version == str(config.get("version", "error_diagnostics_v001"))
+        )
+        if canonical_output_request:
+            validate_full_output_row_counts(tables, config)
         required_table_names = list(config["output_contract"]["tables"])
         required_tables_nonempty = all(
             name in tables and not tables[name].empty for name in required_table_names

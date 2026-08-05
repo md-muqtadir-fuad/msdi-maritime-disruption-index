@@ -12,7 +12,7 @@ import pandas as pd
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = PROJECT_ROOT / "scripts/07d_nonlinear_forecasts.py"
+SCRIPT = PROJECT_ROOT / "scripts/18_forecasting_models.py"
 SPEC = importlib.util.spec_from_file_location("nonlinear_forecasts", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -131,6 +131,42 @@ class NonlinearForecastTests(unittest.TestCase):
         self.assertEqual(fixed, [self.config["models"]["random_forest"]["fixed"]])
         self.assertEqual(tuned, self.config["models"]["random_forest"]["candidates"])
         self.assertGreater(len(tuned), 1)
+
+    def test_glm_is_canonical_deterministic_and_leakage_safe(self) -> None:
+        self.assertEqual(MODULE.ALGORITHMS[0], "glm")
+        fixed = MODULE.resolve_parameter_candidates(self.config, "glm", tune=False)
+        tuned = MODULE.resolve_parameter_candidates(self.config, "glm", tune=True)
+        self.assertEqual(fixed[0]["power"], 0)
+        self.assertEqual(fixed[0]["link"], "identity")
+        self.assertEqual(fixed[0]["alpha"], 0.01)
+        self.assertEqual([item["alpha"] for item in tuned], [0.001, 0.01, 0.1, 1.0])
+
+        panel = pd.DataFrame(
+            {
+                "x1": np.linspace(-1.0, 1.0, 24),
+                "x2": np.linspace(2.0, 4.0, 24),
+                "target": np.linspace(-0.2, 0.2, 24),
+            }
+        )
+        panel.loc[3, "x1"] = np.nan
+        training = np.arange(20, dtype=int)
+        artifact, metadata = MODULE.fit_tabular_predictor(
+            "glm",
+            panel,
+            training,
+            ["x1", "x2"],
+            "target",
+            fixed[0],
+            fit_seed=12345,
+        )
+        self.assertEqual(
+            list(artifact.estimator.named_steps), ["imputer", "scaler", "estimator"]
+        )
+        glm = artifact.estimator.named_steps["estimator"]
+        self.assertNotIn("random_state", glm.get_params())
+        self.assertEqual(metadata["effective_training_rows"], len(training))
+        predictions = artifact.predict(panel, [20, 21], ["x1", "x2"], 1)
+        self.assertTrue(np.isfinite(predictions).all())
 
     def test_missing_prophet_has_explicit_skip_and_error_policies(self) -> None:
         real_find_spec = importlib.util.find_spec

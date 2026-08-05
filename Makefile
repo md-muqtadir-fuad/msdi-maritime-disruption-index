@@ -1,10 +1,12 @@
-.PHONY: setup setup-forecasting audit ingest enrich score validate index panel predict compare-llms-weekly compare-llms-monthly forecast-nonlinear forecast-nonlinear-tuned causality causal-ml robustness diagnostics significance figures analysis all
+.PHONY: setup setup-forecasting audit ingest normalize-legacy normalize-llm retrieve-legacy retrieve-llm merge-text filter-news analyze-news score merge-scores validation-sample index panel predict compare-llms-weekly compare-llms-monthly forecast-models forecast-models-tuned causality causal-ml robustness diagnostics significance figures pipeline-smoke pipeline-full analysis all
 
 ifeq ($(OS),Windows_NT)
 PYTHON ?= .venv/Scripts/python.exe
 else
 PYTHON ?= .venv/bin/python
 endif
+
+PIPELINE_ARGS ?=
 
 setup:
 	$(PYTHON) -m pip install -r requirements.txt
@@ -18,54 +20,81 @@ audit:
 ingest:
 	$(PYTHON) scripts/01_ingest_sources.py
 
-enrich:
-	$(PYTHON) scripts/02_enrich_full_text.py
+normalize-legacy:
+	$(PYTHON) scripts/02_normalize_legacy_news.py
+
+normalize-llm:
+	$(PYTHON) scripts/03_normalize_llm_news.py
+
+retrieve-legacy:
+	$(PYTHON) scripts/05_retrieve_legacy_full_text.py --resume
+
+retrieve-llm:
+	$(PYTHON) scripts/06_retrieve_llm_full_text.py --resume
+
+merge-text:
+	$(PYTHON) scripts/07_merge_full_text_deduplicate.py
+
+filter-news:
+	$(PYTHON) scripts/08_filter_irrelevant_news.py
+
+analyze-news:
+	$(PYTHON) scripts/09_analyze_pre_llm_corpus.py
 
 score:
-	$(PYTHON) scripts/03_run_llm_scoring.py
+	$(PYTHON) scripts/10_run_llm_scoring.py
 
-validate:
-	$(PYTHON) scripts/04_human_validation_metrics.py
+merge-scores:
+	$(PYTHON) scripts/11_merge_llm_scores.py
+
+validation-sample:
+	$(PYTHON) scripts/12_human_validation_metrics.py sample
 
 index:
-	$(PYTHON) scripts/05_build_disruption_index.py
+	$(PYTHON) scripts/13_build_disruption_index.py
 
 panel:
-	$(PYTHON) scripts/06_build_model_panels.py
+	$(PYTHON) scripts/14_build_model_panels.py
 
 predict:
-	$(PYTHON) scripts/07_prediction_benchmarks.py
+	$(PYTHON) scripts/15_prediction_benchmarks.py
 
 compare-llms-weekly:
-	$(PYTHON) scripts/07b_llm_scfi_comparison.py
+	$(PYTHON) scripts/16_llm_scfi_comparison_weekly.py
 
 compare-llms-monthly: compare-llms-weekly
-	$(PYTHON) scripts/07c_monthly_llm_scfi_comparison.py
+	$(PYTHON) scripts/17_llm_scfi_comparison_monthly.py
 
-forecast-nonlinear: compare-llms-monthly
-	$(PYTHON) scripts/07d_nonlinear_forecasts.py --frequency both
+forecast-models: compare-llms-monthly
+	$(PYTHON) scripts/18_forecasting_models.py --frequency both
 
-forecast-nonlinear-tuned: compare-llms-monthly
-	$(PYTHON) scripts/07d_nonlinear_forecasts.py --frequency both --tune
+forecast-models-tuned: compare-llms-monthly
+	$(PYTHON) scripts/18_forecasting_models.py --frequency both --tune --resume
 
 causality:
-	$(PYTHON) scripts/08_causality_analysis.py
+	$(PYTHON) scripts/19_time_series_causality.py
 
 causal-ml:
-	$(PYTHON) scripts/08b_causal_ml.py
+	$(PYTHON) scripts/20_causal_ml.py
 
 robustness:
-	$(PYTHON) scripts/09_robustness_checks.py
+	$(PYTHON) scripts/21_ablation_sensitivity_checks.py
 
 diagnostics:
-	$(PYTHON) scripts/09b_error_diagnostics.py
+	$(PYTHON) scripts/22_error_diagnostics.py
 
 significance:
-	$(PYTHON) scripts/09c_significance_analysis.py
+	$(PYTHON) scripts/23_significance_analysis.py
 
 figures:
-	$(PYTHON) scripts/10_make_figures_tables.py
+	$(PYTHON) scripts/24_make_figures_tables.py
 
-analysis: predict compare-llms-monthly causality causal-ml robustness diagnostics significance figures
+pipeline-smoke:
+	$(PYTHON) scripts/99_run_full_pipeline.py smoke
 
-all: ingest enrich score validate index panel analysis
+pipeline-full:
+	$(PYTHON) scripts/99_run_full_pipeline.py full $(PIPELINE_ARGS)
+
+analysis: predict compare-llms-monthly forecast-models causality causal-ml robustness diagnostics significance figures
+
+all: pipeline-smoke

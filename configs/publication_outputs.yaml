@@ -1,0 +1,171 @@
+version: publication_v001
+
+# Stage 10 is a deterministic presentation layer. It never refits models,
+# changes registered families, or promotes observational evidence to causality.
+guardrails:
+  primary_frequency: weekly
+  monthly_role: robustness
+  human_validation_required: true
+  publication_eligible_without_human_validation: false
+  causal_claim_allowed: false
+  economic_importance_claim_allowed: false
+  point_rank_is_not_formal_superiority: true
+  temporal_precedence_is_not_structural_causality: true
+  dml_interpretation: orthogonalized_predictive_association_only
+  var_identification: reduced_form_exploratory_only
+
+source_manifests:
+  weekly_llm:
+    path: outputs/llm_scfi_comparison/llm_scfi_v001_manifest.json
+    sha256: null
+    version: llm_scfi_v001
+    status: provisional_pending_human_validation
+    required_outputs: [llm_ranking, primary_predictor_ranking, aligned_panel]
+    legacy_outputs:
+      llm_ranking:
+        rows: 3
+        sha256: 5db6d474bd813816762f85abff63f6d115ac61d20377c150df172e53386925e6
+      primary_predictor_ranking:
+        rows: 6
+        sha256: 287cebb99e222c9a8a2037c795fd08395b53e040158154c88fe8a165ea2341f7
+      aligned_panel:
+        rows: 522
+        sha256: faeab464efecf9ffb8fb4f65adf60ccc1c989844555b35177013c5a7d872d524
+
+  monthly_llm:
+    path: outputs/llm_scfi_comparison/llm_scfi_monthly_v001_manifest.json
+    sha256: null
+    version: llm_scfi_monthly_v001
+    status: provisional_pending_human_validation
+    required_outputs: [llm_ranking, primary_predictor_ranking, construction_summary]
+    legacy_outputs:
+      llm_ranking:
+        rows: 9
+        sha256: bc18cbdc93cc1c8c93c4e40de816e89c4419df405710cc4f22e70fea5ff048fa
+      primary_predictor_ranking:
+        rows: 12
+        sha256: 2a8b3947259339b5792462afc7ec9810109f72e06018fba2f9f4a7e1d6da3879
+      construction_summary:
+        rows: 2
+        sha256: 5f52c50232dcbc2e269279da6211ad27ed6276dc03139e89dbb2a694d151186f
+
+  nonlinear_forecasts:
+    path: outputs/nonlinear_forecasts/nonlinear_scfi_v001_manifest.json
+    sha256: null
+    version: nonlinear_scfi_v001
+    status: provisional_pending_human_validation
+    required_outputs: [pipeline_ranking, predictions]
+    legacy_outputs:
+      pipeline_ranking:
+        rows: 15
+        sha256: ce41659f6b84f41f38d30007e6b2de9938d566b97b27ad238aa8e89e8d69c5a4
+      predictions:
+        rows: 157200
+        sha256: a00d241c9229a796f435efe5576ea1d71de5cf8ebdcfc138e85bc79e0651b598
+
+  time_series_causality:
+    path: outputs/time_series_causality/causality_v001_manifest.json
+    sha256: null
+    version: causality_v001
+    required_outputs:
+      - local_projections
+      - conditional_granger_tests
+      - conventional_granger_tests
+      - pcmci_links
+      - var_impulse_responses
+
+  causal_ml:
+    path: outputs/causal_ml/causal_ml_v001_manifest.json
+    sha256: null
+    version: causal_ml_v001
+    status: provisional_orthogonalized_predictive_effects_only
+    required_outputs:
+      - dml_estimates
+      - overlap_diagnostics
+      - placebo_tests
+      - heterogeneous_group_effects
+      - learner_stability
+
+  robustness:
+    path: outputs/robustness/robustness_v001_manifest.json
+    sha256: null
+    version: robustness_v001
+    status: complete_computational_scope_pending_human_validation
+    required_outputs:
+      - ablation_tests
+      - index_stability
+      - forecast_regime_sensitivity
+      - peak_breadth_difference
+      - causal_ml_sensitivity
+      - local_projection_sensitivity
+      - conditional_granger_sensitivity
+      - conventional_granger_sensitivity
+      - pcmci_link_stability
+
+  diagnostics:
+    path: outputs/diagnostics/error_diagnostics_v001_manifest.json
+    sha256: null
+    version: error_diagnostics_v001
+    status: complete_computational_scope_pending_human_validation
+    required_outputs:
+      - forecast_error_summary
+      - forecast_residual_tests
+      - forecast_stability
+      - mincer_zarnowitz_calibration
+
+  significance:
+    path: outputs/significance/significance_v001_manifest.json
+    sha256: null
+    version: significance_v001
+    status: complete_computational_scope_pending_human_validation
+    required_outputs:
+      - primary_forecast_inference
+      - primary_claim_summary
+      - significance_domain_summary
+      - significance_family_summary
+      - uncertainty_effect_size_audit
+      - claim_gate_audit
+
+outputs:
+  tables_directory: outputs/tables
+  figures_directory: outputs/figures
+  reports_directory: outputs/reports
+  logs_directory: outputs/logs
+  workbook_suffix: publication_tables.xlsx
+  report_suffix: results_summary.md
+  manifest_suffix: manifest.json
+  source_audit_suffix: source_audit.csv
+  script_sha256_lock: configs/publication_outputs_script.sha256
+
+figures:
+  dpi: 220
+  formats: [png, pdf]
+  style: seaborn-v0_8-whitegrid
+  color_primary: "#1f4e79"
+  color_secondary: "#c55a11"
+  color_robustness: "#6b7280"
+  color_warning: "#b91c1c"
+
+forecast_trajectory_figures:
+  horizon_steps: 1
+  source_type: score_hybrid
+  score_source: score_median
+  algorithms: [glm, lstm, prophet, random_forest, xgboost]
+  signals: [overall_disruption_max, dimension_mean7]
+  weekly_constructions: [weekly_log_volume]
+  monthly_constructions: [adapted_pdf_sqrt_ema3, mean_safe_weekly]
+  actual_column: actual_scfi_level
+  prediction_column: predicted_scfi_level
+  interpretation: frozen_out_of_sample_forecasts_not_in_sample_fitted_values
+
+expected:
+  source_manifests: 8
+  minimum_tables: 14
+  figure_basenames: 15
+  source_contracts_all_pass: true
+  significance_claim_gates_all_pass: true
+  significance_source_contracts_all_pass: true
+  significance_uncertainty_groups_all_pass: true
+  primary_forecast_hypotheses: 100
+  adjusted_primary_improvements: 0
+  adjusted_primary_worsenings: 21

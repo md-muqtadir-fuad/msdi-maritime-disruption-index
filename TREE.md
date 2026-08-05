@@ -89,28 +89,30 @@ sc-disrupt/
 ├── scripts/
 │   ├── 00_audit_legacy_project.py
 │   ├── 01_ingest_sources.py
-│   ├── 01_normalize_legacy_news.py
-│   ├── 01b_clean_llm_dataset.py
-│   ├── 02_retrieve_full_text.py
-│   ├── 02b_retrieve_llm_full_text.py
-│   ├── 02c_merge_full_text_deduplicate.py
-│   ├── 02d_filter_irrelevant_news.py
-│   ├── 02e_analyze_pre_llm_kept.py
-│   ├── 03_run_llm_scoring.py
-│   ├── 03a_merge_llm_scores.py
-│   ├── 04_human_validation_metrics.py
-│   ├── 05_build_disruption_index.py
-│   ├── 06_build_model_panels.py
-│   ├── 07_prediction_benchmarks.py      # statistical + time-series ML forecasts
-│   ├── 07b_llm_scfi_comparison.py       # common-cohort LLM/dimension/hybrid forecasts
-│   ├── 07c_monthly_llm_scfi_comparison.py # dual-construction monthly robustness forecasts
-│   ├── 07d_nonlinear_forecasts.py       # leakage-safe RF/XGBoost/LSTM/Prophet forecasts
-│   ├── 08_causality_analysis.py         # VAR/VARX, Granger, PCMCI, local projections
-│   ├── 08b_causal_ml.py                 # time-aware DML + guarded GATE/BLP heterogeneity
-│   ├── 09_robustness_checks.py          # ablation and sensitivity
-│   ├── 09b_error_diagnostics.py         # residual, regime, event, influence errors
-│   ├── 09c_significance_analysis.py     # CIs, effect sizes, p-value correction
-│   └── 10_make_figures_tables.py
+│   ├── 02_normalize_legacy_news.py
+│   ├── 03_normalize_llm_news.py
+│   ├── 04_enrich_full_text.py           # umbrella marker
+│   ├── 05_retrieve_legacy_full_text.py
+│   ├── 06_retrieve_llm_full_text.py
+│   ├── 07_merge_full_text_deduplicate.py
+│   ├── 08_filter_irrelevant_news.py
+│   ├── 09_analyze_pre_llm_corpus.py
+│   ├── 10_run_llm_scoring.py            # external/manual gate
+│   ├── 11_merge_llm_scores.py
+│   ├── 12_human_validation_metrics.py
+│   ├── 13_build_disruption_index.py
+│   ├── 14_build_model_panels.py
+│   ├── 15_prediction_benchmarks.py      # statistical + ML forecasts, including GLM
+│   ├── 16_llm_scfi_comparison_weekly.py # common-cohort LLM/dimension/hybrid forecasts
+│   ├── 17_llm_scfi_comparison_monthly.py # dual-construction monthly robustness
+│   ├── 18_forecasting_models.py         # GLM/RF/XGBoost/LSTM/Prophet
+│   ├── 19_time_series_causality.py       # VAR/VARX, Granger, PCMCI, local projections
+│   ├── 20_causal_ml.py                   # time-aware DML + guarded heterogeneity
+│   ├── 21_ablation_sensitivity_checks.py
+│   ├── 22_error_diagnostics.py
+│   ├── 23_significance_analysis.py
+│   ├── 24_make_figures_tables.py
+│   └── 99_run_full_pipeline.py         # read-only smoke / full tuned orchestration
 ├── tests/
 ├── README.md
 ├── TREE.md

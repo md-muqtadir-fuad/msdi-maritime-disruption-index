@@ -15,6 +15,21 @@ design:
 # The candidate lists are intentionally compact.  --tune evaluates them only
 # with nested, horizon-purged expanding-window validation inside each outer fit.
 models:
+  glm:
+    fixed:
+      power: 0
+      link: identity
+      alpha: 0.01
+      fit_intercept: true
+      solver: lbfgs
+      max_iter: 5000
+      tol: 1.0e-8
+    candidates:
+      - {power: 0, link: identity, alpha: 0.001, fit_intercept: true, solver: lbfgs, max_iter: 5000, tol: 1.0e-8}
+      - {power: 0, link: identity, alpha: 0.01, fit_intercept: true, solver: lbfgs, max_iter: 5000, tol: 1.0e-8}
+      - {power: 0, link: identity, alpha: 0.1, fit_intercept: true, solver: lbfgs, max_iter: 5000, tol: 1.0e-8}
+      - {power: 0, link: identity, alpha: 1.0, fit_intercept: true, solver: lbfgs, max_iter: 5000, tol: 1.0e-8}
+
   random_forest:
     fixed:
       n_estimators: 500

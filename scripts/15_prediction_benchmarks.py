@@ -34,7 +34,7 @@ from sklearn.base import RegressorMixin
 from sklearn.compose import TransformedTargetRegressor
 from sklearn.ensemble import HistGradientBoostingRegressor
 from sklearn.impute import SimpleImputer
-from sklearn.linear_model import ElasticNet, Ridge
+from sklearn.linear_model import ElasticNet, Ridge, TweedieRegressor
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -78,6 +78,15 @@ def parse_args() -> argparse.Namespace:
         help="Refit interval for gradient boosting; forecasts are still produced every week.",
     )
     parser.add_argument("--ridge-alpha", type=float, default=1.0)
+    parser.add_argument(
+        "--glm-alpha",
+        type=float,
+        default=0.01,
+        help=(
+            "L2 penalty for the Gaussian identity-link GLM; fitted with "
+            "training-window-only imputation and standardization."
+        ),
+    )
     parser.add_argument("--elastic-alpha", type=float, default=0.01)
     parser.add_argument("--elastic-l1-ratio", type=float, default=0.2)
     parser.add_argument("--seed", type=int, default=20260712)
@@ -232,7 +241,7 @@ def model_configurations() -> list[ModelConfiguration]:
         "ar_brent_breadth",
         "ar_brent_both",
     ]
-    for model_name in ("ridge", "elastic_net", "hist_gradient_boosting"):
+    for model_name in ("ridge", "glm", "elastic_net", "hist_gradient_boosting"):
         configurations.extend(
             ModelConfiguration(model_name, feature_set) for feature_set in matched_sets
         )
@@ -242,6 +251,21 @@ def model_configurations() -> list[ModelConfiguration]:
 def make_estimator(config: ModelConfiguration, args: argparse.Namespace) -> RegressorMixin:
     if config.model_name == "ridge":
         regressor: RegressorMixin = Ridge(alpha=args.ridge_alpha)
+        steps = [
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler()),
+            ("regressor", regressor),
+        ]
+    elif config.model_name == "glm":
+        regressor = TweedieRegressor(
+            power=0,
+            link="identity",
+            alpha=args.glm_alpha,
+            fit_intercept=True,
+            solver="lbfgs",
+            max_iter=5_000,
+            tol=1e-8,
+        )
         steps = [
             ("imputer", SimpleImputer(strategy="median")),
             ("scaler", StandardScaler()),
@@ -724,6 +748,23 @@ def main() -> None:
     statistical_tests.to_csv(tests_path, index=False)
     fits.to_csv(fits_path, index=False)
     features_path.write_text(json.dumps(feature_sets, indent=2), encoding="utf-8")
+    output_paths = {
+        "predictions": prediction_path,
+        "metrics": metrics_path,
+        "statistical_tests": tests_path,
+        "fit_audit": fits_path,
+        "feature_sets": features_path,
+    }
+    output_sha256 = {
+        key: sha256_file(path) for key, path in output_paths.items()
+    }
+    output_row_counts = {
+        "predictions": int(len(forecasts)),
+        "metrics": int(len(metrics)),
+        "statistical_tests": int(len(statistical_tests)),
+        "fit_audit": int(len(fits)),
+        "feature_sets": 1,
+    }
 
     best = (
         metrics.sort_values(["horizon_weeks", "rmse_log_change"])
@@ -745,10 +786,24 @@ def main() -> None:
             "nonlinear_refit_every_origins": args.nonlinear_refit_every,
             "minimum_training_rows": args.minimum_training_rows,
             "horizons_weeks": list(HORIZONS),
+            "model_families": [
+                "ridge",
+                "glm",
+                "elastic_net",
+                "hist_gradient_boosting",
+            ],
             "target": "forward SCFI log change",
             "identical_evaluation_dates_enforced": True,
             "random_train_test_split": False,
             "preprocessing_fit_inside_training_window": True,
+            "glm_specification": {
+                "family": "Gaussian (Tweedie power=0)",
+                "link": "identity",
+                "feature_preprocessing": "training-only median imputation and standardization",
+                "alpha": args.glm_alpha,
+                "max_iter": 5_000,
+                "tol": 1e-8,
+            },
             "hist_gradient_boosting_internal_random_early_stopping": False,
             "algorithm_matched_incremental_tests": True,
         },
@@ -759,14 +814,12 @@ def main() -> None:
         },
         "best_rmse_model_by_horizon": best.to_dict(orient="records"),
         "outputs": {
-            "predictions": str(prediction_path),
-            "metrics": str(metrics_path),
-            "statistical_tests": str(tests_path),
-            "fit_audit": str(fits_path),
-            "feature_sets": str(features_path),
+            **{key: str(path) for key, path in output_paths.items()},
             "log": str(log_path),
             "manifest": str(manifest_path),
         },
+        "output_sha256": output_sha256,
+        "output_row_counts": output_row_counts,
         "software": {
             "python": platform.python_version(),
             "pandas": pd.__version__,
