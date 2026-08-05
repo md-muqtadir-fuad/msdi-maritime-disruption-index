@@ -95,6 +95,11 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         help="Optional final labels. Without this, deterministic consensus labels are used.",
     )
+    evaluate.add_argument(
+        "--allow-pseudo-annotations",
+        action="store_true",
+        help="Permit explicitly synthetic test labels; outputs remain non-human and non-publication-eligible.",
+    )
     return parser.parse_args()
 
 
@@ -614,6 +619,11 @@ def model_human_metrics(scores_path: Path, reference: pd.DataFrame) -> tuple[pd.
 
 def evaluate_annotations(args: argparse.Namespace) -> dict:
     annotations = load_annotations(args.annotations)
+    pseudo = "annotation_provenance" in annotations.columns and annotations["annotation_provenance"].astype(str).str.contains("pseudo", case=False, na=False).any()
+    if pseudo and not args.allow_pseudo_annotations:
+        raise ValueError("Pseudo annotations detected. Supply real human labels or explicitly use --allow-pseudo-annotations for pipeline testing only.")
+    if pseudo and args.output_dir.resolve() == DEFAULT_OUTPUT_DIR.resolve():
+        raise ValueError("Pseudo annotations require a separate --output-dir under data/04_validation/pseudo_test_only/ to avoid overwriting human-validation artifacts.")
     reference, reference_type = load_reference_labels(args.adjudicated, annotations)
     pairwise = pairwise_human_metrics(annotations)
     overall = overall_human_metrics(annotations)
@@ -644,6 +654,8 @@ def evaluate_annotations(args: argparse.Namespace) -> dict:
         "reference_type": reference_type,
         "reference_articles": len(reference),
         "score_scale": {"minimum": SCORE_MIN, "maximum": SCORE_MAX},
+        "status": "synthetic_test_only_not_human_validation" if pseudo else "human_annotation_evaluation",
+        "publication_eligible": False if pseudo else None,
         "outputs": {
             "pairwise_human_reliability": str(pairwise_path),
             "overall_human_reliability": str(overall_path),

@@ -1,0 +1,46 @@
+version: external_controls_v001
+
+# Each source file should contain a date column and at least one numeric value
+# column. The cleaner selects the first matching alias below and records its
+# choice in the manifest. Amend aliases only with a documented source change.
+sources:
+  cpb_world_trade_monitor:
+    raw_directory: data/01_raw/controls/macro
+    file_patterns: ["*cpb*world*trade*.csv", "*cpb*world*trade*.xlsx", "*world*trade*monitor*.csv", "*world*trade*monitor*.xlsx"]
+    frequency: monthly
+    release_lag_days: 45
+    date_columns: [date, month, period, time_period, observation_date]
+    value_columns: [world_import_volume_index, world_trade_volume_index, world_import_volume, world_trade_volume, total_world_trade]
+    output_variable: cpb_world_trade_volume
+    aggregation: last
+  gscpi:
+    raw_directory: data/01_raw/controls/macro
+    file_patterns: ["*gscpi*.csv", "*gscpi*.xlsx", "*gscpi*.xls"]
+    frequency: monthly
+    release_lag_days: 5
+    date_columns: [date, month, period, time_period, observation_date]
+    value_columns: [gscpi, global_supply_chain_pressure_index, value]
+    output_variable: gscpi
+    aggregation: last
+  unctad_lsbci:
+    raw_directory: data/01_raw/controls/connectivity
+    file_patterns: ["*lsbci*.csv", "*lsbci*.xlsx", "*lsci*.csv", "*lsci*.xlsx"]
+    frequency: quarterly
+    release_lag_days: 45
+    date_columns: [quarter, date, month, period, time_period, observation_date]
+    value_columns: [index, lsbci, lsci, liner_shipping_bilateral_connectivity_index, liner_shipping_connectivity_index, value]
+    # Pre-specified China-origin lanes relevant to SCFI; do not average every
+    # bilateral link in the UNCTAD extract.
+    origin_economy: China
+    focus_partners: [United States, Germany, Netherlands (Kingdom of the), United Kingdom, Japan, Republic of Korea, Singapore]
+    output_variable: unctad_china_core_lane_lsbci
+    aggregation: mean
+  imf_portwatch:
+    raw_directory: data/01_raw/controls/portwatch
+    file_patterns: ["*portwatch*.csv", "*portwatch*.xlsx", "*daily*ports*.csv", "*daily*ports*.xlsx"]
+    frequency: daily
+    release_lag_days: 2
+    date_columns: [date, day, period, time_period, observation_date]
+    value_columns: [portcalls_container, port_calls, vessel_calls, ship_calls, shipments, shipment_volume, trade_volume, value]
+    output_variable: imf_portwatch_global_container_calls
+    aggregation: sum

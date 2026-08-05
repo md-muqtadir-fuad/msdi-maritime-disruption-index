@@ -41,6 +41,15 @@ EXPECTED_FORECAST_ALGORITHMS = (
     "lstm",
     "prophet",
 )
+# Optional scripts are checked by ``smoke`` but are deliberately outside the
+# publication pipeline until their external raw-data prerequisites exist.
+OPTIONAL_EXTENSION_SCRIPTS = (
+    "25_clean_external_controls.py",
+    "26_external_controls_eda.py",
+    "27_external_controls_statistical_analysis.py",
+    "28_create_pseudo_annotations.py",
+    "29_inter_annotator_agreement.py",
+)
 
 
 @dataclass(frozen=True)
@@ -283,6 +292,7 @@ STAGE_DEPENDENCIES: dict[int, tuple[int, ...]] = {
 CONFIG_PATHS = (
     "configs/causal_ml.yaml",
     "configs/error_diagnostics.yaml",
+    "configs/external_controls.yaml",
     "configs/model_registry.yaml",
     "configs/nonlinear_forecasting.yaml",
     "configs/paths.yaml",
@@ -375,7 +385,7 @@ def script_registry_checks() -> list[dict[str, Any]]:
             "invalid_forward_edges": forward_edges,
         }
     )
-    registered = {stage.script for stage in STAGES} | {Path(__file__).name}
+    registered = {stage.script for stage in STAGES} | set(OPTIONAL_EXTENSION_SCRIPTS) | {Path(__file__).name}
     observed = {path.name for path in SCRIPTS_DIR.glob("[0-9][0-9]_*.py")}
     rows.append(
         {
@@ -413,7 +423,7 @@ def compile_script(path: Path) -> dict[str, Any]:
         compile(source, str(path), "exec")
         row["passed"] = True
         row["sha256"] = hashlib.sha256(source.encode("utf-8")).hexdigest()
-        row["todo_placeholder"] = "TODO: implement" in source
+        row["todo_placeholder"] = path.name != Path(__file__).name and "TODO: implement" in source
     except Exception as exc:
         row["error"] = f"{type(exc).__name__}: {exc}"
     return row
@@ -634,6 +644,7 @@ def build_smoke_report(deep_hash: bool = False) -> dict[str, Any]:
         interpreter_check(),
         *script_registry_checks(),
         *(compile_script(stage.script_path) for stage in STAGES),
+        *(compile_script(SCRIPTS_DIR / script) for script in OPTIONAL_EXTENSION_SCRIPTS),
         compile_script(Path(__file__).resolve()),
         *dependency_checks(),
         *config_rows,

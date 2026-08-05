@@ -56,6 +56,62 @@ support structural causal claims.
 See [the full runner guide](docs/reproducibility/full_pipeline_runner.md) and
 [the forecasting method](docs/methodology/nonlinear_forecasting.md).
 
+## External control data (planned extension)
+
+Keep downloaded source files in the folders below, preserving the original
+download alongside its retrieval date and source metadata. These controls are
+not automatically used until the panel-building stage is extended; when added,
+use only publication-available lagged values and retain the current
+Brent-only run as the baseline.
+
+| Source | Role in this study | Raw-data location |
+|---|---|---|
+| [IMF PortWatch daily ports data](https://portwatch.imf.org/datasets/daily-ports-data/explore) | **2019+ robustness-only** port-activity / physical-shipping evidence; never a primary 2016–2026 control. | `data/01_raw/controls/portwatch/` |
+| [CPB World Trade Monitor](https://www.cpb.nl/en/world-trade-monitor/cpb-wereldhandelsmonitor-may-2026) | Global import-demand control. | `data/01_raw/controls/macro/` |
+| [UNCTAD Liner Shipping Bilateral Connectivity Index](https://unctadstat.unctad.org/datacentre/dataviewer/US.LSBCI) | Shipping-network supply and route-connectivity control. | `data/01_raw/controls/connectivity/` |
+| [New York Fed GSCPI](https://www.newyorkfed.org/research/policy/gscpi#/interactive) | External validity benchmark and optional lagged forecasting sensitivity feature; not a primary causal control because it includes transport-cost indicators. | `data/01_raw/controls/macro/` |
+
+Do not use a contemporaneous external series when forecasting or causal
+analysis. Record each release date and apply an availability lag before merging
+it into the weekly or monthly panel.
+
+The current UNCTAD control is the unweighted mean of pre-specified China-origin
+core lanes (United States, Germany, Netherlands, United Kingdom, Japan,
+Republic of Korea, and Singapore), not an all-pairs mean. Correlation and
+lagged-association outputs report HAC/FDR inference; ordinary IID correlation
+p-values are descriptive only.
+
+After placing the four downloads in those folders, run the optional control
+extension in order:
+
+```powershell
+.venv\Scripts\python.exe scripts\25_clean_external_controls.py
+.venv\Scripts\python.exe scripts\26_external_controls_eda.py
+.venv\Scripts\python.exe scripts\27_external_controls_statistical_analysis.py
+```
+
+Stage 25 leaves raw files unchanged and writes the standardized, availability-
+dated long dataset to `data/02_interim/controls/`. Stage 26 produces complete
+numeric correlation matrices, missingness summaries, and EDA figures. Stage 27
+exports FDR-adjusted Pearson/Spearman tests, lagged one-to-one SCFI
+associations, and VIF multicollinearity diagnostics. These optional scripts do
+not alter the existing `00`â€“`24` publication pipeline until the controls are
+explicitly incorporated into Stage 14 and the downstream models are rerun.
+
+## Temporary pseudo annotations
+
+For pipeline plumbing only, create explicitly synthetic annotation files and
+their inter-annotator-agreement outputs with:
+
+```powershell
+.venv\Scripts\python.exe scripts\28_create_pseudo_annotations.py
+.venv\Scripts\python.exe scripts\29_inter_annotator_agreement.py --annotations data\04_validation\pseudo_test_only\annotator_1_pseudo.csv data\04_validation\pseudo_test_only\annotator_2_pseudo.csv --allow-pseudo-annotations
+```
+
+Pseudo labels are stored in `data/04_validation/pseudo_test_only/` and are
+blocked by Stage 12 unless `--allow-pseudo-annotations` is explicit. They are
+never human validation and never publication eligible.
+
 ## Testing
 
 ```powershell

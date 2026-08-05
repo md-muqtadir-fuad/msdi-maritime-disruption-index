@@ -6,6 +6,7 @@ statsmodels
 tigramite==5.2.10.1
 matplotlib
 openpyxl
+xlrd>=2.0.1
 pyyaml
 python-dotenv
 pydantic
