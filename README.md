@@ -53,6 +53,14 @@ stage then compares the five end-to-end algorithm pipelines. Granger, PCMCI,
 local projections, and observational causal-ML outputs do not by themselves
 support structural causal claims.
 
+Stage 08 also creates canonical pre-LLM event IDs with the configurable
+`BAAI/bge-m3` encoder (`configs/event_clustering.yaml`). One frozen embedding is
+reused for a weekly five-week event window and a monthly three-calendar-month
+event window. Articles are retained, while Stage 13 gives each event a fixed
+total weight within the current aggregation period. Human reviewers compare
+candidate cosine thresholds 0.85, 0.88, 0.90, and 0.92 before freezing the
+publication-final threshold; 0.88 is provisional only.
+
 See [the full runner guide](docs/reproducibility/full_pipeline_runner.md) and
 [the forecasting method](docs/methodology/nonlinear_forecasting.md).
 

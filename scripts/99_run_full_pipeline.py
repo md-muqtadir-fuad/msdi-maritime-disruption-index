@@ -123,9 +123,10 @@ STAGES: tuple[Stage, ...] = (
     Stage(
         8,
         "08_filter_irrelevant_news.py",
-        "Filter irrelevant news",
+        "Filter irrelevant news and assign canonical events",
         completion_artifacts=(
             "data/03_processed/news_full_text/pre_llm_filter/pre_llm_filter_summary.json",
+            "data/03_processed/news_full_text/pre_llm_filter/event_dedup/canonical_event_manifest.json",
         ),
     ),
     Stage(
@@ -293,6 +294,7 @@ STAGE_DEPENDENCIES: dict[int, tuple[int, ...]] = {
 CONFIG_PATHS = (
     "configs/causal_ml.yaml",
     "configs/error_diagnostics.yaml",
+    "configs/event_clustering.yaml",
     "configs/external_controls.yaml",
     "configs/portwatch_event_study.yaml",
     "configs/model_registry.yaml",
@@ -317,6 +319,7 @@ REQUIRED_IMPORTS = {
     "PyYAML": "yaml",
     "SciPy": "scipy",
     "scikit-learn": "sklearn",
+    "sentence-transformers": "sentence_transformers",
     "statsmodels": "statsmodels",
     "Tigramite": "tigramite",
     "XGBoost": "xgboost",

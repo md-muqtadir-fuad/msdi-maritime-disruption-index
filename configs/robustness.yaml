@@ -56,10 +56,13 @@ measurement_variants:
   permuted_article_dates: true
   weekly_resampling_frequency: W-FRI
   primary_duplicate_penalty: sqrt
+  primary_event_penalty: fixed_total_within_aggregation_period
   primary_media_correction: log
   formulas:
     duplicate_sqrt: one_over_sqrt_duplicate_group_size
     duplicate_inverse: one_over_duplicate_group_size
+    event_fixed: source_duplicate_weight_normalized_to_one_within_period_event
+    event_none: no_semantic_event_coverage_penalty
     media_log: weighted_sum_over_log1p_article_count
     media_mean: weighted_sum_over_article_count
     media_sqrt: weighted_sum_over_sqrt_effective_article_count

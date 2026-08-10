@@ -1,0 +1,43 @@
+version: event_clustering_v001
+
+event_clustering:
+  enabled: true
+  role: model_independent_pre_llm_event_measurement
+  model:
+    name: BAAI/bge-m3
+    revision: null  # resolved model commit is recorded in the run manifest
+    batch_size: 16
+    device: auto
+    torch_dtype: auto
+    local_files_only: false
+    max_sequence_length: 2048
+    maximum_body_characters: 12000
+  matching:
+    similarity: cosine
+    selected_threshold: 0.88  # provisional until blinded human verification
+    profiles:
+      weekly:
+        window_value: 5
+        window_unit: weeks
+      monthly:
+        window_value: 3
+        window_unit: months
+    algorithm: deterministic_date_ordered_greedy_complete_linkage
+    anti_chaining: require_threshold_against_every_cluster_member
+  validation:
+    threshold_candidates: [0.85, 0.88, 0.90, 0.92]
+    pair_audit_min_similarity: 0.80
+    pair_sample_size_total: 400
+    seed: 20260810
+    publication_final_threshold_requires_human_calibration: true
+  aggregation:
+    primary: fixed_event_total_within_aggregation_period
+    sensitivities:
+      - square_root_event_coverage
+      - no_event_penalty
+    global_cluster_size_is_descriptive_only: true
+    recompute_weights_with_current_period_articles_only: true
+  guardrails:
+    use_llm_scores: false
+    use_scfi: false
+    remove_independent_articles: false

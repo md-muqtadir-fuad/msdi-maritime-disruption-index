@@ -36,6 +36,8 @@ def scored_article_frame() -> pd.DataFrame:
         "publication_date": pd.Timestamp("2024-01-03"),
         "source_domain": "example.test",
         "duplicate_group_size": 1.0,
+        "event_id": "event-a1",
+        "event_cluster_size": 1.0,
     }
     for score, model_values in values.items():
         for alias, value in zip(ALIASES, model_values):
@@ -122,6 +124,23 @@ class RobustnessChecksTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             MODULE.media_correct(raw, count, effective, "unknown")
 
+    def test_fixed_event_weights_sum_to_one_per_week_event(self) -> None:
+        frame = pd.DataFrame(
+            {
+                "article_id": ["a", "b", "c"],
+                "publication_date": pd.to_datetime(
+                    ["2024-01-01", "2024-01-02", "2024-01-03"]
+                ),
+                "event_id": ["same", "same", "other"],
+            }
+        )
+        weights = MODULE.period_event_weights(
+            frame, pd.Series([0.5, 1.0, 1.0]), "W-FRI", "fixed"
+        )
+        observed = frame.assign(weight=weights).groupby("event_id")["weight"].sum()
+        self.assertAlmostEqual(observed["same"], 1.0)
+        self.assertAlmostEqual(observed["other"], 1.0)
+
     def test_article_peak_breadth_mean_and_dimension_ablation_by_hand(self) -> None:
         article = scored_article_frame()
         peak = MODULE.IndexVariant(
@@ -162,6 +181,7 @@ class RobustnessChecksTests(unittest.TestCase):
         second.loc[0, "article_id"] = "a2"
         second.loc[0, "publication_date"] = pd.Timestamp("2024-01-05")
         second.loc[0, "source_domain"] = "other.test"
+        second.loc[0, "event_id"] = "event-a2"
         first.loc[0, "duplicate_group_size"] = 1.0
         second.loc[0, "duplicate_group_size"] = 4.0
         # Both article peak medians are 3, hence raw = 3*1 + 3*(1/2).

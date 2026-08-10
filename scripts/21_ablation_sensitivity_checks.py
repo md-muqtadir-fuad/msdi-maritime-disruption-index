@@ -161,6 +161,7 @@ class IndexVariant:
     included_aliases: tuple[str, ...] = ()
     excluded_dimension: str | None = None
     duplicate_penalty: str = "sqrt"
+    event_penalty: str = "fixed"
     media_correction: str = "log"
     filter_rule: str = "all_common_articles"
     excluded_source: str | None = None
@@ -519,6 +520,9 @@ def load_common_articles(
         "source_domain",
         "source_name",
         "duplicate_group_size",
+        "event_id",
+        "event_cluster_size",
+        "source_duplicate_weight",
         "novelty_weight",
     ]
     required = [*metadata_columns, *score_columns]
@@ -531,7 +535,13 @@ def load_common_articles(
     article["publication_date"] = pd.to_datetime(
         article["publication_date"], format="mixed", errors="coerce"
     )
-    for column in [*score_columns, "duplicate_group_size", "novelty_weight"]:
+    for column in [
+        *score_columns,
+        "duplicate_group_size",
+        "event_cluster_size",
+        "source_duplicate_weight",
+        "novelty_weight",
+    ]:
         article[column] = pd.to_numeric(article[column], errors="coerce")
     common = article.loc[
         article["publication_date"].notna()
@@ -621,6 +631,32 @@ def duplicate_weights(group_size: pd.Series, method: str) -> pd.Series:
     if method == "none":
         return pd.Series(1.0, index=size.index, dtype=float)
     raise ValueError(f"Unknown duplicate penalty: {method}")
+
+
+def period_event_weights(
+    frame: pd.DataFrame,
+    source_weight: pd.Series,
+    frequency: str,
+    method: str,
+) -> pd.Series:
+    """Availability-safe event coverage weights for one aggregation period."""
+    if method not in {"fixed", "sqrt", "none"}:
+        raise ValueError(f"Unknown event penalty: {method}")
+    base = pd.to_numeric(source_weight, errors="coerce").fillna(1.0)
+    if method == "none":
+        return base
+    event = frame["event_id"].astype("string").str.strip()
+    event = event.mask(event.isna() | event.eq(""), "ARTICLE_" + frame["article_id"].astype(str))
+    period = frame["publication_date"].dt.to_period(frequency).astype(str)
+    helper = pd.DataFrame(
+        {"period": period, "event": event, "base": base, "article_id": frame["article_id"]},
+        index=frame.index,
+    )
+    groups = helper.groupby(["period", "event"], sort=False)
+    denominator = groups["base"].transform("sum").replace(0, np.nan)
+    size = groups["article_id"].transform("nunique").clip(lower=1)
+    weight = base.div(denominator).fillna(1.0)
+    return weight.mul(np.sqrt(size)) if method == "sqrt" else weight
 
 
 def media_correct(
@@ -747,18 +783,21 @@ def aggregate_weekly_variant(
     work["duplicate_weight"] = duplicate_weights(
         work["duplicate_group_size"], variant.duplicate_penalty
     )
-    work["weighted_score"] = work["article_score"] * work["duplicate_weight"]
     if variant.permute_dates:
         rng = np.random.default_rng(stable_seed(seed, variant.variant_id, "dates"))
         work["publication_date"] = rng.permutation(
             work["publication_date"].to_numpy()
         )
+    work["novelty_weight"] = period_event_weights(
+        work, work["duplicate_weight"], frequency, variant.event_penalty
+    )
+    work["weighted_score"] = work["article_score"] * work["novelty_weight"]
     grouped = work.set_index("publication_date").resample(
         frequency, label="right", closed="right"
     ).agg(
         article_count=("article_id", "nunique"),
         source_count=("source_domain", "nunique"),
-        effective_article_count=("duplicate_weight", "sum"),
+        effective_article_count=("novelty_weight", "sum"),
         weighted_score_sum=("weighted_score", "sum"),
         unweighted_score_mean=("article_score", "mean"),
         active_article_count=("article_score", lambda value: int(value.gt(0).sum())),
@@ -910,12 +949,17 @@ def build_index_variants(
                     family_id="duplicate_penalty",
                     included_aliases=tuple(aliases),
                     duplicate_penalty=str(method),
+                    event_penalty="none" if str(method) == "none" else "fixed",
                     comparison_reference=(
                         "reference_peak_median"
                         if path == "peak"
                         else "reference_breadth_median7"
                     ),
-                    description=f"Alternative {method} duplicate penalty",
+                    description=(
+                        "No exact-duplicate or semantic-event penalty"
+                        if str(method) == "none"
+                        else f"Alternative {method} exact-duplicate penalty with fixed event totals"
+                    ),
                 )
             )
     filters = [
@@ -1453,17 +1497,20 @@ def reference_reconstruction_audit(
     tolerance: float = 1e-10,
 ) -> pd.DataFrame:
     """Fail closed unless stage-09 references reproduce stages 07b/07c."""
-    expected_weight = duplicate_weights(article["duplicate_group_size"], "sqrt")
+    expected_source_weight = duplicate_weights(article["duplicate_group_size"], "sqrt")
+    expected_weight = period_event_weights(
+        article, expected_source_weight, "W-FRI", "fixed"
+    )
     novelty_difference = (article["novelty_weight"] - expected_weight).abs()
     novelty_maximum = float(novelty_difference.max())
     rows: list[dict[str, Any]] = [
         {
             "audit_layer": "article_novelty_weight",
             "frequency": "article",
-            "index_construction": "sqrt_duplicate_weight",
+            "index_construction": "sqrt_duplicate_then_fixed_event_total",
             "msdi_path": "both",
             "date_column": "publication_date",
-            "reconstructed_column": "one_over_sqrt_duplicate_group_size",
+            "reconstructed_column": "period_local_fixed_event_total_weight",
             "reference_column": "novelty_weight",
             "matched_nonmissing_rows": int(novelty_difference.notna().sum()),
             "reconstructed_nonmissing_rows": int(expected_weight.notna().sum()),

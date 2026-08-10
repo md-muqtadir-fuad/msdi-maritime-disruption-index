@@ -36,6 +36,11 @@ def synthetic_scores() -> pd.DataFrame:
             "preferred_url": "https://example.com/a",
             "duplicate_group_id": "group-1",
             "duplicate_group_size": 4,
+            "event_day": "2024-01-01",
+            "event_id": "EVT_20240101_test",
+            "event_cluster_size": 1,
+            "event_source_count": 1,
+            "event_span_days": 0,
             "quality_score": 1,
             MODULE.PRIMARY_COLUMN: overall,
         }
@@ -46,6 +51,13 @@ def synthetic_scores() -> pd.DataFrame:
 
 
 class BuildDisruptionIndexTests(unittest.TestCase):
+    def test_event_profile_follows_aggregation_frequency(self) -> None:
+        self.assertEqual(MODULE.resolve_event_profile("W-FRI"), "weekly")
+        self.assertEqual(MODULE.resolve_event_profile("ME"), "monthly")
+        self.assertEqual(MODULE.resolve_event_profile("W-FRI", "monthly"), "monthly")
+        with self.assertRaises(ValueError):
+            MODULE.resolve_event_profile("D")
+
     def test_two_measurement_paths_and_differences(self) -> None:
         logger = logging.getLogger("test_index")
         article, diagnostics = MODULE.build_article_scores(
@@ -59,6 +71,26 @@ class BuildDisruptionIndexTests(unittest.TestCase):
             row[f"{MODULE.PRIMARY_COLUMN}__diff__model_a_minus_model_b"], 2
         )
         self.assertEqual(diagnostics["articles_ensemble_eligible"], 1)
+
+    def test_fixed_event_weight_totals_one_within_period(self) -> None:
+        article = pd.DataFrame(
+            {
+                "article_id": ["a", "b", "c"],
+                "publication_date": pd.to_datetime(
+                    ["2024-01-01", "2024-01-02", "2024-01-03"]
+                ),
+                "event_id": ["event-1", "event-1", "event-2"],
+                "source_duplicate_weight": [0.5, 1.0, 1.0],
+                "peak_severity_score": [2.0, 4.0, 1.0],
+                "breadth_severity_score": [1.0, 3.0, 1.0],
+            }
+        )
+        observed = MODULE.apply_period_event_weights(article, "W-FRI", "fixed")
+        totals = observed.groupby("event_id")["novelty_weight"].sum()
+        self.assertAlmostEqual(totals["event-1"], 1.0)
+        self.assertAlmostEqual(totals["event-2"], 1.0)
+        self.assertAlmostEqual(observed.loc[0, "novelty_weight"], 1 / 3)
+        self.assertAlmostEqual(observed.loc[1, "novelty_weight"], 2 / 3)
 
     def test_media_correction(self) -> None:
         raw = pd.Series([0.0, 10.0])

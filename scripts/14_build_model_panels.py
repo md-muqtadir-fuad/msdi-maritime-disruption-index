@@ -53,6 +53,7 @@ ROLLING_WINDOWS_WEEKS = (4, 13, 26, 52)
 
 MSDI_BASE_COLUMNS = [
     "article_count",
+    "event_count",
     "source_count",
     "effective_article_count",
     "peak_active_article_count",
@@ -322,6 +323,20 @@ def attach_external_controls(panel: pd.DataFrame, controls: pd.DataFrame) -> tup
         if future.any(): raise AssertionError(f"Future external-control match: {variable}")
         result[variable] = joined["value"].to_numpy(); result[f"{variable}_availability_date"] = joined["availability_date"].to_numpy(); result[f"{variable}_age_days"] = age.to_numpy()
         audit[variable] = {"frequency": str(group["source_frequency"].iloc[0]), "maximum_age_days": threshold, "matched": int(joined["availability_date"].notna().sum()), "stale_rejected": int(stale.sum()), "future_matches": int(future.sum())}
+    for variable in EXTERNAL_CONTROL_COLUMNS:
+        if variable in result.columns:
+            continue
+        result[variable] = np.nan
+        result[f"{variable}_availability_date"] = pd.NaT
+        result[f"{variable}_age_days"] = np.nan
+        audit[variable] = {
+            "frequency": None,
+            "maximum_age_days": None,
+            "matched": 0,
+            "stale_rejected": 0,
+            "future_matches": 0,
+            "status": "not_supplied",
+        }
     return result, audit
 
 
@@ -525,6 +540,9 @@ def build_weekly_panel(
 
 def build_monthly_panel(weekly: pd.DataFrame) -> tuple[pd.DataFrame, list[dict[str, Any]]]:
     work = weekly.copy()
+    for control in EXTERNAL_CONTROL_COLUMNS:
+        if control not in work.columns:
+            work[control] = np.nan
     work["weeks_observed_flag"] = 1
     work["msdi_available_flag"] = work[PRIMARY_PREDICTORS].notna().all(axis=1).astype(int)
     work = work.set_index("observation_date")
@@ -534,6 +552,7 @@ def build_monthly_panel(weekly: pd.DataFrame) -> tuple[pd.DataFrame, list[dict[s
         "peak_score_media_corrected": ["mean", "max", "sum"],
         "breadth_score_media_corrected": ["mean", "max", "sum"],
         "article_count": "sum",
+        "event_count": "sum",
         "source_count": "mean",
         "peak_model_disagreement_mean": "mean",
         "dimension_disagreement_mean": "mean",

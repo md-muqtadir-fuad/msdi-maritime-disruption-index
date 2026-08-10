@@ -60,7 +60,12 @@ class BuildModelPanelsTests(unittest.TestCase):
                 "brent_price": [70.0, 71.0, 72.0],
             }
         )
-        panel, _, report = MODULE.build_weekly_panel(scfi, msdi, brent, 6)
+        external_controls = pd.DataFrame(
+            columns=["variable", "availability_date", "value", "source_frequency"]
+        )
+        panel, _, report = MODULE.build_weekly_panel(
+            scfi, msdi, brent, external_controls, 6
+        )
         self.assertEqual(panel.loc[0, "msdi_age_days"], 3)
         self.assertEqual(panel.loc[0, "target_scfi_level_h1w"], 110.0)
         self.assertAlmostEqual(panel.loc[0, "target_scfi_log_change_h1w"], np.log(1.1))

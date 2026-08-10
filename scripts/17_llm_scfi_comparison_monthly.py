@@ -264,7 +264,8 @@ def load_and_validate_weekly_manifest(
     if list(design.get("score_scale", [])) != [0, 4]:
         failures.append("weekly score scale is not the frozen 0-4 scale")
     if design.get("novelty_weighting") != (
-        "input novelty_weight from duplicate penalty"
+        "input novelty_weight combines exact-duplicate correction with "
+        "availability-safe within-week canonical-event weighting"
     ):
         failures.append("weekly novelty-weight provenance is incompatible")
     manifest_panel = Path(manifest.get("outputs", {}).get("aligned_panel", "")).resolve()

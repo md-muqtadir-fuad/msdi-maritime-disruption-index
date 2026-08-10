@@ -65,12 +65,27 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--log-dir", type=Path, default=DEFAULT_LOG_DIR)
     parser.add_argument("--version", default="msdi_v001")
     parser.add_argument("--frequency", default="W-FRI")
+    parser.add_argument(
+        "--event-profile",
+        choices=("auto", "weekly", "monthly"),
+        default="auto",
+        help="Event map used for weighting; auto selects from --frequency.",
+    )
     parser.add_argument("--minimum-models", type=int, default=2)
     parser.add_argument(
         "--duplicate-penalty",
         choices=("sqrt", "inverse", "none"),
         default="sqrt",
         help="Novelty weight applied to the source duplicate-group size.",
+    )
+    parser.add_argument(
+        "--event-penalty",
+        choices=("fixed", "sqrt", "none"),
+        default="fixed",
+        help=(
+            "Within-period semantic-event coverage correction. 'fixed' gives every "
+            "event one total unit of weight and is the publication-primary setting."
+        ),
     )
     parser.add_argument(
         "--media-correction",
@@ -147,7 +162,25 @@ def assign_model_alias(model_name: str, registry: list[dict[str, Any]]) -> str:
     return matches[0]
 
 
-def read_scores(path: Path, registry: list[dict[str, Any]], logger: logging.Logger) -> pd.DataFrame:
+def resolve_event_profile(frequency: str, requested: str = "auto") -> str:
+    if requested != "auto":
+        return requested
+    normalized = frequency.upper()
+    if normalized.startswith("W"):
+        return "weekly"
+    if normalized.startswith("M"):
+        return "monthly"
+    raise ValueError(
+        f"Cannot infer event profile from frequency={frequency!r}; pass --event-profile"
+    )
+
+
+def read_scores(
+    path: Path,
+    registry: list[dict[str, Any]],
+    logger: logging.Logger,
+    event_profile: str,
+) -> pd.DataFrame:
     if not path.is_file():
         raise FileNotFoundError(f"Merged score file not found: {path}")
     required = [
@@ -163,11 +196,27 @@ def read_scores(path: Path, registry: list[dict[str, Any]], logger: logging.Logg
         "preferred_url",
         "duplicate_group_id",
         "duplicate_group_size",
+        "event_day",
+        f"event_id_{event_profile}",
+        f"event_cluster_size_{event_profile}",
+        f"event_source_count_{event_profile}",
+        f"event_span_days_{event_profile}",
         "quality_score",
         *ALL_SCORE_COLUMNS,
         *OPERATIONAL_COLUMNS,
     ]
     scores = pd.read_csv(path, usecols=required, low_memory=False)
+    scores = scores.rename(
+        columns={
+            f"{column}_{event_profile}": column
+            for column in (
+                "event_id",
+                "event_cluster_size",
+                "event_source_count",
+                "event_span_days",
+            )
+        }
+    )
     if scores.empty:
         raise ValueError("Merged score file is empty")
     if scores.duplicated(["model_name", "article_id"]).any():
@@ -176,7 +225,15 @@ def read_scores(path: Path, registry: list[dict[str, Any]], logger: logging.Logg
     if scores["model_alias"].nunique() != 3:
         raise ValueError("Expected exactly three mapped scoring models")
 
-    for column in [*ALL_SCORE_COLUMNS, *OPERATIONAL_COLUMNS, "duplicate_group_size", "quality_score"]:
+    for column in [
+        *ALL_SCORE_COLUMNS,
+        *OPERATIONAL_COLUMNS,
+        "duplicate_group_size",
+        "event_cluster_size",
+        "event_source_count",
+        "event_span_days",
+        "quality_score",
+    ]:
         scores[column] = pd.to_numeric(scores[column], errors="coerce")
     successful = scores["scoring_status"].eq("success")
     for column in ALL_SCORE_COLUMNS:
@@ -217,7 +274,14 @@ def parse_publication_dates(metadata: pd.DataFrame) -> tuple[pd.Series, dict[str
 
 def check_metadata_consistency(scores: pd.DataFrame) -> dict[str, int]:
     report: dict[str, int] = {}
-    for column in ["date", "duplicate_group_id", "duplicate_group_size", "source_domain"]:
+    for column in [
+        "date",
+        "duplicate_group_id",
+        "duplicate_group_size",
+        "event_id",
+        "event_cluster_size",
+        "source_domain",
+    ]:
         counts = scores.groupby("article_id")[column].nunique(dropna=True)
         report[f"articles_with_conflicting_{column}"] = int(counts.gt(1).sum())
     return report
@@ -261,6 +325,71 @@ def novelty_weight(group_size: pd.Series, method: str) -> pd.Series:
     return pd.Series(1.0, index=size.index)
 
 
+def apply_period_event_weights(
+    article: pd.DataFrame,
+    frequency: str,
+    event_penalty: str,
+) -> pd.DataFrame:
+    """Create availability-safe event weights within each aggregation period.
+
+    Global event-cluster sizes are descriptive and can include later reports.
+    Forecasting features must therefore calculate coverage weights only from
+    articles available inside the current week/month.  Existing exact-duplicate
+    weights are normalized within an event under the fixed/sqrt specifications.
+    """
+    if event_penalty not in {"fixed", "sqrt", "none"}:
+        raise ValueError(f"Unsupported event penalty: {event_penalty}")
+    output = article.copy()
+    if "source_duplicate_weight" not in output.columns:
+        output["source_duplicate_weight"] = output.get("novelty_weight", 1.0)
+    event_id = output["event_id"].astype("string").str.strip()
+    missing_event = event_id.isna() | event_id.eq("")
+    event_id = event_id.mask(missing_event, "ARTICLE_" + output["article_id"].astype(str))
+    output["event_id"] = event_id
+
+    valid_date = output["publication_date"].notna()
+    output["event_period_article_count"] = 1
+    output["event_period_source_weight_sum"] = output["source_duplicate_weight"].astype(float)
+    if valid_date.any():
+        period = output.loc[valid_date, "publication_date"].dt.to_period(frequency).astype(str)
+        keys = pd.DataFrame(
+            {
+                "_period": period,
+                "_event": output.loc[valid_date, "event_id"].astype(str),
+            },
+            index=output.index[valid_date],
+        )
+        grouped = output.loc[valid_date].assign(
+            _period=keys["_period"], _event=keys["_event"]
+        ).groupby(["_period", "_event"], sort=False)
+        output.loc[valid_date, "event_period_article_count"] = grouped[
+            "article_id"
+        ].transform("nunique").astype(int)
+        output.loc[valid_date, "event_period_source_weight_sum"] = grouped[
+            "source_duplicate_weight"
+        ].transform("sum")
+
+    base = pd.to_numeric(output["source_duplicate_weight"], errors="coerce").fillna(1.0)
+    denominator = pd.to_numeric(
+        output["event_period_source_weight_sum"], errors="coerce"
+    ).replace(0, np.nan)
+    size = pd.to_numeric(output["event_period_article_count"], errors="coerce").fillna(1).clip(lower=1)
+    if event_penalty == "fixed":
+        output["novelty_weight"] = base.div(denominator).fillna(1.0)
+    elif event_penalty == "sqrt":
+        output["novelty_weight"] = base.div(denominator).mul(np.sqrt(size)).fillna(1.0)
+    else:
+        output["novelty_weight"] = base
+    output["event_penalty_method"] = event_penalty
+    output["peak_weighted_contribution"] = (
+        output["peak_severity_score"] * output["novelty_weight"]
+    )
+    output["breadth_weighted_contribution"] = (
+        output["breadth_severity_score"] * output["novelty_weight"]
+    )
+    return output
+
+
 def build_article_scores(
     scores: pd.DataFrame,
     aliases: list[str],
@@ -279,6 +408,11 @@ def build_article_scores(
         "preferred_url",
         "duplicate_group_id",
         "duplicate_group_size",
+        "event_day",
+        "event_id",
+        "event_cluster_size",
+        "event_source_count",
+        "event_span_days",
         "quality_score",
     ]
     metadata = (
@@ -309,7 +443,11 @@ def build_article_scores(
     article["dimension_disagreement_sd_mean"] = article[
         [f"{column}__ensemble_sd" for column in DIMENSION_COLUMNS]
     ].mean(axis=1)
-    article["novelty_weight"] = novelty_weight(article["duplicate_group_size"], duplicate_penalty)
+    article["source_duplicate_weight"] = novelty_weight(
+        article["duplicate_group_size"], duplicate_penalty
+    )
+    # This is replaced with a period-local semantic-event weight in main().
+    article["novelty_weight"] = article["source_duplicate_weight"]
     article["peak_weighted_contribution"] = article["peak_severity_score"] * article["novelty_weight"]
     article["breadth_weighted_contribution"] = (
         article["breadth_severity_score"] * article["novelty_weight"]
@@ -397,6 +535,7 @@ def aggregate_weekly(
     work = work.set_index("publication_date")
     grouped = work.resample(frequency, label="right", closed="right").agg(
         article_count=("article_id", "nunique"),
+        event_count=("event_id", "nunique"),
         source_count=("source_domain", "nunique"),
         effective_article_count=("novelty_weight", "sum"),
         peak_active_article_count=("peak_severity_score", lambda value: int(value.gt(0).sum())),
@@ -701,6 +840,21 @@ def write_outputs(
                 "inverse": "1 / duplicate_group_size",
                 "none": "1",
             }[args.duplicate_penalty],
+            "event_penalty": args.event_penalty,
+            "event_novelty_formula": {
+                "fixed": (
+                    "within each aggregation period, source_duplicate_weight divided by "
+                    "the event's summed source_duplicate_weight; every event totals one"
+                ),
+                "sqrt": (
+                    "fixed-event weight multiplied by sqrt(within-period event article count)"
+                ),
+                "none": "source duplicate weight only",
+            }[args.event_penalty],
+            "event_weight_leakage_guard": (
+                "Global event cluster size is descriptive only; model index weights are "
+                "recomputed within each contemporaneously available aggregation period."
+            ),
             "media_correction": args.media_correction,
             "media_formula": {
                 "log": "weekly weighted sum / log(1 + weekly article count)",
@@ -758,7 +912,9 @@ def main() -> None:
     logger.info("Arguments: %s", vars(args))
     registry, criteria = load_model_config(args.model_config.resolve())
     scores_path = args.scores.resolve()
-    scores = read_scores(scores_path, registry, logger)
+    event_profile = resolve_event_profile(args.frequency, args.event_profile)
+    logger.info("Using %s semantic-event assignment", event_profile)
+    scores = read_scores(scores_path, registry, logger, event_profile)
     aliases = [str(item["alias"]) for item in registry]
 
     article, diagnostics = build_article_scores(
@@ -768,6 +924,19 @@ def main() -> None:
         args.duplicate_penalty,
         logger,
     )
+    article = apply_period_event_weights(article, args.frequency, args.event_penalty)
+    diagnostics["event_clustering"] = {
+        "unique_events": int(article["event_id"].nunique()),
+        "multi_article_events_global_descriptive": int(
+            article.groupby("event_id")["article_id"].nunique().gt(1).sum()
+        ),
+        "articles_in_multi_article_events_global_descriptive": int(
+            article["event_cluster_size"].gt(1).sum()
+        ),
+        "period_local_weighting": args.event_penalty,
+        "event_profile": event_profile,
+        "maximum_event_period_article_count": int(article["event_period_article_count"].max()),
+    }
     weekly = aggregate_weekly(
         article, args.frequency, args.media_correction, args.expanding_min_periods
     )

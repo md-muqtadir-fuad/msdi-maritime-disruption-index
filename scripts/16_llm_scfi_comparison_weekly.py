@@ -2029,7 +2029,10 @@ def main() -> None:
             "model_specific_unequal_coverage_indices_used": False,
             "score_scale": [0, 4],
             "weekly_frequency": "W-FRI, right-labeled and right-closed",
-            "novelty_weighting": "input novelty_weight from duplicate penalty",
+            "novelty_weighting": (
+                "input novelty_weight combines exact-duplicate correction with "
+                "availability-safe within-week canonical-event weighting"
+            ),
             "media_correction": "novelty-weighted sum / log1p(common article count)",
             "signals": list(SIGNALS),
             "primary_signals": list(PRIMARY_SIGNALS),
