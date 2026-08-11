@@ -1,29 +1,115 @@
-# Python
+# -----------------------------------------------------------------------------
+# Python bytecode and tool caches
+# -----------------------------------------------------------------------------
 __pycache__/
 *.py[cod]
-.ipynb_checkpoints/
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+.pytype/
+.cache/
+
+# Test and coverage artifacts
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# -----------------------------------------------------------------------------
+# Local Python environments and packaging outputs
+# -----------------------------------------------------------------------------
 .venv/
+venv/
+env/
+ENV/
+.python-version
+build/
+dist/
+*.egg-info/
+.eggs/
+pip-wheel-metadata/
+
+# -----------------------------------------------------------------------------
+# Secrets and machine-local configuration
+# -----------------------------------------------------------------------------
 .env
 .env.*
+!.env.example
+!.env.template
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+.kaggle/
 
-# Large/raw data
-/data
-/data/01_raw/**
-/data/00_legacy/**
-/data/**/*.env
-/data/**/*.env.*
+# -----------------------------------------------------------------------------
+# Research data and generated outputs
+# -----------------------------------------------------------------------------
+/data/
+/outputs/
+/artifacts/
+/checkpoints/
+/models/
+/runs/
+
+# Experiment trackers and distributed-training state
+/wandb/
+/mlruns/
+/lightning_logs/
+/ray_results/
+/dask-worker-space/
+
+# Model binaries, serialized estimators, and local databases
+*.ckpt
+*.pt
+*.pth
+*.safetensors
+*.onnx
+*.pkl
+*.pickle
+*.joblib
+*.sqlite
+*.sqlite3
+*.db
+
+# Downloaded archives and large transfer bundles
 *.zip
 *.rar
 *.7z
+*.tar
+*.tar.gz
+*.tgz
 
-# LLM/API sensitive logs
-/outputs
+# Logs, temporary files, and interrupted atomic writes
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
 
-# OS/editor
-.DS_Store
+# -----------------------------------------------------------------------------
+# Jupyter, IDE, and operating-system metadata
+# -----------------------------------------------------------------------------
+.ipynb_checkpoints/
+.jupyter/
+.idea/
 .vscode/*
 !.vscode/settings.json
+*.code-workspace
 
-.csv
-.xlsx
-.pdf
+.DS_Store
+._*
+Thumbs.db
+Desktop.ini
+
+# Codex/agent workspace 
+/.codex/
+/.agents/
