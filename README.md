@@ -30,7 +30,7 @@ it does not fit models or write partial smoke outputs.
 ```
 
 The full run executes stages `00`–`24` sequentially and enables complete
-nested, horizon-purged tuning for the weekly-primary/monthly-robustness
+nested, horizon-purged tuning for the monthly-primary/weekly-robustness
 forecasting stage:
 
 ```powershell
@@ -42,8 +42,8 @@ completed annotation files with `--annotations`. External LLM score ZIPs must
 already be present under `data/03_processed/model_scores/scores_zips`.
 
 Stage 18 evaluates a penalized Gaussian identity-link GLM, Random Forest,
-XGBoost, LSTM, and Prophet at both frequencies. Weekly evidence is primary;
-monthly evidence is robustness. Fixed parameters live in
+XGBoost, LSTM, and Prophet at both frequencies. Direct monthly evidence is
+primary; weekly evidence is higher-frequency robustness. Fixed parameters live in
 `configs/nonlinear_forecasting.yaml`; `99` uses the predefined full tuning grid
 and resumable per-cell checkpoints.
 
@@ -87,7 +87,9 @@ The current UNCTAD control is the unweighted mean of pre-specified China-origin
 core lanes (United States, Germany, Netherlands, United Kingdom, Japan,
 Republic of Korea, and Singapore), not an all-pairs mean. Correlation and
 lagged-association outputs report HAC/FDR inference; ordinary IID correlation
-p-values are descriptive only.
+p-values are descriptive only. The current download provides one Q01 value per
+year, so the cleaned control is explicitly treated as annual rather than as a
+complete quarterly series.
 
 The integrated primary-control set is deliberately limited to released, lagged
 CPB global trade demand and China-core-lane UNCTAD connectivity. Stage 14

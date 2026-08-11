@@ -17,7 +17,7 @@ sys.modules[SPEC.name] = MODULE
 SPEC.loader.exec_module(MODULE)
 
 
-ALIASES = ["model_a", "model_b", "model_c"]
+ALIASES = ["model_a", "model_b", "model_c", "model_d"]
 
 
 def synthetic_article_frame(rows: int = 3) -> pd.DataFrame:
@@ -26,6 +26,9 @@ def synthetic_article_frame(rows: int = 3) -> pd.DataFrame:
             "article_id": [f"a{index}" for index in range(rows)],
             "publication_date": pd.date_range("2024-01-01", periods=rows, freq="D"),
             "novelty_weight": np.ones(rows),
+            "source_duplicate_weight": np.ones(rows),
+            "event_id_weekly": [f"weekly-{index}" for index in range(rows)],
+            "event_id_monthly": [f"monthly-{index}" for index in range(rows)],
             "llm_common_complete": np.ones(rows, dtype=bool),
         }
     )
@@ -77,29 +80,30 @@ def synthetic_direct_forecasts(periods: int = 30) -> pd.DataFrame:
 
 
 class LlmScfiComparisonTests(unittest.TestCase):
-    def test_alias_validation_requires_exactly_three_unique_values(self) -> None:
+    def test_alias_validation_requires_exactly_four_unique_values(self) -> None:
         self.assertEqual(MODULE.validate_model_aliases(ALIASES), ALIASES)
         with self.assertRaises(ValueError):
-            MODULE.validate_model_aliases(["a", "b"])
+            MODULE.validate_model_aliases(["a", "b", "c"])
         with self.assertRaises(ValueError):
-            MODULE.validate_model_aliases(["a", "a", "b"])
+            MODULE.validate_model_aliases(["a", "a", "b", "c"])
 
     def test_score_hybrids_are_computed_at_article_level(self) -> None:
         frame = synthetic_article_frame(2)
         frame.loc[0, "overall_disruption_max__model_a"] = 0.0
         frame.loc[0, "overall_disruption_max__model_b"] = 0.0
         frame.loc[0, "overall_disruption_max__model_c"] = 4.0
+        frame.loc[0, "overall_disruption_max__model_d"] = 4.0
         median = MODULE.article_signal_values(
             frame, ALIASES, "score_median", "overall_disruption_max"
         )
         mean = MODULE.article_signal_values(
             frame, ALIASES, "score_mean", "overall_disruption_max"
         )
-        np.testing.assert_allclose(median, [0.0, 2.0])
-        np.testing.assert_allclose(mean, [4.0 / 3.0, 2.0])
+        np.testing.assert_allclose(median, [2.0, 2.5])
+        np.testing.assert_allclose(mean, [2.0, 2.5])
 
         expected_dimension_mean = np.mean(
-            [1.0 + index / 10 for index in range(len(MODULE.DIMENSION_COLUMNS))]
+            [1.5 + index / 10 for index in range(len(MODULE.DIMENSION_COLUMNS))]
         )
         breadth = MODULE.article_signal_values(
             frame, ALIASES, "score_median", "dimension_mean7"
@@ -121,6 +125,9 @@ class LlmScfiComparisonTests(unittest.TestCase):
 
     def test_frozen_repository_input_has_exact_common_cohort(self) -> None:
         aliases = MODULE.load_model_aliases(MODULE.DEFAULT_MODEL_CONFIG)
+        header = pd.read_csv(MODULE.DEFAULT_ARTICLE_SCORES, nrows=0).columns
+        if f"{MODULE.PRIMARY_SCORE_COLUMN}__glm_4_9b_0414" not in header:
+            self.skipTest("requires Stage 13 to regenerate four-LLM article scores")
         _, report = MODULE.load_article_scores(
             MODULE.DEFAULT_ARTICLE_SCORES,
             aliases,
@@ -166,6 +173,8 @@ class LlmScfiComparisonTests(unittest.TestCase):
                 "brent_log": [4.0, 4.1],
             }
         )
+        for feature in MODULE.EXTERNAL_CONTROL_FEATURES:
+            base[feature] = [1.0, 1.0]
         weekly = pd.DataFrame(
             {
                 "week_ending": pd.to_datetime(["2024-01-05", "2024-01-19"]),

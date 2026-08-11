@@ -58,6 +58,24 @@ class HumanValidationMetricsTests(unittest.TestCase):
             np.isnan(MODULE.icc_two_way_random_single(pd.DataFrame({"a": [1.0]})))
         )
 
+    def test_event_threshold_metrics_use_cosine_and_human_labels(self) -> None:
+        master = pd.DataFrame(
+            {
+                "event_profile": ["weekly"] * 4,
+                "article_id_a": ["a", "b", "c", "d"],
+                "article_id_b": ["e", "f", "g", "h"],
+                "cosine_similarity": [0.95, 0.89, 0.87, 0.80],
+            }
+        )
+        reference = master[MODULE.EVENT_PAIR_KEYS].copy()
+        reference["human_same_event"] = [1, 1, 0, 0]
+        result = MODULE.event_threshold_metrics(master, reference, [0.88])
+        weekly = result[result["event_profile"].eq("weekly")].iloc[0]
+        self.assertEqual(weekly["true_positive"], 2)
+        self.assertEqual(weekly["true_negative"], 2)
+        self.assertEqual(weekly["f1"], 1.0)
+        self.assertTrue(weekly["is_interim_operational_threshold"])
+
 
 if __name__ == "__main__":
     unittest.main()

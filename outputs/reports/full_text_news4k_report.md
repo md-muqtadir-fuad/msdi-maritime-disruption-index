@@ -1,6 +1,6 @@
 # Full-text Retrieval Report: Newspaper4k
 
-Generated at UTC: `2026-07-02T23:59:50.386531+00:00`
+Generated at UTC: `2026-08-11T06:22:04.561422+00:00`
 
 ## Inputs
 
@@ -8,7 +8,7 @@ Generated at UTC: `2026-07-02T23:59:50.386531+00:00`
 - Input rows loaded: **5,779**
 - Max rows argument: `None`
 - Resume mode: `True`
-- Sleep seconds: `1.0`
+- Sleep seconds: `0.5`
 - Language: `en`
 - NLP enabled: `False`
 

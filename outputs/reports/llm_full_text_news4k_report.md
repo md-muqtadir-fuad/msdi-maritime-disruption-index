@@ -1,6 +1,6 @@
 # LLM News Full-text Retrieval Report: Newspaper4k
 
-Generated at UTC: `2026-07-11T15:52:32.224997+00:00`
+Generated at UTC: `2026-08-11T06:28:56.302405+00:00`
 
 ## Input
 

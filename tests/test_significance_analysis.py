@@ -110,7 +110,7 @@ class SignificanceAnalysisTests(unittest.TestCase):
                 "0" * 64,
             )
 
-    def test_glm_expansion_counts_are_frozen(self) -> None:
+    def test_four_llm_scorer_dependent_counts_are_manifest_native(self) -> None:
         config = MODULE.load_yaml(MODULE.DEFAULT_CONFIG)
         prediction = config["inputs"]["trusted_legacy_inference_tables"][
             "prediction"
@@ -118,9 +118,9 @@ class SignificanceAnalysisTests(unittest.TestCase):
         self.assertTrue(prediction["require_manifest_output_contract"])
         self.assertEqual(prediction["expected_rows"], 180)
         handoff = config["registry_sources"]["stage09b_raw_handoff"]
-        self.assertEqual(handoff["expected_rows"], 6910)
+        self.assertIsNone(handoff["expected_rows"])
         nonlinear = config["registry_sources"]["stage09_nonlinear"]
-        self.assertEqual(nonlinear["expected_rows"], 1540)
+        self.assertIsNone(nonlinear["expected_rows"])
         self.assertEqual(
             nonlinear["expected_algorithms"],
             ["glm", "lstm", "prophet", "random_forest", "xgboost"],
@@ -128,9 +128,9 @@ class SignificanceAnalysisTests(unittest.TestCase):
         self.assertEqual(
             config["expected_registry_counts"],
             {
-                "main_rows_before_semantic_deduplication": 13993,
-                "semantic_duplicate_rows": 335,
-                "canonical_main_rows": 13658,
+                "main_rows_before_semantic_deduplication": None,
+                "semantic_duplicate_rows": None,
+                "canonical_main_rows": None,
                 "supporting_bootstrap_and_clark_west_are_not_main_rows": True,
             },
         )
@@ -292,6 +292,12 @@ class SignificanceAnalysisTests(unittest.TestCase):
             MODULE.classify_weekly_llm_family(
                 "primary_hybrid_vs_baseline__diebold_mariano_squared"
             ),
+            "prespecified_secondary",
+        )
+        self.assertEqual(
+            MODULE.classify_monthly_llm_family(
+                "monthly_primary_llm_vs_coverage__diebold_mariano_squared"
+            ),
             "confirmatory_primary",
         )
         self.assertEqual(
@@ -306,22 +312,15 @@ class SignificanceAnalysisTests(unittest.TestCase):
             ),
             "exploratory",
         )
-        self.assertEqual(
-            MODULE.classify_monthly_llm_family(
-                "monthly_primary_llm_vs_coverage__diebold_mariano_squared"
-            ),
-            "prespecified_secondary",
-        )
-
     def test_semantic_forecast_alias_uses_models_then_validates_numbers(self) -> None:
         ablation = pd.DataFrame(
             [
                 {
-                    "frequency": "weekly",
+                    "frequency": "monthly",
                     "frequency_role": "primary",
-                    "index_construction": "weekly_log_volume",
+                    "index_construction": "adapted_pdf_sqrt_ema3",
                     "comparison_id": "peak_vs_no_msdi",
-                    "family_id": "primary_weekly_peak_vs_no_msdi",
+                    "family_id": "primary_monthly_peak_vs_no_msdi",
                     "baseline_specification_id": "no_msdi",
                     "variant_specification_id": "peak_only",
                     "primary_family": True,
@@ -351,12 +350,13 @@ class SignificanceAnalysisTests(unittest.TestCase):
                 MODULE.make_registry_row(
                     hypothesis_id="earliest_owner",
                     semantic_key="owner",
-                    source_stage="stage07b_weekly_llm",
-                    source_table="stage07b_weekly_llm_statistical_tests",
+                    source_stage="stage07c_monthly_llm",
+                    source_table="stage07c_monthly_llm_statistical_tests",
                     inference_role="confirmatory_primary",
-                    index_construction="weekly_log_volume",
+                    index_construction="adapted_pdf_sqrt_ema3",
+                    challenger_index_construction="adapted_pdf_sqrt_ema3",
                     baseline_model="ridge__ar_brent_coverage",
-                    challenger_model="ridge__score_hybrid__score_median__overall_disruption_max",
+                    challenger_model="ridge__monthly__adapted_pdf_sqrt_ema3__score_hybrid__score_median__overall_disruption_max",
                     horizon=1,
                     test_method="diebold_mariano_squared",
                     sample_size=100,
@@ -381,7 +381,7 @@ class SignificanceAnalysisTests(unittest.TestCase):
                     }
                 ],
                 "expected_stage09_duplicate_rows": 1,
-                "expected_stage09_duplicate_rows_by_frequency": {"weekly": 1},
+                "expected_stage09_duplicate_rows_by_frequency": {"monthly": 1},
                 "expected_reassigned_primary_rows": 1,
             }
         }

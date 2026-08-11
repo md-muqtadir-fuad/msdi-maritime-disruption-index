@@ -6,7 +6,7 @@ severity_scale:
   4: severe_systemic_or_key_route_disruption
 
 article_aggregation:
-  primary_peak: median overall_disruption_max across the three models
+  primary_peak: median overall_disruption_max across the four registered models
   secondary_breadth: equal-weight mean of the seven dimension-level model medians
 
 weekly_aggregation:

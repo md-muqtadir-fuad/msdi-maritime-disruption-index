@@ -28,6 +28,7 @@ import pandas as pd
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_MSDI = PROJECT_ROOT / "data/05_indices/weekly/msdi_weekly.csv"
+DEFAULT_MONTHLY_MSDI = PROJECT_ROOT / "data/05_indices/monthly/msdi_monthly.csv"
 DEFAULT_SCFI = PROJECT_ROOT / "data/01_raw/freight/scfi/freight_index_data_legacy.xlsx"
 DEFAULT_BRENT = PROJECT_ROOT / "data/01_raw/controls/brent/brent_weekly_legacy.csv"
 DEFAULT_EXTERNAL_CONTROLS = PROJECT_ROOT / "data/02_interim/controls/external_controls_clean_long.csv"
@@ -84,6 +85,7 @@ def parse_args() -> argparse.Namespace:
         description="Build weekly forecasting and monthly causal-analysis panels."
     )
     parser.add_argument("--msdi", type=Path, default=DEFAULT_MSDI)
+    parser.add_argument("--monthly-msdi", type=Path, default=DEFAULT_MONTHLY_MSDI)
     parser.add_argument("--scfi", type=Path, default=DEFAULT_SCFI)
     parser.add_argument("--scfi-sheet", default="Sheet1")
     parser.add_argument("--brent", type=Path, default=DEFAULT_BRENT)
@@ -217,6 +219,42 @@ def load_msdi(path: Path) -> tuple[pd.DataFrame, dict[str, Any]]:
     return frame, report
 
 
+def load_monthly_msdi(path: Path) -> tuple[pd.DataFrame, dict[str, Any]]:
+    resolved = require_file(path, "Monthly MSDI file")
+    raw = pd.read_csv(resolved, low_memory=False)
+    if "month_end" not in raw.columns:
+        raise ValueError("Monthly MSDI file lacks month_end")
+    missing_columns = [column for column in MSDI_BASE_COLUMNS if column not in raw.columns]
+    if missing_columns:
+        raise ValueError(f"Monthly MSDI file lacks required columns: {missing_columns}")
+    forbidden = [column for column in raw if "z_full_sample" in column]
+    keep = [
+        column
+        for column in raw.columns
+        if column == "month_end" or "z_full_sample" not in column
+    ]
+    frame = raw[keep].copy()
+    frame["month_ending"] = pd.to_datetime(
+        frame.pop("month_end"), format="mixed", errors="coerce"
+    )
+    for column in frame.columns:
+        if column != "month_ending":
+            frame[column] = pd.to_numeric(frame[column], errors="coerce")
+    invalid_date = int(frame["month_ending"].isna().sum())
+    frame = frame.dropna(subset=["month_ending"]).sort_values("month_ending").reset_index(drop=True)
+    ensure_unique_dates(frame, "month_ending", "Monthly MSDI")
+    report = {
+        "input_rows": len(raw),
+        "usable_rows": len(frame),
+        "invalid_dates": invalid_date,
+        "first_date": frame["month_ending"].min(),
+        "last_date": frame["month_ending"].max(),
+        "excluded_full_sample_standardized_columns": forbidden,
+        "construction": "direct_article_monthly_sqrt_effective_volume_causal_ema3",
+    }
+    return frame, report
+
+
 def load_brent(path: Path) -> tuple[pd.DataFrame, dict[str, Any]]:
     resolved = require_file(path, "Brent file")
     raw = pd.read_csv(resolved, low_memory=False)
@@ -299,9 +337,20 @@ def load_external_controls(path: Path) -> tuple[pd.DataFrame, dict[str, Any]]:
         raise ValueError(f"External controls lack required columns: {sorted(missing)}")
     raw["availability_date"] = pd.to_datetime(raw["availability_date"], errors="coerce")
     raw["value"] = pd.to_numeric(raw["value"], errors="coerce")
+    supplied_variables = set(raw["variable"].dropna().astype(str))
     raw = raw.loc[raw["variable"].isin(EXTERNAL_CONTROL_COLUMNS)].dropna(subset=["availability_date", "value"])
     absent = sorted(set(EXTERNAL_CONTROL_COLUMNS) - set(raw["variable"]))
     if absent:
+        if (
+            "unctad_china_core_lane_lsbci" in absent
+            and "unctad_lsbci" in supplied_variables
+        ):
+            raise ValueError(
+                "External controls contain the obsolete generic 'unctad_lsbci' "
+                "series, not the pre-specified China-core-lane control. Rerun "
+                "scripts/25_clean_external_controls.py with the current config; "
+                "the generic series must not be silently renamed or substituted."
+            )
         raise ValueError(f"External controls missing expected variables: {absent}")
     if raw.duplicated(["variable", "availability_date"]).any():
         raise ValueError("External controls have duplicate variable/availability-date keys")
@@ -311,7 +360,7 @@ def load_external_controls(path: Path) -> tuple[pd.DataFrame, dict[str, Any]]:
 def attach_external_controls(panel: pd.DataFrame, controls: pd.DataFrame) -> tuple[pd.DataFrame, dict[str, Any]]:
     """Attach only released values; current values are retained for audit, model sets use lags."""
     result = panel.sort_values("observation_date").copy(); audit: dict[str, Any] = {}
-    maximum_age = {"daily": 7, "monthly": 75, "quarterly": 180}
+    maximum_age = {"daily": 7, "monthly": 75, "quarterly": 180, "annual": 455}
     for variable, group in controls.groupby("variable", sort=True):
         source = group[["availability_date", "value", "source_frequency"]].sort_values("availability_date")
         joined = pd.merge_asof(result[["observation_date"]], source, left_on="observation_date", right_on="availability_date", direction="backward", allow_exact_matches=True)
@@ -538,7 +587,9 @@ def build_weekly_panel(
     return panel, dictionary, report
 
 
-def build_monthly_panel(weekly: pd.DataFrame) -> tuple[pd.DataFrame, list[dict[str, Any]]]:
+def build_monthly_panel(
+    weekly: pd.DataFrame, monthly_msdi: pd.DataFrame | None = None
+) -> tuple[pd.DataFrame, list[dict[str, Any]]]:
     work = weekly.copy()
     for control in EXTERNAL_CONTROL_COLUMNS:
         if control not in work.columns:
@@ -599,15 +650,49 @@ def build_monthly_panel(weekly: pd.DataFrame) -> tuple[pd.DataFrame, list[dict[s
     for control in EXTERNAL_CONTROL_COLUMNS:
         monthly[f"{control}_lag_1m"] = monthly[control].shift(1)
 
+    if monthly_msdi is not None:
+        # Remove all MSDI values constructed by averaging weekly indices. The
+        # monthly-primary series is constructed directly from article rows by
+        # Stage 13 with event_id_monthly, sqrt effective volume, and EMA(3).
+        legacy_msdi_columns = [
+            column
+            for column in monthly.columns
+            if column == "msdi_available_weeks"
+            or any(column.startswith(f"{source}_") for source in MSDI_BASE_COLUMNS)
+        ]
+        monthly = monthly.drop(columns=legacy_msdi_columns, errors="ignore")
+        direct = monthly_msdi.copy()
+        direct_rename = {
+            "article_count": "article_count_sum",
+            "event_count": "event_count_sum",
+            "source_count": "source_count_mean",
+            "effective_article_count": "effective_article_count_sum",
+            "peak_model_disagreement_mean": "peak_model_disagreement_mean_mean",
+            "dimension_disagreement_mean": "dimension_disagreement_mean_mean",
+            "peak_score_media_corrected": "peak_score_media_corrected_mean",
+            "breadth_score_media_corrected": "breadth_score_media_corrected_mean",
+        }
+        for column in MSDI_BASE_COLUMNS:
+            if column.endswith("_media_corrected") and column not in {
+                "peak_score_media_corrected",
+                "breadth_score_media_corrected",
+            }:
+                direct_rename[column] = f"{column}_mean"
+        direct = direct.rename(columns=direct_rename)
+        direct["msdi_available_weeks"] = direct[
+            ["peak_score_media_corrected_mean", "breadth_score_media_corrected_mean"]
+        ].notna().all(axis=1).astype(int)
+        monthly = monthly.merge(direct, on="month_ending", how="left", validate="one_to_one")
+
     dictionary: list[dict[str, Any]] = [
         feature_entry("month_ending", "key", "Calendar month end", "t"),
         feature_entry("scfi_monthly_mean", "outcome", "Mean weekly SCFI within month", "t"),
         feature_entry("scfi_month_end", "outcome", "Last observed weekly SCFI within month", "t"),
         feature_entry(
-            "peak_score_media_corrected_mean", "MSDI treatment", "Monthly mean primary peak MSDI", "within t"
+            "peak_score_media_corrected_mean", "MSDI treatment", "Direct monthly peak MSDI: sqrt effective volume then causal EMA(3)", "within t"
         ),
         feature_entry(
-            "breadth_score_media_corrected_mean", "MSDI treatment", "Monthly mean secondary breadth MSDI", "within t"
+            "breadth_score_media_corrected_mean", "MSDI treatment", "Direct monthly breadth MSDI: sqrt effective volume then causal EMA(3)", "within t"
         ),
     ]
     for horizon in FORECAST_HORIZONS_MONTHS:
@@ -673,10 +758,12 @@ def main() -> None:
 
     scfi_path = require_file(args.scfi, "SCFI workbook")
     msdi_path = require_file(args.msdi, "Weekly MSDI file")
+    monthly_msdi_path = require_file(args.monthly_msdi, "Monthly MSDI file")
     brent_path = require_file(args.brent, "Brent file")
     external_controls_path = require_file(args.external_controls, "Cleaned external controls")
     scfi, scfi_report = load_scfi(scfi_path, args.scfi_sheet)
     msdi, msdi_report = load_msdi(msdi_path)
+    monthly_msdi, monthly_msdi_report = load_monthly_msdi(monthly_msdi_path)
     brent, brent_report = load_brent(brent_path)
     external_controls, external_controls_report = load_external_controls(external_controls_path)
     logger.info("SCFI: rows=%s range=%s to %s", len(scfi), scfi.observation_date.min(), scfi.observation_date.max())
@@ -686,7 +773,7 @@ def main() -> None:
     weekly, weekly_dictionary, panel_report = build_weekly_panel(
         scfi, msdi, brent, external_controls, args.maximum_feature_age_days
     )
-    monthly, monthly_dictionary = build_monthly_panel(weekly)
+    monthly, monthly_dictionary = build_monthly_panel(weekly, monthly_msdi)
 
     weekly_output = args.weekly_output.resolve()
     monthly_output = args.monthly_output.resolve()
@@ -728,6 +815,7 @@ def main() -> None:
         "inputs": {
             "scfi": {"path": str(scfi_path), "sha256": sha256_file(scfi_path), "report": scfi_report},
             "msdi": {"path": str(msdi_path), "sha256": sha256_file(msdi_path), "report": msdi_report},
+            "monthly_msdi": {"path": str(monthly_msdi_path), "sha256": sha256_file(monthly_msdi_path), "report": monthly_msdi_report},
             "brent": {"path": str(brent_path), "sha256": sha256_file(brent_path), "report": brent_report},
             "external_controls": {"path": str(external_controls_path), "sha256": sha256_file(external_controls_path), "report": external_controls_report},
         },
@@ -738,12 +826,15 @@ def main() -> None:
             "panel_report": panel_report,
         },
         "forecast_design": {
+            "primary_frequency": "monthly",
+            "weekly_role": "higher_frequency_robustness",
             "weekly_horizons": list(FORECAST_HORIZONS_WEEKS),
             "monthly_horizons": list(FORECAST_HORIZONS_MONTHS),
             "random_split_created": False,
             "full_sample_zscores_included": False,
             "primary_msdi_path": "peak_score_media_corrected",
             "secondary_msdi_path": "breadth_score_media_corrected",
+            "monthly_primary_construction": "direct_article_monthly_sqrt_effective_volume_causal_ema3",
         },
         "availability": {
             "aggregate_scfi": True,

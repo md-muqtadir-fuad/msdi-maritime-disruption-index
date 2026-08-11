@@ -3,8 +3,8 @@ version: publication_v001
 # Stage 10 is a deterministic presentation layer. It never refits models,
 # changes registered families, or promotes observational evidence to causality.
 guardrails:
-  primary_frequency: weekly
-  monthly_role: robustness
+  primary_frequency: monthly
+  weekly_role: higher_frequency_robustness
   human_validation_required: true
   publication_eligible_without_human_validation: false
   causal_claim_allowed: false
@@ -166,6 +166,7 @@ expected:
   significance_claim_gates_all_pass: true
   significance_source_contracts_all_pass: true
   significance_uncertainty_groups_all_pass: true
-  primary_forecast_hypotheses: 100
-  adjusted_primary_improvements: 0
-  adjusted_primary_worsenings: 21
+  primary_forecast_hypotheses: 84
+  # Result counts are recorded, not prefilled from the obsolete weekly-primary run.
+  adjusted_primary_improvements: null
+  adjusted_primary_worsenings: null

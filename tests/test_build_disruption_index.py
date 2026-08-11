@@ -16,12 +16,12 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
-ALIASES = ["model_a", "model_b", "model_c"]
+ALIASES = ["model_a", "model_b", "model_c", "model_d"]
 
 
 def synthetic_scores() -> pd.DataFrame:
     rows = []
-    for alias, overall, dimension in zip(ALIASES, [4, 2, 3], [1, 2, 3]):
+    for alias, overall, dimension in zip(ALIASES, [4, 2, 3, 1], [1, 2, 3, 4]):
         row = {
             "article_id": "article-1",
             "model_name": alias,
@@ -64,8 +64,8 @@ class BuildDisruptionIndexTests(unittest.TestCase):
             synthetic_scores(), ALIASES, minimum_models=2, duplicate_penalty="sqrt", logger=logger
         )
         row = article.iloc[0]
-        self.assertEqual(row["peak_severity_score"], 3)
-        self.assertEqual(row["breadth_severity_score"], 2)
+        self.assertEqual(row["peak_severity_score"], 2.5)
+        self.assertEqual(row["breadth_severity_score"], 2.5)
         self.assertEqual(row["novelty_weight"], 0.5)
         self.assertEqual(
             row[f"{MODULE.PRIMARY_COLUMN}__diff__model_a_minus_model_b"], 2
@@ -91,6 +91,54 @@ class BuildDisruptionIndexTests(unittest.TestCase):
         self.assertAlmostEqual(totals["event-2"], 1.0)
         self.assertAlmostEqual(observed.loc[0, "novelty_weight"], 1 / 3)
         self.assertAlmostEqual(observed.loc[1, "novelty_weight"], 2 / 3)
+
+    def test_ineligible_articles_do_not_dilute_event_weights(self) -> None:
+        article = pd.DataFrame(
+            {
+                "article_id": ["eligible", "excluded"],
+                "publication_date": pd.to_datetime(["2024-01-01", "2024-01-02"]),
+                "event_id": ["event-1", "event-1"],
+                "ensemble_eligible": [True, False],
+                "source_duplicate_weight": [1.0, 1.0],
+                "peak_severity_score": [2.0, 4.0],
+                "breadth_severity_score": [1.0, 3.0],
+            }
+        )
+        observed = MODULE.apply_period_event_weights(article, "W-FRI", "fixed")
+        self.assertAlmostEqual(observed.loc[0, "novelty_weight"], 1.0)
+        self.assertAlmostEqual(observed.loc[1, "novelty_weight"], 0.0)
+
+    def test_monthly_primary_is_direct_sqrt_volume_then_causal_ema(self) -> None:
+        article = pd.DataFrame(
+            {
+                "article_id": ["a", "b", "c"],
+                "publication_date": pd.to_datetime(
+                    ["2024-01-05", "2024-01-06", "2024-02-05"]
+                ),
+                "event_id": ["e1", "e2", "e3"],
+                "source_domain": ["a.com", "b.com", "c.com"],
+                "ensemble_eligible": [True, True, True],
+                "novelty_weight": [1.0, 1.0, 1.0],
+                "peak_severity_score": [2.0, 4.0, 2.0],
+                "breadth_severity_score": [1.0, 3.0, 2.0],
+                "peak_weighted_contribution": [2.0, 4.0, 2.0],
+                "breadth_weighted_contribution": [1.0, 3.0, 2.0],
+                f"{MODULE.PRIMARY_COLUMN}__ensemble_sd": [0.1, 0.2, 0.1],
+                "dimension_disagreement_sd_mean": [0.1, 0.2, 0.1],
+            }
+        )
+        for dimension in MODULE.DIMENSION_COLUMNS:
+            article[f"{dimension}__ensemble_median"] = [1.0, 3.0, 2.0]
+        observed = MODULE.aggregate_monthly_direct(article, "ME", 2, ema_span=3)
+        january = observed.iloc[0]
+        february = observed.iloc[1]
+        january_base = 6.0 / np.sqrt(2.0)
+        self.assertAlmostEqual(january["peak_score_sqrt_effective_volume"], january_base)
+        self.assertAlmostEqual(january["peak_score_media_corrected"], january_base)
+        self.assertAlmostEqual(
+            february["peak_score_media_corrected"],
+            0.5 * 2.0 + 0.5 * january_base,
+        )
 
     def test_media_correction(self) -> None:
         raw = pd.Series([0.0, 10.0])

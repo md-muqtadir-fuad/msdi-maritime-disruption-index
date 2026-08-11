@@ -49,9 +49,11 @@ class RobustnessChecksTests(unittest.TestCase):
     def test_config_freezes_publication_scope_and_inference(self) -> None:
         config = MODULE.load_yaml(MODULE.DEFAULT_CONFIG)
         self.assertFalse(config["identification"]["causal_claim_allowed"])
-        self.assertEqual(config["analysis"]["primary_frequency"], "weekly")
-        self.assertEqual(config["analysis"]["monthly_role"], "robustness")
-        self.assertEqual(config["analysis"]["frozen_common_article_cohort"], 6481)
+        self.assertEqual(config["analysis"]["primary_frequency"], "monthly")
+        self.assertEqual(
+            config["analysis"]["weekly_role"], "higher_frequency_robustness"
+        )
+        self.assertEqual(config["analysis"]["frozen_common_article_cohort"], 6480)
         self.assertTrue(config["analysis"]["common_cohort_required"])
         self.assertEqual(config["analysis"]["score_scale"], [0, 4])
         self.assertEqual(config["forecast"]["ridge_alpha"], 1.0)
@@ -68,8 +70,10 @@ class RobustnessChecksTests(unittest.TestCase):
 
     def test_config_freezes_frequency_lags_pcmci_and_explicit_skips(self) -> None:
         config = MODULE.load_yaml(MODULE.DEFAULT_CONFIG)
-        self.assertEqual(config["forecast"]["weekly"]["role"], "primary")
-        self.assertEqual(config["forecast"]["monthly"]["role"], "robustness")
+        self.assertEqual(
+            config["forecast"]["weekly"]["role"], "higher_frequency_robustness"
+        )
+        self.assertEqual(config["forecast"]["monthly"]["role"], "primary")
         self.assertEqual(
             config["forecast"]["weekly"]["lag_sets"]["primary"],
             [1, 2, 4, 8, 12],
@@ -89,6 +93,16 @@ class RobustnessChecksTests(unittest.TestCase):
         self.assertIn("dml_iv", config["skipped_specifications"])
         self.assertIn("causal_forest", config["skipped_specifications"])
         self.assertIn("event_date_assignment", config["skipped_specifications"])
+
+    def test_primary_ablation_family_is_direct_monthly_only(self) -> None:
+        config = MODULE.load_yaml(MODULE.DEFAULT_CONFIG)
+        _, weekly = MODULE.build_forecast_specifications([], "weekly", config)
+        _, monthly = MODULE.build_forecast_specifications([], "monthly", config)
+        weekly_peak = next(item for item in weekly if item.comparison_id == "peak_vs_no_msdi")
+        monthly_peak = next(item for item in monthly if item.comparison_id == "peak_vs_no_msdi")
+        self.assertFalse(weekly_peak.primary)
+        self.assertTrue(monthly_peak.primary)
+        self.assertEqual(monthly_peak.family_id, "primary_monthly_peak_vs_no_msdi")
 
     def test_duplicate_weights_match_hand_calculation(self) -> None:
         size = pd.Series([1.0, 4.0, 9.0, np.nan, 0.0])
@@ -195,9 +209,10 @@ class RobustnessChecksTests(unittest.TestCase):
         self.assertEqual(len(weekly), 1)
         self.assertEqual(int(weekly.at[0, "article_count"]), 2)
         self.assertEqual(int(weekly.at[0, "source_count"]), 2)
-        self.assertAlmostEqual(weekly.at[0, "effective_article_count"], 1.5)
-        self.assertAlmostEqual(weekly.at[0, "weighted_score_sum"], 4.5)
-        self.assertAlmostEqual(weekly.at[0, "signal_value"], 4.5 / np.log(3.0))
+        # Fixed-event weighting gives each distinct event one total unit.
+        self.assertAlmostEqual(weekly.at[0, "effective_article_count"], 2.0)
+        self.assertAlmostEqual(weekly.at[0, "weighted_score_sum"], 6.0)
+        self.assertAlmostEqual(weekly.at[0, "signal_value"], 6.0 / np.log(3.0))
 
     def test_signal_features_are_future_mutation_invariant(self) -> None:
         frame = pd.DataFrame({"signal": np.arange(30, dtype=float)})

@@ -41,15 +41,15 @@ class ErrorDiagnosticsTests(unittest.TestCase):
         self.assertEqual(
             config["analysis"]["nonlinear_selected_prediction_rows"], 31440
         )
-        expected = config["output_contract"]["expected_full_row_counts"]
-        self.assertEqual(expected["forecast_error_summary"], 960)
-        self.assertEqual(expected["raw_significance_handoff"], 6910)
+        self.assertEqual(config["output_contract"]["expected_full_row_counts"], {})
 
     def test_config_freezes_frequency_cohort_constructions_and_regime(self) -> None:
         config = MODULE.load_yaml(MODULE.DEFAULT_CONFIG)
-        self.assertEqual(config["analysis"]["primary_frequency"], "weekly")
-        self.assertEqual(config["analysis"]["monthly_role"], "robustness")
-        self.assertEqual(config["analysis"]["frozen_common_article_cohort"], 6481)
+        self.assertEqual(config["analysis"]["primary_frequency"], "monthly")
+        self.assertEqual(
+            config["analysis"]["weekly_role"], "higher_frequency_robustness"
+        )
+        self.assertEqual(config["analysis"]["frozen_common_article_cohort"], 6480)
         self.assertTrue(config["analysis"]["common_cohort_required"])
         self.assertEqual(
             config["analysis"]["monthly_index_constructions"],
@@ -170,27 +170,27 @@ class ErrorDiagnosticsTests(unittest.TestCase):
             [
                 {
                     "rows_read": 6542,
-                    "common_complete_rows": 6481,
-                    "expected_common_complete_rows": 6481,
+                    "common_complete_rows": 6480,
+                    "expected_common_complete_rows": 6480,
                     "common_cohort_passed": True,
                 }
             ]
         )
-        MODULE.validate_common_article_scope(good, expected_n=6481)
+        MODULE.validate_common_article_scope(good, expected_n=6480)
 
         wrong_count = good.copy()
-        wrong_count.loc[0, "common_complete_rows"] = 6480
+        wrong_count.loc[0, "common_complete_rows"] = 6479
         with self.assertRaises((AssertionError, ValueError)):
-            MODULE.validate_common_article_scope(wrong_count, expected_n=6481)
+            MODULE.validate_common_article_scope(wrong_count, expected_n=6480)
 
         upstream_failed = good.copy()
         upstream_failed.loc[0, "common_cohort_passed"] = False
         with self.assertRaises((AssertionError, ValueError)):
-            MODULE.validate_common_article_scope(upstream_failed, expected_n=6481)
+            MODULE.validate_common_article_scope(upstream_failed, expected_n=6480)
 
         with self.assertRaises((AssertionError, ValueError)):
             MODULE.validate_common_article_scope(
-                pd.concat([good, good], ignore_index=True), expected_n=6481
+                pd.concat([good, good], ignore_index=True), expected_n=6480
             )
 
     def test_unique_key_contract_rejects_duplicates_and_missing_columns(self) -> None:

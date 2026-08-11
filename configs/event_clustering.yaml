@@ -5,7 +5,7 @@ event_clustering:
   role: model_independent_pre_llm_event_measurement
   model:
     name: BAAI/bge-m3
-    revision: null  # resolved model commit is recorded in the run manifest
+    revision: 5617a9f61b028005a4858fdac845db406aefb181
     batch_size: 16
     device: auto
     torch_dtype: auto
@@ -14,7 +14,7 @@ event_clustering:
     maximum_body_characters: 12000
   matching:
     similarity: cosine
-    selected_threshold: 0.88  # provisional until blinded human verification
+    selected_threshold: 0.88  # interim operational choice; publication-final only after human verification
     profiles:
       weekly:
         window_value: 5

@@ -1,6 +1,6 @@
 """Run dynamic time-series analyses for MSDI and SCFI.
 
-Weekly estimates are primary and monthly estimates are robustness checks. The
+Monthly estimates are primary and weekly estimates are higher-frequency robustness checks. The
 script tests stationarity and cointegration, estimates stationary VARX systems,
 runs conventional and conditional Granger predictive-precedence tests, applies
 PCMCI with FDR control, and estimates HAC local projections using innovations
@@ -76,7 +76,7 @@ class FrequencySpecification:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Estimate weekly-primary VAR, Granger, PCMCI, and local projections."
+        description="Estimate monthly-primary VAR, Granger, PCMCI, and local projections."
     )
     parser.add_argument("--weekly-panel", type=Path, default=DEFAULT_WEEKLY_PANEL)
     parser.add_argument("--monthly-panel", type=Path, default=DEFAULT_MONTHLY_PANEL)
@@ -1549,7 +1549,7 @@ def main() -> None:
                 {
                     "frequency": spec.frequency,
                     "msdi_path": path_name,
-                    "role": "primary" if spec.frequency == "weekly" else "robustness",
+                    "role": "primary" if spec.frequency == "monthly" else "robustness",
                 }
             )
             sample_audits.append(sample_audit)
@@ -1851,8 +1851,8 @@ def main() -> None:
     manifest = {
         "version": args.version,
         "status": "provisional_pending_human_validation_and_causal_identification",
-        "primary_frequency": "weekly",
-        "monthly_role": "robustness_and_slower_dynamics",
+        "primary_frequency": "monthly",
+        "weekly_role": "higher_frequency_robustness",
         "inputs": {
             label: {"path": str(path), "sha256": sha256_file(path)}
             for label, path in input_paths.items()

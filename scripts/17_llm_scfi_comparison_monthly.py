@@ -1,13 +1,12 @@
-"""Run a monthly robustness version of the common-cohort LLM forecast comparison.
+"""Run the monthly-primary common-cohort LLM forecast comparison.
 
-The weekly 07b analysis is primary.  This script consumes only its frozen,
-leakage-safe Monday panel, aggregates raw weekly common-cohort signals to
-complete calendar months, and recomputes all monthly lags and SCFI targets.
+The direct monthly article construction is primary. The mean of leakage-safe
+weekly signals is retained as a higher-frequency-derived sensitivity path.
 Friday news is therefore assigned to the month of the following Monday, which
 is the date on which it enters the forecasting information set.
 
-Partial months are never treated as complete or filled with zero.  Monthly
-results are slower-dynamics robustness evidence, not structural causal claims.
+Partial months are never treated as complete or filled with zero. Monthly
+results are the primary predictive evidence, not structural causal claims.
 """
 
 from __future__ import annotations
@@ -54,6 +53,10 @@ DEFAULT_WEEKLY_MANIFEST = (
     PROJECT_ROOT
     / "outputs/llm_scfi_comparison/llm_scfi_v001_manifest.json"
 )
+DEFAULT_COMMON_ARTICLES = (
+    PROJECT_ROOT
+    / "outputs/llm_scfi_comparison/llm_scfi_v001_common_article_cohort.csv"
+)
 DEFAULT_PANEL_OUTPUT = (
     PROJECT_ROOT
     / "data/06_model_ready/prediction/llm_specific_scfi_monthly_panel.csv"
@@ -63,10 +66,13 @@ DEFAULT_OUTPUT_DIR = SUPPORT.DEFAULT_OUTPUT_DIR
 DEFAULT_LOG_DIR = SUPPORT.DEFAULT_LOG_DIR
 
 EXPECTED_COMMON_COHORT_SIZE = SUPPORT.EXPECTED_COMMON_COHORT_SIZE
-EXPECTED_ALIGNED_WEEKLY_ARTICLE_COUNT = 6075
-EXPECTED_COMPLETE_MONTH_ARTICLE_COUNT = 6040
-EXPECTED_SCFI_COMPLETE_MONTHS = 119
-EXPECTED_LLM_COMPLETE_MONTHS = 118
+# These coverage totals are recorded on a four-model run. They are not copied
+# from earlier scorer artifacts because scorer availability changes the
+# complete weekly/monthly sample independently of SCFI.
+EXPECTED_ALIGNED_WEEKLY_ARTICLE_COUNT = 0
+EXPECTED_COMPLETE_MONTH_ARTICLE_COUNT = 0
+EXPECTED_SCFI_COMPLETE_MONTHS = 0
+EXPECTED_LLM_COMPLETE_MONTHS = 0
 
 MEAN_SAFE_WEEKLY = "mean_safe_weekly"
 ADAPTED_PDF_SQRT_EMA3 = "adapted_pdf_sqrt_ema3"
@@ -127,10 +133,11 @@ class MonthlyForecastConfiguration:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Aggregate safe weekly LLM signals and run monthly SCFI robustness forecasts."
+        description="Run direct monthly-primary and weekly-derived sensitivity SCFI forecasts."
     )
     parser.add_argument("--weekly-panel", type=Path, default=DEFAULT_WEEKLY_PANEL)
     parser.add_argument("--weekly-manifest", type=Path, default=DEFAULT_WEEKLY_MANIFEST)
+    parser.add_argument("--common-articles", type=Path, default=DEFAULT_COMMON_ARTICLES)
     parser.add_argument("--panel-output", type=Path, default=DEFAULT_PANEL_OUTPUT)
     parser.add_argument("--model-config", type=Path, default=DEFAULT_MODEL_CONFIG)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
@@ -151,7 +158,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--expected-complete-month-articles",
         type=int,
-        default=EXPECTED_COMPLETE_MONTH_ARTICLE_COUNT,
+        default=0,
+        help="Optional frozen direct-month article total; 0 records rather than enforces it.",
     )
     parser.add_argument(
         "--expected-scfi-complete-months",
@@ -263,10 +271,7 @@ def load_and_validate_weekly_manifest(
         failures.append("weekly media-correction formula is incompatible")
     if list(design.get("score_scale", [])) != [0, 4]:
         failures.append("weekly score scale is not the frozen 0-4 scale")
-    if design.get("novelty_weighting") != (
-        "input novelty_weight combines exact-duplicate correction with "
-        "availability-safe within-week canonical-event weighting"
-    ):
+    if design.get("novelty_weighting") != SUPPORT.NOVELTY_WEIGHTING_PROVENANCE:
         failures.append("weekly novelty-weight provenance is incompatible")
     manifest_panel = Path(manifest.get("outputs", {}).get("aligned_panel", "")).resolve()
     if manifest_panel != weekly_panel_path.resolve():
@@ -323,7 +328,7 @@ def recovered_sum_column(score_source: str, signal: str) -> str:
 def load_safe_weekly_panel(
     path: Path,
     aliases: list[str],
-    expected_aligned_weekly_articles: int,
+    expected_aligned_weekly_articles: int | None,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
     resolved = require_file(path, "Weekly common-cohort LLM panel")
     header = pd.read_csv(resolved, nrows=0).columns.tolist()
@@ -341,6 +346,7 @@ def load_safe_weekly_panel(
         "llm_signal_age_days",
         "llm_comparison_complete_case",
         *COVERAGE_FEATURES,
+        *EXTERNAL_CONTROL_RAW_COLUMNS,
         *raw_signal_columns,
     ]
     missing = [column for column in required if column not in header]
@@ -373,6 +379,7 @@ def load_safe_weekly_panel(
         "brent_price",
         "llm_signal_age_days",
         *COVERAGE_FEATURES,
+        *EXTERNAL_CONTROL_RAW_COLUMNS,
         *raw_signal_columns,
     ]
     for column in numeric_columns:
@@ -399,6 +406,7 @@ def load_safe_weekly_panel(
         "llm_week_ending",
         "llm_signal_age_days",
         *COVERAGE_FEATURES,
+        *EXTERNAL_CONTROL_RAW_COLUMNS,
         *raw_signal_columns,
     ]
     if panel.loc[complete, complete_requirements].isna().any().any():
@@ -406,7 +414,10 @@ def load_safe_weekly_panel(
     aligned_article_count = int(
         round(float(panel["llm_common_article_count"].fillna(0).sum()))
     )
-    if aligned_article_count != expected_aligned_weekly_articles:
+    if (
+        expected_aligned_weekly_articles is not None
+        and aligned_article_count != expected_aligned_weekly_articles
+    ):
         raise ValueError(
             "Aligned weekly article-count mismatch: "
             f"expected {expected_aligned_weekly_articles}, found {aligned_article_count}"
@@ -436,9 +447,109 @@ def load_safe_weekly_panel(
     return panel, report
 
 
+def build_direct_monthly_article_signals(
+    path: Path,
+    aliases: list[str],
+    expected_common_articles: int,
+) -> tuple[pd.DataFrame, dict[str, Any]]:
+    """Aggregate the frozen common cohort directly by publication month."""
+    resolved = require_file(path, "Frozen common article cohort")
+    sources = [*aliases, *SCORE_HYBRID_SOURCES]
+    signal_columns = {
+        (source, signal): f"article_signal__{source}__{signal}"
+        for source in sources
+        for signal in SIGNALS
+    }
+    required = [
+        "article_id",
+        "publication_date",
+        "source_duplicate_weight",
+        "event_id_monthly",
+        *signal_columns.values(),
+    ]
+    header = pd.read_csv(resolved, nrows=0).columns.tolist()
+    missing = [column for column in required if column not in header]
+    if missing:
+        raise ValueError(
+            "Common article export lacks direct-month fields; rerun Stages 13 and 16: "
+            f"{missing}"
+        )
+    article = pd.read_csv(resolved, usecols=required, low_memory=False)
+    if article["article_id"].isna().any() or article["article_id"].duplicated().any():
+        raise ValueError("Common article export must have unique nonmissing article_id")
+    if len(article) != expected_common_articles:
+        raise ValueError(
+            f"Expected {expected_common_articles:,} frozen common articles; found {len(article):,}"
+        )
+    article["publication_date"] = pd.to_datetime(
+        article["publication_date"], format="mixed", errors="coerce"
+    )
+    article["source_duplicate_weight"] = pd.to_numeric(
+        article["source_duplicate_weight"], errors="coerce"
+    )
+    for column in signal_columns.values():
+        article[column] = pd.to_numeric(article[column], errors="coerce")
+    if article[["publication_date", "source_duplicate_weight", *signal_columns.values()]].isna().any().any():
+        raise ValueError("Common article export has missing direct-month inputs")
+    if article["source_duplicate_weight"].le(0).any():
+        raise ValueError("source_duplicate_weight must be positive")
+
+    article["month_period"] = article["publication_date"].dt.to_period("M")
+    event_id = article["event_id_monthly"].astype("string").str.strip()
+    article["_event"] = event_id.mask(
+        event_id.isna() | event_id.eq(""), "ARTICLE_" + article["article_id"].astype(str)
+    )
+    event_denominator = article.groupby(["month_period", "_event"], sort=False)[
+        "source_duplicate_weight"
+    ].transform("sum")
+    article["monthly_event_weight"] = article["source_duplicate_weight"].div(
+        event_denominator
+    )
+    if article["monthly_event_weight"].isna().any() or article["monthly_event_weight"].le(0).any():
+        raise AssertionError("Direct monthly event weights must be positive and nonmissing")
+
+    coverage = article.groupby("month_period", sort=True).agg(
+        direct_month_article_count=("article_id", "nunique"),
+        direct_month_effective_article_count=("monthly_event_weight", "sum"),
+        direct_month_event_count=("_event", "nunique"),
+    )
+    periods = pd.period_range(
+        article["month_period"].min(), article["month_period"].max(), freq="M"
+    )
+    coverage = coverage.reindex(periods)
+    coverage.index.name = "month_period"
+    result = coverage.copy()
+    for (source, signal), column in signal_columns.items():
+        weighted = article[column] * article["monthly_event_weight"]
+        numerator = weighted.groupby(article["month_period"]).sum().reindex(periods)
+        denominator = np.sqrt(
+            result["direct_month_effective_article_count"].where(lambda value: value.gt(0))
+        )
+        base = numerator.div(denominator)
+        result[recovered_sum_column(source, signal)] = numerator
+        result[pdf_base_column(source, signal)] = base
+        result[monthly_signal_column(PDF_SQRT_EMA3, source, signal)] = (
+            causal_ema_restart_on_gap(base, span=PDF_EMA_SPAN)
+        )
+    result = result.reset_index()
+    result["month_ending"] = result.pop("month_period").dt.to_timestamp("M")
+    report = {
+        "common_articles": len(article),
+        "article_count_conserved": int(result["direct_month_article_count"].sum()),
+        "calendar_months": len(result),
+        "first_month": result["month_ending"].min(),
+        "last_month": result["month_ending"].max(),
+        "event_profile": "monthly",
+        "event_weighting": "fixed total per event within month on frozen common cohort",
+        "formula": "weighted article score sum / sqrt(effective article count), then causal EMA(3)",
+    }
+    return result, report
+
+
 def aggregate_complete_months(
     weekly: pd.DataFrame,
     aliases: list[str],
+    direct_monthly: pd.DataFrame | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     score_sources = [*aliases, *SCORE_HYBRID_SOURCES]
     raw_signal_columns = [
@@ -558,13 +669,50 @@ def aggregate_complete_months(
             row[sum_column] = weighted_sum
         rows.append(row)
     monthly = pd.DataFrame(rows)
+    if direct_monthly is not None:
+        direct = direct_monthly.copy()
+        monthly = monthly.merge(
+            direct,
+            on="month_ending",
+            how="left",
+            validate="one_to_one",
+            suffixes=("", "__direct"),
+        )
+        direct_signal_columns = [
+            column
+            for column in direct.columns
+            if column.startswith("llm_monthly_signal__")
+            or column.startswith("llm_monthly_signal_base__")
+            or column.startswith("llm_monthly_weighted_score_sum__")
+        ]
+        for column in direct_signal_columns:
+            merged_column = f"{column}__direct" if column in rows[0] else column
+            if merged_column in monthly.columns:
+                monthly[column] = monthly.pop(merged_column)
+        direct_available = monthly[
+            [
+                monthly_signal_column(PDF_SQRT_EMA3, source, signal)
+                for source in score_sources
+                for signal in SIGNALS
+            ]
+        ].notna().all(axis=1)
+        monthly["monthly_llm_complete"] = (
+            monthly["monthly_llm_complete"].astype(bool) & direct_available
+        )
+        monthly["llm_common_article_count"] = monthly[
+            "direct_month_article_count"
+        ]
+        monthly["llm_common_effective_article_count"] = monthly[
+            "direct_month_effective_article_count"
+        ]
     for source in score_sources:
         for signal in SIGNALS:
             base_column = pdf_base_column(source, signal)
             final_column = monthly_signal_column(PDF_SQRT_EMA3, source, signal)
-            monthly[final_column] = causal_ema_restart_on_gap(
-                monthly[base_column], span=PDF_EMA_SPAN
-            )
+            if direct_monthly is None:
+                monthly[final_column] = causal_ema_restart_on_gap(
+                    monthly[base_column], span=PDF_EMA_SPAN
+                )
     monthly["monthly_analysis_complete_case"] = monthly[
         ["monthly_scfi_complete", "monthly_brent_complete", "monthly_llm_complete"]
     ].all(axis=1)
@@ -633,9 +781,11 @@ def aggregate_complete_months(
             "novelty-weighted-sum/log1p(common-count) index"
         ),
         "adapted_pdf_formula": (
-            "EMA(span=3, alpha=0.5, adjust=False) of monthly recovered novelty-weighted "
-            "score sum divided by sqrt(monthly effective article count); EMA restarts after gaps"
+            "Direct publication-month article score sum with monthly-profile fixed-event "
+            "weights, divided by sqrt(monthly effective article count), followed by "
+            "EMA(span=3, alpha=0.5, adjust=False); EMA restarts after gaps"
         ),
+        "adapted_pdf_uses_direct_articles": direct_monthly is not None,
         "adapted_pdf_is_literal_replication": False,
         "zero_effective_volume_months": int(
             monthly["monthly_llm_complete"]
@@ -1078,7 +1228,7 @@ def derived_forecast_row(
         "horizon_months": int(template["horizon_months"]),
         "model_id": model_id,
         "feature_set": (
-            f"forecast_hybrid_from_three_llms_{index_construction}_{signal_name}"
+            f"forecast_hybrid_from_four_llms_{index_construction}_{signal_name}"
         ),
         "index_construction": index_construction,
         "source_type": "forecast_hybrid",
@@ -1456,9 +1606,9 @@ def loss_test_rows(
                 "baseline_index_construction": baseline_construction,
                 "challenger_index_construction": challenger_construction,
                 "analysis_role": (
-                    "adapted_equation_sensitivity"
+                    "direct_monthly_primary"
                     if challenger_construction == PDF_SQRT_EMA3
-                    else "monthly_frequency_robustness"
+                    else "weekly_derived_monthly_sensitivity"
                 ),
                 "source_type": source_type,
                 "score_source": score_source,
@@ -1806,8 +1956,8 @@ def build_predictor_summaries(
     construction_summary["selection_rule"] = "report_both_no_full_sample_winner_selection"
     construction_summary["analysis_role"] = np.where(
         construction_summary["index_construction"].eq(MEAN_SAFE_WEEKLY),
-        "previous_monthly_robustness",
-        "adapted_pdf_equation_sensitivity",
+        "weekly_derived_monthly_sensitivity",
+        "direct_monthly_primary",
     )
     return (
         primary_summary,
@@ -1828,15 +1978,17 @@ def main() -> None:
         raise ValueError("ridge-alpha must be positive")
     if args.minimum_stacking_history < 12:
         raise ValueError("minimum-stacking-history must be at least 12 months")
+    for name in ("expected_common_articles",):
+        if int(getattr(args, name)) < 1:
+            raise ValueError(f"{name.replace('_', '-')} must be positive")
     for name in (
-        "expected_common_articles",
         "expected_aligned_weekly_articles",
         "expected_complete_month_articles",
         "expected_scfi_complete_months",
         "expected_llm_complete_months",
     ):
-        if int(getattr(args, name)) < 1:
-            raise ValueError(f"{name.replace('_', '-')} must be positive")
+        if int(getattr(args, name)) < 0:
+            raise ValueError(f"{name.replace('_', '-')} cannot be negative")
     np.random.seed(args.seed)
 
     logger, log_path = configure_logging(args.log_dir.resolve(), args.version)
@@ -1851,6 +2003,7 @@ def main() -> None:
 
     weekly_panel_path = require_file(args.weekly_panel, "Weekly common-cohort panel")
     weekly_manifest_path = require_file(args.weekly_manifest, "Weekly 07b manifest")
+    common_articles_path = require_file(args.common_articles, "Frozen common article cohort")
     model_config_path = require_file(args.model_config, "Model registry")
     aliases = SUPPORT.load_model_aliases(model_config_path)
     logger.info("Model aliases in registry order: %s", aliases)
@@ -1863,7 +2016,10 @@ def main() -> None:
     weekly, weekly_report = load_safe_weekly_panel(
         weekly_panel_path,
         aliases,
-        args.expected_aligned_weekly_articles,
+        args.expected_aligned_weekly_articles or None,
+    )
+    direct_monthly, direct_monthly_report = build_direct_monthly_article_signals(
+        common_articles_path, aliases, args.expected_common_articles
     )
     logger.info(
         "Weekly provenance passed: frozen_common=%s aligned_articles=%s rows=%s "
@@ -1876,7 +2032,7 @@ def main() -> None:
     )
 
     monthly_raw, monthly_long, aggregation_report = aggregate_complete_months(
-        weekly, aliases
+        weekly, aliases, direct_monthly
     )
     complete_month_articles = int(
         round(
@@ -1888,18 +2044,27 @@ def main() -> None:
             )
         )
     )
-    if complete_month_articles != args.expected_complete_month_articles:
+    if (
+        args.expected_complete_month_articles > 0
+        and complete_month_articles != args.expected_complete_month_articles
+    ):
         raise ValueError(
             "Complete-month article-count mismatch: "
             f"expected {args.expected_complete_month_articles}, found {complete_month_articles}"
         )
-    if aggregation_report["scfi_complete_months"] != args.expected_scfi_complete_months:
+    if (
+        args.expected_scfi_complete_months > 0
+        and aggregation_report["scfi_complete_months"] != args.expected_scfi_complete_months
+    ):
         raise ValueError(
             "SCFI complete-month mismatch: "
             f"expected {args.expected_scfi_complete_months}, "
             f"found {aggregation_report['scfi_complete_months']}"
         )
-    if aggregation_report["llm_complete_months"] != args.expected_llm_complete_months:
+    if (
+        args.expected_llm_complete_months > 0
+        and aggregation_report["llm_complete_months"] != args.expected_llm_complete_months
+    ):
         raise ValueError(
             "LLM complete-month mismatch: "
             f"expected {args.expected_llm_complete_months}, "
@@ -2187,6 +2352,11 @@ def main() -> None:
                 "sha256": sha256_file(weekly_manifest_path),
                 "version": weekly_manifest.get("version"),
             },
+            "frozen_common_article_cohort": {
+                "path": str(common_articles_path),
+                "sha256": sha256_file(common_articles_path),
+                "rows": direct_monthly_report["common_articles"],
+            },
             "model_registry": {
                 "path": str(model_config_path),
                 "sha256": sha256_file(model_config_path),
@@ -2198,15 +2368,18 @@ def main() -> None:
         },
         "provenance_audit": provenance_audit,
         "weekly_input_audit": weekly_report,
+        "direct_monthly_article_audit": direct_monthly_report,
         "monthly_aggregation_audit": aggregation_report,
         "monthly_panel_audit": panel_report,
         "design": {
-            "weekly_analysis_is_primary": True,
-            "monthly_analysis_role": "pre_specified_slower_dynamics_robustness",
+            "primary_frequency": "monthly",
+            "weekly_analysis_role": "higher_frequency_robustness",
             "model_aliases": aliases,
             "common_cohort_is_only_score_input": True,
             "frozen_common_articles": args.expected_common_articles,
-            "safe_weekly_overlap_articles": args.expected_aligned_weekly_articles,
+            "safe_weekly_overlap_articles": weekly_report[
+                "aligned_weekly_article_count_sum"
+            ],
             "complete_month_articles": complete_month_articles,
             "score_scale": [0, 4],
             "month_assignment": (
@@ -2216,23 +2389,23 @@ def main() -> None:
             "partial_month_policy": "missing; never zero-filled",
             "index_constructions": {
                 MEAN_SAFE_WEEKLY: {
-                    "role": "previous_monthly_concept",
+                    "role": "weekly_derived_monthly_sensitivity",
                     "formula": (
                         "complete-month arithmetic mean of leakage-safe weekly indices, where "
                         "weekly index = novelty-weighted score sum / log1p(common article count)"
                     ),
                 },
                 PDF_SQRT_EMA3: {
-                    "role": "pre_specified_adapted_equation_sensitivity",
+                    "role": "monthly_primary",
                     "formula": (
-                        "U_t = sum_w[I_w*log1p(n_w)]/sqrt(sum_w effective_count_w); "
+                        "U_t = sum_i[w_i,t*S_i]/sqrt(sum_i[w_i,t]); "
                         "B_t = 0.5*U_t + 0.5*B_(t-1)"
                     ),
                     "ema": "one-sided span=3, alpha=0.5, adjust=False, restart after missing month",
                     "literal_pdf_replication": False,
                     "adaptations": (
-                        "frozen common cohort, novelty-weighted numerator, effective volume, "
-                        "safe Monday-month timing"
+                        "frozen common cohort, direct publication-month article aggregation, "
+                        "monthly event map, period-local fixed-event weights"
                     ),
                 },
             },
@@ -2255,7 +2428,7 @@ def main() -> None:
             "algorithm": "Ridge",
             "ridge_alpha": args.ridge_alpha,
             "forecast_hybrids": {
-                "equal_mean": "equal mean of three LLM forecasts within each construction",
+                "equal_mean": "equal mean of four LLM forecasts within each construction",
                 "past_only_nnls": (
                     "nonnegative weights use only prior OOS forecasts with targets observed "
                     "by the current origin; constructions are never mixed"
@@ -2280,7 +2453,7 @@ def main() -> None:
         "primary_construction_pairwise_tests": int(len(construction_tests)),
         "interpretation_limits": {
             "causal_claim": False,
-            "monthly_results_are_secondary_to_weekly": True,
+            "monthly_results_are_primary": True,
             "adapted_pdf_path_is_not_literal_replication": True,
             "point_rank_does_not_establish_statistical_superiority": True,
             "freight_cost_dimension_price_overlap_risk": True,

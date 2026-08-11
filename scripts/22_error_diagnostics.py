@@ -2,8 +2,8 @@
 
 This stage explains where the completed forecasts fail. It never refits a
 forecast model, selects a preferred index, or upgrades an observational result
-to a causal claim. Weekly common-cohort evidence is primary; both monthly index
-constructions are retained as robustness evidence.
+to a causal claim. Direct monthly common-cohort evidence is primary; weekly and
+weekly-derived monthly constructions are retained as robustness evidence.
 """
 
 from __future__ import annotations
@@ -67,8 +67,16 @@ DEFAULT_MONTHLY_PANEL = (
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs/diagnostics"
 DEFAULT_LOG_DIR = PROJECT_ROOT / "outputs/logs"
 CANONICAL_CONFIG_SHA256 = (
-    "ee40a1a0d611d4e388d0463b5bab6adb0ee4dd82fa148f0455b43def26df21e8"
+    "47da8fef774e794b7bca7633e6b1a0ff8b572af357627f5a6a10163ac58d3230"
 )
+
+FROZEN_MODEL_ALIASES = (
+    "gemma_2_9b_it",
+    "qwen_3_8b",
+    "qwen_2_5_7b",
+    "glm_4_9b_0414",
+)
+FROZEN_COMMON_COHORT_SIZE = 6480
 
 PRIMARY_SCORE = "overall_disruption_max"
 DIMENSION_COLUMNS = (
@@ -289,7 +297,7 @@ def assert_unique_keys(frame: pd.DataFrame, keys: Sequence[str], label: str) -> 
 
 
 def validate_common_article_scope(
-    article_audit: pd.DataFrame | Mapping[str, Any], expected_n: int = 6481
+    article_audit: pd.DataFrame | Mapping[str, Any], expected_n: int = FROZEN_COMMON_COHORT_SIZE
 ) -> bool:
     if isinstance(article_audit, pd.DataFrame):
         if len(article_audit) != 1:
@@ -589,15 +597,15 @@ def load_stage09_predictions(path: Path) -> pd.DataFrame:
     frame["analysis_source"] = "stage09_common_cohort_ridge"
     frame["model_family"] = "ridge"
     frame["model_tier"] = "primary_robustness_pipeline"
-    frame["cohort_scope"] = "frozen_6481_common_articles"
+    frame["cohort_scope"] = "frozen_6480_common_articles"
     frame["frequency_role"] = np.where(
-        frame["frequency"].eq("weekly"), "primary", "robustness"
+        frame["frequency"].eq("monthly"), "primary", "robustness"
     )
     frame["score_source"] = "stage09_specification"
     frame["signal_name"] = frame["signal_variants"].fillna("none")
     frame["is_core_diagnostic"] = frame["model_id"].isin(CORE_STAGE09_MODELS)
     frame["primary_family"] = (
-        frame["frequency"].eq("weekly") & frame["is_core_diagnostic"]
+        frame["frequency"].eq("monthly") & frame["is_core_diagnostic"]
     )
     return frame
 
@@ -644,9 +652,9 @@ def load_nonlinear_predictions(path: Path) -> pd.DataFrame:
     frame["family_id"] = frame["source_type"]
     frame["model_family"] = frame["algorithm"]
     frame["model_tier"] = "secondary_fixed_parameter_pipeline"
-    frame["cohort_scope"] = "frozen_6481_common_articles"
+    frame["cohort_scope"] = "frozen_6480_common_articles"
     frame["frequency_role"] = np.where(
-        frame["frequency"].eq("weekly"), "primary_frequency_secondary_model", "robustness"
+        frame["frequency"].eq("monthly"), "primary_frequency_secondary_model", "robustness"
     )
     frame["is_core_diagnostic"] = True
     frame["primary_family"] = False
@@ -673,7 +681,7 @@ def apply_debug_limit(
 
 def load_common_articles(path: Path, expected_n: int) -> pd.DataFrame:
     frame = pd.read_csv(path, low_memory=False)
-    aliases = ("gemma_2_9b_it", "qwen_3_8b", "qwen_2_5_7b")
+    aliases = FROZEN_MODEL_ALIASES
     score_names = (PRIMARY_SCORE, *DIMENSION_COLUMNS)
     score_columns = [
         f"{score}__{alias}" for alias in aliases for score in score_names
@@ -705,7 +713,8 @@ def load_common_articles(path: Path, expected_n: int) -> pd.DataFrame:
         "peak_severity_score",
         "breadth_severity_score",
         "dimension_disagreement_sd_mean",
-        "novelty_weight",
+        "event_id_weekly",
+        "event_id_monthly",
         "overall_disruption_max__ensemble_sd",
     ]
     missing = sorted(set(required).difference(frame.columns))
@@ -716,7 +725,7 @@ def load_common_articles(path: Path, expected_n: int) -> pd.DataFrame:
     )
     frame["article_week_origin"] = frame["article_week_ending"] + pd.Timedelta(days=3)
     frame["article_month_ending"] = (
-        frame["article_week_origin"].dt.to_period("M").dt.end_time.dt.normalize()
+        frame["publication_date"].dt.to_period("M").dt.end_time.dt.normalize()
     )
     frame["duplicate_group_size"] = (
         pd.to_numeric(frame["duplicate_group_size"], errors="coerce")
@@ -726,7 +735,23 @@ def load_common_articles(path: Path, expected_n: int) -> pd.DataFrame:
     frame["source_domain"] = (
         frame["source_domain"].fillna("unknown_source").astype(str).str.strip()
     )
-    frame["novelty_weight"] = 1.0 / np.sqrt(frame["duplicate_group_size"])
+    frame["source_duplicate_weight"] = 1.0 / np.sqrt(frame["duplicate_group_size"])
+    for profile, date_column in (
+        ("weekly", "article_week_ending"),
+        ("monthly", "article_month_ending"),
+    ):
+        event_column = f"event_id_{profile}"
+        event = frame[event_column].astype("string").str.strip()
+        event = event.mask(
+            event.isna() | event.eq(""), "ARTICLE_" + frame["article_id"].astype(str)
+        )
+        denominator = frame.assign(_event=event).groupby(
+            [date_column, "_event"], sort=False
+        )["source_duplicate_weight"].transform("sum")
+        frame[f"novelty_weight_{profile}"] = frame["source_duplicate_weight"].div(
+            denominator
+        )
+    frame["novelty_weight"] = frame["novelty_weight_monthly"]
     frame["peak_severity_score"] = frame[
         [f"{PRIMARY_SCORE}__{alias}" for alias in aliases]
     ].median(axis=1, skipna=False)
@@ -751,8 +776,8 @@ def load_common_articles(path: Path, expected_n: int) -> pd.DataFrame:
 
 def article_context(articles: pd.DataFrame, period: str) -> pd.DataFrame:
     date_column = "article_week_origin" if period == "weekly" else "article_month_ending"
-    grouped = articles.groupby(date_column, sort=True, observed=True)
     work = articles.copy()
+    work["novelty_weight"] = work[f"novelty_weight_{period}"]
     work["peak_weighted_sum"] = work["peak_severity_score"] * work["novelty_weight"]
     work["breadth_weighted_sum"] = (
         work["breadth_severity_score"] * work["novelty_weight"]
@@ -994,7 +1019,34 @@ def build_monthly_context(
         *[f"adapted_ema3__{dimension}" for dimension in DIMENSION_COLUMNS],
     ]
     raw.loc[~complete, monthly_signal_columns] = np.nan
-    raw = raw.merge(article_aggregate, on="origin_date", how="left", validate="one_to_one")
+    direct = article_aggregate.rename(
+        columns={
+            "article_context_count": "direct_article_count",
+            "article_context_source_count": "direct_source_count",
+            "article_context_effective_count": "direct_effective_article_count",
+            "peak_weighted_sum": "direct_peak_weighted_sum",
+            "breadth_weighted_sum": "direct_breadth_weighted_sum",
+            **{
+                f"{dimension}__weighted_sum": f"direct__{dimension}__weighted_sum"
+                for dimension in DIMENSION_COLUMNS
+            },
+        }
+    )
+    raw = raw.merge(direct, on="origin_date", how="left", validate="one_to_one")
+    direct_denominator = np.sqrt(
+        raw["direct_effective_article_count"].where(
+            raw["direct_effective_article_count"].gt(0)
+        )
+    )
+    raw["adapted_peak_base"] = raw["direct_peak_weighted_sum"].div(direct_denominator)
+    raw["adapted_breadth_base"] = raw["direct_breadth_weighted_sum"].div(
+        direct_denominator
+    )
+    raw["adapted_peak_ema3"] = ema_after_gaps(raw["adapted_peak_base"])
+    raw["adapted_breadth_ema3"] = ema_after_gaps(raw["adapted_breadth_base"])
+    for dimension in DIMENSION_COLUMNS:
+        base = raw[f"direct__{dimension}__weighted_sum"].div(direct_denominator)
+        raw[f"adapted_ema3__{dimension}"] = ema_after_gaps(base)
     pieces: list[pd.DataFrame] = []
     for construction in MONTHLY_CONSTRUCTIONS:
         columns = [
@@ -1029,9 +1081,14 @@ def build_monthly_context(
         piece["index_construction"] = construction
         piece["past_only_target_scale"] = piece["volatility"]
         piece["control_missing_count"] = piece[["brent_log_change"]].isna().sum(axis=1)
-        piece["article_count"] = raw["article_count_common"]
-        piece["effective_article_count"] = raw["effective_article_count_common"]
-        piece["source_count"] = raw["source_count_common"]
+        if construction == "adapted_pdf_sqrt_ema3":
+            piece["article_count"] = raw["direct_article_count"]
+            piece["effective_article_count"] = raw["direct_effective_article_count"]
+            piece["source_count"] = raw["direct_source_count"]
+        else:
+            piece["article_count"] = raw["article_count_common"]
+            piece["effective_article_count"] = raw["effective_article_count_common"]
+            piece["source_count"] = raw["source_count_common"]
         piece["peak_model_disagreement"] = raw["peak_model_disagreement"].fillna(0.0)
         piece["dimension_model_disagreement"] = raw[
             "dimension_model_disagreement"
@@ -2167,8 +2224,10 @@ def trace_extreme_case_articles(
         target = pd.Timestamp(case["target_date"])
         if case["frequency"] == "weekly":
             origin_mask = articles["article_week_origin"].eq(origin)
+            weight_column = "novelty_weight_weekly"
         else:
             origin_mask = articles["article_month_ending"].eq(origin)
+            weight_column = "novelty_weight_monthly"
         outcome_mask = articles["publication_date"].gt(origin) & articles[
             "publication_date"
         ].le(target)
@@ -2176,8 +2235,12 @@ def trace_extreme_case_articles(
             ("origin_information", origin_mask),
             ("outcome_context", outcome_mask),
         ):
-            candidates = articles.loc[mask].sort_values(
-                ["absolute_novelty_weighted_score_contribution", "article_id"],
+            candidates = articles.loc[mask].copy()
+            candidates["_case_contribution"] = candidates[weight_column] * candidates[
+                ["peak_severity_score", "breadth_severity_score"]
+            ].abs().max(axis=1)
+            candidates = candidates.sort_values(
+                ["_case_contribution", "article_id"],
                 ascending=[False, True],
             )
             if candidates.empty:
@@ -2203,9 +2266,9 @@ def trace_extreme_case_articles(
                         "dimension_disagreement_sd_mean": article[
                             "dimension_disagreement_sd_mean"
                         ],
-                        "novelty_weight": article["novelty_weight"],
+                        "novelty_weight": article[weight_column],
                         "absolute_novelty_weighted_score_contribution": article[
-                            "absolute_novelty_weighted_score_contribution"
+                            "_case_contribution"
                         ],
                         "known_at_forecast_origin": role == "origin_information",
                         "event_claim_allowed": False,
@@ -2260,7 +2323,7 @@ def consolidate_dynamic_diagnostics(
                 frame,
                 name,
                 paths[name],
-                "frozen_6481_common_cohort_unless_row_label_overrides",
+                "frozen_6480_common_cohort_unless_row_label_overrides",
             )
         )
     result = pd.concat(tagged, ignore_index=True, sort=False)
@@ -2368,7 +2431,7 @@ def nuisance_oof_summary(oof: pd.DataFrame) -> pd.DataFrame:
                 },
                 "negative_outcome_nuisance_r2_warning": outcome_r2 < 0,
                 "negative_treatment_nuisance_r2_warning": treatment_r2 < 0,
-                "cohort_scope": "upstream_stage08b_broader_panel_not_frozen_common_6481",
+                "cohort_scope": "upstream_stage08b_broader_panel_not_frozen_common_6480",
                 "interpretation": "nuisance_predictive_diagnostic_not_identification",
             }
         )
@@ -2388,7 +2451,7 @@ def consolidate_dml_diagnostics(
             nuisance,
             "nuisance_oof_summary",
             causal_paths["oof_predictions"],
-            "upstream_stage08b_broader_panel_not_frozen_common_6481",
+            "upstream_stage08b_broader_panel_not_frozen_common_6480",
         )
     ]
     causal_names = (
@@ -2407,7 +2470,7 @@ def consolidate_dml_diagnostics(
                 frame,
                 f"stage08b_{name}",
                 causal_paths[name],
-                "upstream_stage08b_broader_panel_not_frozen_common_6481",
+                "upstream_stage08b_broader_panel_not_frozen_common_6480",
             )
         )
     robustness_names = (
@@ -2970,7 +3033,7 @@ def main() -> None:
         aliases = tuple(
             item["alias"] for item in registry.get("active_scoring_models", [])
         )
-        if aliases != ("gemma_2_9b_it", "qwen_3_8b", "qwen_2_5_7b"):
+        if aliases != FROZEN_MODEL_ALIASES:
             raise ValueError(f"Frozen model registry alias order changed: {aliases}")
 
         article_audit = pd.read_csv(robustness_paths["article_audit"])
@@ -3313,8 +3376,8 @@ def main() -> None:
             "status": status,
             "run_signature": run_signature,
             "runtime_seconds": time.perf_counter() - started,
-            "primary_frequency": "weekly",
-            "monthly_role": "robustness",
+            "primary_frequency": "monthly",
+            "weekly_role": "higher_frequency_robustness",
             "causal_claim_allowed": False,
             "publication_scope_complete": full_scope and all_contracts_passed,
             "publication_eligible_without_human_validation": False,
@@ -3326,7 +3389,8 @@ def main() -> None:
             "arguments": vars(arguments),
             "design": {
                 "frozen_common_articles": expected_articles,
-                "weekly_primary": True,
+                "monthly_primary_construction": "adapted_pdf_sqrt_ema3",
+                "weekly_role": "higher_frequency_robustness",
                 "monthly_constructions": list(MONTHLY_CONSTRUCTIONS),
                 "reference_stage09_specifications": list(CORE_STAGE09_MODELS),
                 "nonlinear_role": "secondary_fixed_parameter_common_cohort",

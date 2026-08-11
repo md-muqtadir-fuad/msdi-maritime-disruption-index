@@ -1,7 +1,7 @@
 research:
   index_name: MSDI
   index_full_name: Maritime Supply-chain Disruption Intelligence Index
-  frequency: weekly
+  frequency: monthly
   primary_outcome: SCFI
   route_level_analysis: true
   use_scfi_inside_index: false
@@ -17,6 +17,7 @@ aggregation:
   semantic_event_monthly_window: 3_calendar_months
   semantic_event_threshold_candidates: [0.85, 0.88, 0.90, 0.92]
   semantic_event_provisional_threshold: 0.88
+  semantic_event_threshold_status: interim_operational_pending_human_validation
   primary_event_weight: fixed_total_within_aggregation_period
   event_threshold_requires_human_pair_validation: true
   uncertainty_bands: true
@@ -42,8 +43,8 @@ models:
     - xgboost
 
 prediction:
-  primary_frequency: weekly
-  monthly_frequency_role: robustness_only
+  primary_frequency: monthly
+  weekly_frequency_role: higher_frequency_robustness
   horizons_weeks: [1, 2, 4, 8, 12]
   validation: expanding_window_with_horizon_purge
   statistical_models:
@@ -63,8 +64,8 @@ prediction:
     - out_of_sample_r2
 
 dynamic_time_series:
-  primary_frequency: weekly
-  monthly_frequency_role: robustness_and_long_run_dynamics
+  primary_frequency: monthly
+  weekly_frequency_role: higher_frequency_robustness
   lag_selection:
     criterion: bic
     maximum_lags_weekly: 12

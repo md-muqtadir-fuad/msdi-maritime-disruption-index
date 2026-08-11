@@ -27,7 +27,7 @@ outcome:
 
 frequencies:
   weekly:
-    role: primary
+    role: higher_frequency_robustness
     panel: data/06_model_ready/prediction/msdi_scfi_weekly_panel.csv
     date_column: observation_date
     scfi_column: scfi
@@ -41,7 +41,7 @@ frequencies:
     volatility_window: 13
     minimum_complete_date: null
   monthly:
-    role: robustness
+    role: primary
     panel: data/06_model_ready/causality/msdi_scfi_monthly_panel.csv
     date_column: month_ending
     scfi_column: scfi_monthly_mean

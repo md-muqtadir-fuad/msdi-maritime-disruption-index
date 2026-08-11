@@ -3,15 +3,20 @@
 The script has two modes:
 
 1. ``sample`` creates a reproducible 1,000-article gold-set template from the
-   merged outputs of the three aligned LLMs.
+   merged outputs of the four registered aligned LLMs.
 2. ``evaluate`` computes human-human reliability, adjudicated/consensus labels,
-   and model-human agreement from completed annotation files.
+   and model-human agreement from completed article annotations.
+3. ``evaluate-event-pairs`` computes reviewer agreement and evaluates the
+   pre-specified semantic-event thresholds using completed blinded pair files.
 
 Examples
 --------
 python scripts/12_human_validation_metrics.py sample
 python scripts/12_human_validation_metrics.py evaluate \
     --annotations annotator_1_completed.csv annotator_2_completed.csv
+python scripts/12_human_validation_metrics.py evaluate-event-pairs \
+    --annotations event_pairs_annotator_1_completed.csv \
+                  event_pairs_annotator_2_completed.csv
 """
 
 from __future__ import annotations
@@ -32,6 +37,15 @@ from sklearn.metrics import cohen_kappa_score, confusion_matrix, f1_score
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SCORES = PROJECT_ROOT / "data/03_processed/model_scores/llm_scores_merged.csv"
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "data/04_validation"
+DEFAULT_EVENT_PAIR_DIR = (
+    PROJECT_ROOT / "data/03_processed/news_full_text/pre_llm_filter/event_dedup"
+)
+DEFAULT_EVENT_PAIR_MASTER = DEFAULT_EVENT_PAIR_DIR / "canonical_event_pair_validation_template.csv"
+DEFAULT_EVENT_PAIR_OUTPUT = DEFAULT_OUTPUT_DIR / "event_pairs"
+EVENT_PAIR_KEYS = ["event_profile", "article_id_a", "article_id_b"]
+EVENT_THRESHOLDS = (0.85, 0.88, 0.90, 0.92)
+INTERIM_EVENT_THRESHOLD = 0.88
+EXPECTED_SCORING_MODEL_COUNT = 4
 
 MODEL_SCORE_COLUMNS = [
     "port_disruption_score",
@@ -100,6 +114,22 @@ def parse_args() -> argparse.Namespace:
         action="store_true",
         help="Permit explicitly synthetic test labels; outputs remain non-human and non-publication-eligible.",
     )
+
+    event_pairs = subparsers.add_parser(
+        "evaluate-event-pairs",
+        help="Evaluate completed blinded semantic-event pair annotations.",
+    )
+    event_pairs.add_argument("--master", type=Path, default=DEFAULT_EVENT_PAIR_MASTER)
+    event_pairs.add_argument("--output-dir", type=Path, default=DEFAULT_EVENT_PAIR_OUTPUT)
+    event_pairs.add_argument("--annotations", type=Path, nargs="+", required=True)
+    event_pairs.add_argument(
+        "--adjudicated",
+        type=Path,
+        help="Optional file with one final human_same_event label per pair.",
+    )
+    event_pairs.add_argument(
+        "--thresholds", type=float, nargs="+", default=list(EVENT_THRESHOLDS)
+    )
     return parser.parse_args()
 
 
@@ -127,9 +157,9 @@ def load_scores_for_sampling(path: Path) -> tuple[pd.DataFrame, pd.DataFrame]:
         *MODEL_SCORE_COLUMNS,
     ]
     scores = pd.read_csv(require_file(path, "Merged score file"), usecols=columns, low_memory=False)
-    if scores["model_name"].nunique(dropna=True) != 3:
+    if scores["model_name"].nunique(dropna=True) != EXPECTED_SCORING_MODEL_COUNT:
         raise ValueError(
-            "Expected exactly three aligned models; found "
+            f"Expected exactly {EXPECTED_SCORING_MODEL_COUNT} aligned models; found "
             f"{scores['model_name'].nunique(dropna=True)}"
         )
     if scores.duplicated(["model_name", "article_id"]).any():
@@ -671,12 +701,271 @@ def evaluate_annotations(args: argparse.Namespace) -> dict:
     return summary
 
 
+def _normalize_event_pair_keys(frame: pd.DataFrame, label: str) -> pd.DataFrame:
+    missing = [column for column in EVENT_PAIR_KEYS if column not in frame.columns]
+    if missing:
+        raise ValueError(f"{label} lacks event-pair keys: {missing}")
+    output = frame.copy()
+    for column in ("article_id_a", "article_id_b", "event_profile"):
+        output[column] = output[column].astype("string").str.strip()
+    if output[EVENT_PAIR_KEYS].isna().any().any():
+        raise ValueError(f"{label} contains missing event-pair keys")
+    if output.duplicated(EVENT_PAIR_KEYS).any():
+        examples = output.loc[
+            output.duplicated(EVENT_PAIR_KEYS, keep=False), EVENT_PAIR_KEYS
+        ].head(10)
+        raise ValueError(f"{label} has duplicate event pairs:\n{examples.to_string(index=False)}")
+    return output
+
+
+def _binary_event_labels(series: pd.Series, label: str) -> pd.Series:
+    values = pd.to_numeric(series, errors="coerce")
+    invalid = values.notna() & ~values.isin([0, 1])
+    if invalid.any():
+        raise ValueError(f"{label} must contain only 0, 1, or blank")
+    return values.astype("Int64")
+
+
+def load_event_pair_annotations(
+    paths: Iterable[Path], master_keys: pd.DataFrame
+) -> pd.DataFrame:
+    expected = set(map(tuple, master_keys[EVENT_PAIR_KEYS].itertuples(index=False, name=None)))
+    frames: list[pd.DataFrame] = []
+    reviewer_ids: set[str] = set()
+    for path in paths:
+        resolved = require_file(path, "Event-pair annotation file")
+        frame = _normalize_event_pair_keys(
+            pd.read_csv(resolved, low_memory=False), resolved.name
+        )
+        if "human_same_event" not in frame.columns:
+            raise ValueError(f"{resolved.name} lacks human_same_event")
+        frame["human_same_event"] = _binary_event_labels(
+            frame["human_same_event"], f"{resolved.name}: human_same_event"
+        )
+        incomplete = int(frame["human_same_event"].isna().sum())
+        if incomplete:
+            raise ValueError(
+                f"{resolved.name} is incomplete: {incomplete} human_same_event labels are blank"
+            )
+        if "reviewer_id" not in frame.columns:
+            frame["reviewer_id"] = resolved.stem
+        ids = frame["reviewer_id"].astype("string").str.strip().dropna().unique().tolist()
+        if len(ids) != 1 or not ids[0]:
+            raise ValueError(f"{resolved.name} must contain exactly one nonblank reviewer_id")
+        reviewer = str(ids[0])
+        if reviewer in reviewer_ids:
+            raise ValueError(f"Reviewer ID {reviewer!r} occurs in more than one file")
+        reviewer_ids.add(reviewer)
+        actual = set(map(tuple, frame[EVENT_PAIR_KEYS].itertuples(index=False, name=None)))
+        if actual != expected:
+            raise ValueError(
+                f"{resolved.name} does not match the master pair set: "
+                f"missing={len(expected - actual)}, extra={len(actual - expected)}"
+            )
+        frame["reviewer_id"] = reviewer
+        frame["_annotation_file"] = resolved.name
+        frames.append(frame[[*EVENT_PAIR_KEYS, "reviewer_id", "human_same_event", "_annotation_file"]])
+    if len(frames) < 2:
+        raise ValueError("At least two completed event-pair annotation files are required")
+    return pd.concat(frames, ignore_index=True)
+
+
+def event_pair_agreement(annotations: pd.DataFrame) -> pd.DataFrame:
+    rows: list[dict[str, object]] = []
+    reviewers = sorted(annotations["reviewer_id"].astype(str).unique())
+    profiles: list[str | None] = [None, *sorted(annotations["event_profile"].unique())]
+    for left_id, right_id in combinations(reviewers, 2):
+        left = annotations[annotations["reviewer_id"].eq(left_id)]
+        right = annotations[annotations["reviewer_id"].eq(right_id)]
+        pair = left.merge(
+            right,
+            on=EVENT_PAIR_KEYS,
+            suffixes=("_left", "_right"),
+            validate="one_to_one",
+        )
+        for profile in profiles:
+            subset = pair if profile is None else pair[pair["event_profile"].eq(profile)]
+            a = subset["human_same_event_left"].astype(int)
+            b = subset["human_same_event_right"].astype(int)
+            rows.append(
+                {
+                    "event_profile": "all" if profile is None else profile,
+                    "reviewer_1": left_id,
+                    "reviewer_2": right_id,
+                    "n_pairs": len(subset),
+                    "raw_agreement": float((a == b).mean()) if len(subset) else math.nan,
+                    "cohen_kappa": float(cohen_kappa_score(a, b)) if len(subset) else math.nan,
+                    "positive_rate_reviewer_1": float(a.mean()) if len(subset) else math.nan,
+                    "positive_rate_reviewer_2": float(b.mean()) if len(subset) else math.nan,
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def event_pair_reference(
+    annotations: pd.DataFrame, adjudicated_path: Path | None
+) -> tuple[pd.DataFrame, pd.DataFrame, str]:
+    matrix = annotations.pivot(
+        index=EVENT_PAIR_KEYS, columns="reviewer_id", values="human_same_event"
+    )
+    disagreements = matrix[matrix.nunique(axis=1).gt(1)].reset_index()
+    if adjudicated_path is not None:
+        reference = _normalize_event_pair_keys(
+            pd.read_csv(require_file(adjudicated_path, "Adjudicated event-pair file"), low_memory=False),
+            "Adjudicated event-pair file",
+        )
+        if "human_same_event" not in reference.columns:
+            raise ValueError("Adjudicated event-pair file lacks human_same_event")
+        reference["human_same_event"] = _binary_event_labels(
+            reference["human_same_event"], "Adjudicated human_same_event"
+        )
+        if reference["human_same_event"].isna().any():
+            raise ValueError("Adjudicated event-pair labels must be complete")
+        expected = set(map(tuple, matrix.reset_index()[EVENT_PAIR_KEYS].itertuples(index=False, name=None)))
+        actual = set(map(tuple, reference[EVENT_PAIR_KEYS].itertuples(index=False, name=None)))
+        if actual != expected:
+            raise ValueError(
+                "Adjudicated pair set does not match annotations: "
+                f"missing={len(expected - actual)}, extra={len(actual - expected)}"
+            )
+        return reference[[*EVENT_PAIR_KEYS, "human_same_event"]], disagreements, "adjudicated_all_pairs"
+
+    unanimous = matrix[matrix.nunique(axis=1).eq(1)].copy()
+    unanimous["human_same_event"] = unanimous.iloc[:, 0].astype("Int64")
+    reference = unanimous[["human_same_event"]].reset_index()
+    return reference, disagreements, "unanimous_pairs_only_pending_adjudication"
+
+
+def _safe_ratio(numerator: int, denominator: int) -> float:
+    return math.nan if denominator == 0 else float(numerator / denominator)
+
+
+def event_threshold_metrics(
+    master: pd.DataFrame, reference: pd.DataFrame, thresholds: Iterable[float]
+) -> pd.DataFrame:
+    merged = master.merge(reference, on=EVENT_PAIR_KEYS, how="inner", validate="one_to_one")
+    profiles: list[str | None] = [None, *sorted(merged["event_profile"].unique())]
+    rows: list[dict[str, object]] = []
+    for profile in profiles:
+        subset = merged if profile is None else merged[merged["event_profile"].eq(profile)]
+        actual = subset["human_same_event"].astype(int)
+        for threshold in sorted(set(float(value) for value in thresholds)):
+            predicted = subset["cosine_similarity"].ge(threshold).astype(int)
+            tn, fp, fn, tp = confusion_matrix(actual, predicted, labels=[0, 1]).ravel()
+            precision = _safe_ratio(int(tp), int(tp + fp))
+            recall = _safe_ratio(int(tp), int(tp + fn))
+            specificity = _safe_ratio(int(tn), int(tn + fp))
+            f1 = (
+                math.nan
+                if not np.isfinite(precision) or not np.isfinite(recall) or precision + recall == 0
+                else float(2 * precision * recall / (precision + recall))
+            )
+            rows.append(
+                {
+                    "event_profile": "all" if profile is None else profile,
+                    "threshold": threshold,
+                    "n_reference_pairs": len(subset),
+                    "human_same_event_count": int(actual.sum()),
+                    "true_negative": int(tn),
+                    "false_positive": int(fp),
+                    "false_negative": int(fn),
+                    "true_positive": int(tp),
+                    "precision": precision,
+                    "recall": recall,
+                    "specificity": specificity,
+                    "f1": f1,
+                    "balanced_accuracy": (
+                        float(np.nanmean([recall, specificity]))
+                        if np.isfinite(recall) or np.isfinite(specificity)
+                        else math.nan
+                    ),
+                    "accuracy": float((actual == predicted).mean()) if len(subset) else math.nan,
+                    "is_interim_operational_threshold": math.isclose(
+                        threshold, INTERIM_EVENT_THRESHOLD, abs_tol=1e-12
+                    ),
+                }
+            )
+    return pd.DataFrame(rows)
+
+
+def evaluate_event_pairs(args: argparse.Namespace) -> dict:
+    master = _normalize_event_pair_keys(
+        pd.read_csv(require_file(args.master, "Event-pair master file"), low_memory=False),
+        "Event-pair master file",
+    )
+    if "cosine_similarity" not in master.columns:
+        raise ValueError("Event-pair master file lacks cosine_similarity")
+    master["cosine_similarity"] = pd.to_numeric(master["cosine_similarity"], errors="coerce")
+    if master["cosine_similarity"].isna().any():
+        raise ValueError("Event-pair master file contains missing/invalid cosine_similarity")
+    annotations = load_event_pair_annotations(args.annotations, master[EVENT_PAIR_KEYS])
+    agreement = event_pair_agreement(annotations)
+    reference, disagreements, reference_type = event_pair_reference(
+        annotations, args.adjudicated
+    )
+    metrics = event_threshold_metrics(master, reference, args.thresholds)
+
+    output_dir = args.output_dir.resolve()
+    output_dir.mkdir(parents=True, exist_ok=True)
+    agreement_path = output_dir / "event_pair_reviewer_agreement.csv"
+    disagreement_path = output_dir / "event_pair_disagreements_for_adjudication.csv"
+    reference_path = output_dir / "event_pair_reference_labels.csv"
+    metrics_path = output_dir / "event_threshold_metrics.csv"
+    agreement.to_csv(agreement_path, index=False)
+    disagreements.to_csv(disagreement_path, index=False)
+    reference.to_csv(reference_path, index=False)
+    metrics.to_csv(metrics_path, index=False)
+
+    final_ready = args.adjudicated is not None
+    summary = {
+        "status": (
+            "event_threshold_human_evaluation_complete"
+            if final_ready
+            else "pending_adjudication_metrics_use_unanimous_pairs_only"
+        ),
+        "publication_final_threshold_ready": final_ready,
+        "interim_operational_threshold": INTERIM_EVENT_THRESHOLD,
+        "interim_threshold_status": "proceed_for_pipeline_building_pending_human_validation",
+        "candidate_thresholds": sorted(set(float(value) for value in args.thresholds)),
+        "master_file": str(args.master.resolve()),
+        "annotation_files": [str(path.resolve()) for path in args.annotations],
+        "adjudicated_file": str(args.adjudicated.resolve()) if args.adjudicated else None,
+        "reviewers": sorted(annotations["reviewer_id"].unique().tolist()),
+        "pairs_per_reviewer": int(annotations.groupby("reviewer_id").size().iloc[0]),
+        "disagreement_pairs": len(disagreements),
+        "reference_type": reference_type,
+        "reference_pairs_used": len(reference),
+        "selection_guardrail": (
+            "Threshold evaluation reads semantic similarity and human labels only; "
+            "it does not read SCFI, forecasts, causal estimates, or LLM disruption scores."
+        ),
+        "sampling_warning": (
+            "The validation set is threshold-focused and stratified; its raw same-event "
+            "rate is not an estimate of corpus-wide prevalence."
+        ),
+        "outputs": {
+            "reviewer_agreement": str(agreement_path),
+            "disagreements_for_adjudication": str(disagreement_path),
+            "reference_labels": str(reference_path),
+            "threshold_metrics": str(metrics_path),
+        },
+    }
+    summary_path = output_dir / "event_pair_validation_summary.json"
+    summary_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    print(f"Evaluated {summary['pairs_per_reviewer']:,} event pairs per reviewer")
+    print(f"Disagreements requiring adjudication: {len(disagreements):,}")
+    print(f"Summary: {summary_path}")
+    return summary
+
+
 def main() -> None:
     args = parse_args()
     if args.command == "sample":
         create_annotation_sample(args)
-    else:
+    elif args.command == "evaluate":
         evaluate_annotations(args)
+    else:
+        evaluate_event_pairs(args)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-"""Build article-level consensus scores and weekly MSDI variants.
+"""Build article-level consensus scores and monthly/weekly MSDI variants.
 
 Two parallel, pre-specified measurement paths are retained:
 
@@ -66,6 +66,11 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--version", default="msdi_v001")
     parser.add_argument("--frequency", default="W-FRI")
     parser.add_argument(
+        "--monthly-frequency",
+        default="ME",
+        help="Calendar month-end frequency for the publication-primary index.",
+    )
+    parser.add_argument(
         "--event-profile",
         choices=("auto", "weekly", "monthly"),
         default="auto",
@@ -94,6 +99,7 @@ def parse_args() -> argparse.Namespace:
         help="Correction applied to weekly weighted score sums.",
     )
     parser.add_argument("--expanding-min-periods", type=int, default=26)
+    parser.add_argument("--monthly-expanding-min-periods", type=int, default=24)
     return parser.parse_args()
 
 
@@ -141,8 +147,8 @@ def load_model_config(path: Path) -> tuple[list[dict[str, Any]], dict[str, dict[
     config = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
     models = config.get("active_scoring_models", [])
     criteria = config.get("topsis_operational_ranking", {}).get("criteria", {})
-    if len(models) != 3:
-        raise ValueError("model_registry.yaml must define exactly three active_scoring_models")
+    if len(models) != 4:
+        raise ValueError("model_registry.yaml must define exactly four active_scoring_models")
     if not criteria:
         raise ValueError("model_registry.yaml lacks TOPSIS criteria")
     weights = [float(spec["weight"]) for spec in criteria.values()]
@@ -183,6 +189,16 @@ def read_scores(
 ) -> pd.DataFrame:
     if not path.is_file():
         raise FileNotFoundError(f"Merged score file not found: {path}")
+    event_columns = [
+        f"{column}_{profile}"
+        for profile in ("weekly", "monthly")
+        for column in (
+            "event_id",
+            "event_cluster_size",
+            "event_source_count",
+            "event_span_days",
+        )
+    ]
     required = [
         "article_id",
         "model_name",
@@ -197,33 +213,26 @@ def read_scores(
         "duplicate_group_id",
         "duplicate_group_size",
         "event_day",
-        f"event_id_{event_profile}",
-        f"event_cluster_size_{event_profile}",
-        f"event_source_count_{event_profile}",
-        f"event_span_days_{event_profile}",
+        *event_columns,
         "quality_score",
         *ALL_SCORE_COLUMNS,
         *OPERATIONAL_COLUMNS,
     ]
     scores = pd.read_csv(path, usecols=required, low_memory=False)
-    scores = scores.rename(
-        columns={
-            f"{column}_{event_profile}": column
-            for column in (
-                "event_id",
-                "event_cluster_size",
-                "event_source_count",
-                "event_span_days",
-            )
-        }
-    )
+    for column in (
+        "event_id",
+        "event_cluster_size",
+        "event_source_count",
+        "event_span_days",
+    ):
+        scores[column] = scores[f"{column}_{event_profile}"]
     if scores.empty:
         raise ValueError("Merged score file is empty")
     if scores.duplicated(["model_name", "article_id"]).any():
         raise ValueError("Merged scores contain duplicate (model_name, article_id) keys")
     scores["model_alias"] = scores["model_name"].map(lambda value: assign_model_alias(value, registry))
-    if scores["model_alias"].nunique() != 3:
-        raise ValueError("Expected exactly three mapped scoring models")
+    if scores["model_alias"].nunique() != 4:
+        raise ValueError("Expected exactly four mapped scoring models")
 
     for column in [
         *ALL_SCORE_COLUMNS,
@@ -232,6 +241,12 @@ def read_scores(
         "event_cluster_size",
         "event_source_count",
         "event_span_days",
+        "event_cluster_size_weekly",
+        "event_source_count_weekly",
+        "event_span_days_weekly",
+        "event_cluster_size_monthly",
+        "event_source_count_monthly",
+        "event_span_days_monthly",
         "quality_score",
     ]:
         scores[column] = pd.to_numeric(scores[column], errors="coerce")
@@ -325,6 +340,25 @@ def novelty_weight(group_size: pd.Series, method: str) -> pd.Series:
     return pd.Series(1.0, index=size.index)
 
 
+def select_event_profile(article: pd.DataFrame, profile: str) -> pd.DataFrame:
+    """Expose one pre-LLM event map through the generic weighting columns."""
+    if profile not in {"weekly", "monthly"}:
+        raise ValueError(f"Unsupported event profile: {profile}")
+    output = article.copy()
+    for column in (
+        "event_id",
+        "event_cluster_size",
+        "event_source_count",
+        "event_span_days",
+    ):
+        source = f"{column}_{profile}"
+        if source not in output.columns:
+            raise ValueError(f"Article table lacks {source}")
+        output[column] = output[source]
+    output["event_profile_used"] = profile
+    return output
+
+
 def apply_period_event_weights(
     article: pd.DataFrame,
     frequency: str,
@@ -348,24 +382,28 @@ def apply_period_event_weights(
     output["event_id"] = event_id
 
     valid_date = output["publication_date"].notna()
-    output["event_period_article_count"] = 1
-    output["event_period_source_weight_sum"] = output["source_duplicate_weight"].astype(float)
-    if valid_date.any():
-        period = output.loc[valid_date, "publication_date"].dt.to_period(frequency).astype(str)
+    eligible = valid_date & output.get(
+        "ensemble_eligible", pd.Series(True, index=output.index)
+    ).fillna(False)
+    output["event_period_article_count"] = 0
+    output["event_period_source_weight_sum"] = 0.0
+    if eligible.any():
+        period_frequency = "M" if frequency.upper().startswith("M") else frequency
+        period = output.loc[eligible, "publication_date"].dt.to_period(period_frequency).astype(str)
         keys = pd.DataFrame(
             {
                 "_period": period,
                 "_event": output.loc[valid_date, "event_id"].astype(str),
             },
-            index=output.index[valid_date],
+            index=output.index[eligible],
         )
-        grouped = output.loc[valid_date].assign(
+        grouped = output.loc[eligible].assign(
             _period=keys["_period"], _event=keys["_event"]
         ).groupby(["_period", "_event"], sort=False)
-        output.loc[valid_date, "event_period_article_count"] = grouped[
+        output.loc[eligible, "event_period_article_count"] = grouped[
             "article_id"
         ].transform("nunique").astype(int)
-        output.loc[valid_date, "event_period_source_weight_sum"] = grouped[
+        output.loc[eligible, "event_period_source_weight_sum"] = grouped[
             "source_duplicate_weight"
         ].transform("sum")
 
@@ -375,11 +413,12 @@ def apply_period_event_weights(
     ).replace(0, np.nan)
     size = pd.to_numeric(output["event_period_article_count"], errors="coerce").fillna(1).clip(lower=1)
     if event_penalty == "fixed":
-        output["novelty_weight"] = base.div(denominator).fillna(1.0)
+        output["novelty_weight"] = base.div(denominator)
     elif event_penalty == "sqrt":
-        output["novelty_weight"] = base.div(denominator).mul(np.sqrt(size)).fillna(1.0)
+        output["novelty_weight"] = base.div(denominator).mul(np.sqrt(size))
     else:
-        output["novelty_weight"] = base
+        output["novelty_weight"] = base.where(eligible)
+    output.loc[~eligible, "novelty_weight"] = 0.0
     output["event_penalty_method"] = event_penalty
     output["peak_weighted_contribution"] = (
         output["peak_severity_score"] * output["novelty_weight"]
@@ -397,6 +436,19 @@ def build_article_scores(
     duplicate_penalty: str,
     logger: logging.Logger,
 ) -> tuple[pd.DataFrame, dict[str, Any]]:
+    scores = scores.copy()
+    # Backward-compatible for bounded unit fixtures; production ingestion always
+    # supplies two independently generated profile maps.
+    for profile in ("weekly", "monthly"):
+        for column in (
+            "event_id",
+            "event_cluster_size",
+            "event_source_count",
+            "event_span_days",
+        ):
+            profile_column = f"{column}_{profile}"
+            if profile_column not in scores.columns and column in scores.columns:
+                scores[profile_column] = scores[column]
     metadata_columns = [
         "article_id",
         "date",
@@ -413,6 +465,14 @@ def build_article_scores(
         "event_cluster_size",
         "event_source_count",
         "event_span_days",
+        "event_id_weekly",
+        "event_cluster_size_weekly",
+        "event_source_count_weekly",
+        "event_span_days_weekly",
+        "event_id_monthly",
+        "event_cluster_size_monthly",
+        "event_source_count_monthly",
+        "event_span_days_monthly",
         "quality_score",
     ]
     metadata = (
@@ -512,6 +572,18 @@ def expanding_realtime_zscore(series: pd.Series, minimum_periods: int) -> pd.Ser
     return (series - prior_mean) / prior_sd.replace(0, np.nan)
 
 
+def causal_ema_restart_gaps(series: pd.Series, span: int = 3) -> pd.Series:
+    """Causal EMA that does not carry state through periods with no articles."""
+    if span < 1:
+        raise ValueError("EMA span must be positive")
+    output = pd.Series(np.nan, index=series.index, dtype=float)
+    observed = series.notna()
+    block = observed.ne(observed.shift(fill_value=False)).cumsum()
+    for _, positions in series[observed].groupby(block[observed]).groups.items():
+        output.loc[positions] = series.loc[positions].ewm(span=span, adjust=False).mean()
+    return output
+
+
 def complete_week_index(grouped: pd.DataFrame, frequency: str) -> pd.DataFrame:
     if grouped.empty:
         return grouped
@@ -586,6 +658,106 @@ def aggregate_weekly(
     return grouped.reset_index()
 
 
+def aggregate_monthly_direct(
+    article: pd.DataFrame,
+    frequency: str,
+    expanding_min_periods: int,
+    ema_span: int = 3,
+) -> pd.DataFrame:
+    """Construct the monthly primary index directly from eligible article rows.
+
+    For each score path, the contemporaneous event-weighted numerator is divided
+    by the square root of the period-local effective article count, followed by
+    a causal EMA(3). No weekly index value is used in this construction.
+    """
+    work = article[article["ensemble_eligible"] & article["publication_date"].notna()].copy()
+    work = work.set_index("publication_date")
+    grouped = work.resample(frequency, label="right", closed="right").agg(
+        article_count=("article_id", "nunique"),
+        event_count=("event_id", "nunique"),
+        source_count=("source_domain", "nunique"),
+        effective_article_count=("novelty_weight", "sum"),
+        peak_active_article_count=("peak_severity_score", lambda value: int(value.gt(0).sum())),
+        breadth_active_article_count=("breadth_severity_score", lambda value: int(value.gt(0).sum())),
+        peak_score_sum=("peak_weighted_contribution", "sum"),
+        breadth_score_sum=("breadth_weighted_contribution", "sum"),
+        peak_score_unweighted_mean=("peak_severity_score", "mean"),
+        breadth_score_unweighted_mean=("breadth_severity_score", "mean"),
+        peak_model_disagreement_mean=(f"{PRIMARY_COLUMN}__ensemble_sd", "mean"),
+        dimension_disagreement_mean=("dimension_disagreement_sd_mean", "mean"),
+    )
+    grouped.index.name = "month_end"
+    denominator = np.sqrt(grouped["effective_article_count"].where(lambda value: value.gt(0)))
+    for path in ("peak", "breadth"):
+        base_column = f"{path}_score_sqrt_effective_volume"
+        ema_column = f"{base_column}_ema{ema_span}"
+        grouped[base_column] = grouped[f"{path}_score_sum"].div(denominator)
+        grouped[ema_column] = causal_ema_restart_gaps(grouped[base_column], span=ema_span)
+        # Generic contract used by panel builders; formula is recorded explicitly.
+        grouped[f"{path}_score_media_corrected"] = grouped[ema_column]
+        grouped[f"{path}_msdi_z_full_sample_descriptive"] = full_sample_zscore(
+            grouped[ema_column]
+        )
+        grouped[f"{path}_msdi_z_expanding_realtime"] = expanding_realtime_zscore(
+            grouped[ema_column], expanding_min_periods
+        )
+
+    for dimension in DIMENSION_COLUMNS:
+        consensus = f"{dimension}__ensemble_median"
+        contribution = work[consensus] * work["novelty_weight"]
+        stem = dimension.removesuffix("_score")
+        sum_column = f"{stem}_sum"
+        base_column = f"{stem}_sqrt_effective_volume"
+        ema_column = f"{base_column}_ema{ema_span}"
+        grouped[sum_column] = contribution.resample(
+            frequency, label="right", closed="right"
+        ).sum()
+        grouped[base_column] = grouped[sum_column].div(denominator)
+        grouped[ema_column] = causal_ema_restart_gaps(grouped[base_column], span=ema_span)
+        grouped[f"{stem}_media_corrected"] = grouped[ema_column]
+    return grouped.reset_index()
+
+
+def aggregate_model_monthly_direct(
+    article: pd.DataFrame,
+    aliases: list[str],
+    frequency: str,
+    ema_span: int = 3,
+) -> pd.DataFrame:
+    rows: list[pd.DataFrame] = []
+    for alias in aliases:
+        peak = f"peak_severity_score__{alias}"
+        breadth = f"breadth_severity_score__{alias}"
+        work = article[
+            article["ensemble_eligible"]
+            & article["publication_date"].notna()
+            & article[peak].notna()
+        ].copy()
+        work["peak_contribution"] = work[peak] * work["novelty_weight"]
+        work["breadth_contribution"] = work[breadth] * work["novelty_weight"]
+        grouped = work.set_index("publication_date").resample(
+            frequency, label="right", closed="right"
+        ).agg(
+            article_count=("article_id", "nunique"),
+            effective_article_count=("novelty_weight", "sum"),
+            peak_score_sum=("peak_contribution", "sum"),
+            breadth_score_sum=("breadth_contribution", "sum"),
+        )
+        denominator = np.sqrt(
+            grouped["effective_article_count"].where(lambda value: value.gt(0))
+        )
+        for path in ("peak", "breadth"):
+            base = grouped[f"{path}_score_sum"].div(denominator)
+            grouped[f"{path}_score_sqrt_effective_volume"] = base
+            grouped[f"{path}_score_media_corrected"] = causal_ema_restart_gaps(
+                base, span=ema_span
+            )
+        grouped["model_alias"] = alias
+        grouped.index.name = "month_end"
+        rows.append(grouped.reset_index())
+    return pd.concat(rows, ignore_index=True)
+
+
 def aggregate_model_weekly(
     article: pd.DataFrame,
     aliases: list[str],
@@ -596,7 +768,11 @@ def aggregate_model_weekly(
     for alias in aliases:
         peak = f"peak_severity_score__{alias}"
         breadth = f"breadth_severity_score__{alias}"
-        work = article[article["publication_date"].notna() & article[peak].notna()].copy()
+        work = article[
+            article["ensemble_eligible"]
+            & article["publication_date"].notna()
+            & article[peak].notna()
+        ].copy()
         work["peak_contribution"] = work[peak] * work["novelty_weight"]
         work["breadth_contribution"] = work[breadth] * work["novelty_weight"]
         grouped = work.set_index("publication_date").resample(
@@ -618,12 +794,14 @@ def aggregate_model_weekly(
     return pd.concat(rows, ignore_index=True)
 
 
-def build_model_spread(model_weekly: pd.DataFrame, aliases: list[str]) -> pd.DataFrame:
-    base = model_weekly[["week_ending"]].drop_duplicates().sort_values("week_ending")
-    output = base.set_index("week_ending")
+def build_model_spread(
+    model_period: pd.DataFrame, aliases: list[str], date_column: str = "week_ending"
+) -> pd.DataFrame:
+    base = model_period[[date_column]].drop_duplicates().sort_values(date_column)
+    output = base.set_index(date_column)
     for path in ("peak", "breadth"):
         value = f"{path}_score_media_corrected"
-        pivot = model_weekly.pivot(index="week_ending", columns="model_alias", values=value).reindex(
+        pivot = model_period.pivot(index=date_column, columns="model_alias", values=value).reindex(
             columns=aliases
         )
         for alias in aliases:
@@ -780,7 +958,10 @@ def write_outputs(
     article: pd.DataFrame,
     weekly: pd.DataFrame,
     model_weekly: pd.DataFrame,
-    spread: pd.DataFrame,
+    weekly_spread: pd.DataFrame,
+    monthly: pd.DataFrame,
+    model_monthly: pd.DataFrame,
+    monthly_spread: pd.DataFrame,
     score_summary: pd.DataFrame,
     differences: pd.DataFrame,
     ranking: pd.DataFrame,
@@ -793,9 +974,10 @@ def write_outputs(
     output_dir = args.output_dir.resolve()
     article_dir = output_dir / "article_level"
     weekly_dir = output_dir / "weekly"
+    monthly_dir = output_dir / "monthly"
     uncertainty_dir = output_dir / "uncertainty_bands"
     version_dir = output_dir / "disruption_index_versions"
-    for directory in (article_dir, weekly_dir, uncertainty_dir, version_dir):
+    for directory in (article_dir, weekly_dir, monthly_dir, uncertainty_dir, version_dir):
         directory.mkdir(parents=True, exist_ok=True)
 
     paths = {
@@ -803,6 +985,9 @@ def write_outputs(
         "weekly_indices": weekly_dir / "msdi_weekly.csv",
         "weekly_model_specific": weekly_dir / "msdi_weekly_model_specific.csv",
         "weekly_model_spread": uncertainty_dir / "msdi_weekly_model_spread.csv",
+        "monthly_indices": monthly_dir / "msdi_monthly.csv",
+        "monthly_model_specific": monthly_dir / "msdi_monthly_model_specific.csv",
+        "monthly_model_spread": uncertainty_dir / "msdi_monthly_model_spread.csv",
         "model_score_summary": version_dir / f"{args.version}_model_score_summary.csv",
         "pairwise_score_differences": version_dir / f"{args.version}_pairwise_score_differences.csv",
         "topsis_model_ranking": version_dir / f"{args.version}_topsis_model_ranking.csv",
@@ -812,7 +997,10 @@ def write_outputs(
     article.to_csv(paths["article_consensus"], index=False)
     weekly.to_csv(paths["weekly_indices"], index=False)
     model_weekly.to_csv(paths["weekly_model_specific"], index=False)
-    spread.to_csv(paths["weekly_model_spread"], index=False)
+    weekly_spread.to_csv(paths["weekly_model_spread"], index=False)
+    monthly.to_csv(paths["monthly_indices"], index=False)
+    model_monthly.to_csv(paths["monthly_model_specific"], index=False)
+    monthly_spread.to_csv(paths["monthly_model_spread"], index=False)
     score_summary.to_csv(paths["model_score_summary"], index=False)
     differences.to_csv(paths["pairwise_score_differences"], index=False)
     ranking.to_csv(paths["topsis_model_ranking"], index=False)
@@ -832,7 +1020,9 @@ def write_outputs(
             "secondary_breadth": "equal-weight mean of seven dimension-level cross-model medians",
         },
         "index_construction": {
-            "frequency": args.frequency,
+            "primary_frequency": "monthly",
+            "weekly_robustness_frequency": args.frequency,
+            "monthly_frequency": args.monthly_frequency,
             "minimum_models": args.minimum_models,
             "duplicate_penalty": args.duplicate_penalty,
             "novelty_formula": {
@@ -855,12 +1045,17 @@ def write_outputs(
                 "Global event cluster size is descriptive only; model index weights are "
                 "recomputed within each contemporaneously available aggregation period."
             ),
-            "media_correction": args.media_correction,
+            "weekly_media_correction": args.media_correction,
             "media_formula": {
                 "log": "weekly weighted sum / log(1 + weekly article count)",
                 "mean": "weekly weighted sum / weekly article count",
                 "none": "weekly weighted sum",
             }[args.media_correction],
+            "monthly_primary_formula": (
+                "Direct article-level monthly event-weighted score sum divided by "
+                "sqrt(monthly effective article count), followed by causal EMA(3); "
+                "event_id_monthly is used and no weekly index value is averaged."
+            ),
             "full_sample_zscore_warning": "Descriptive only; do not use in forecasting.",
             "realtime_zscore": (
                 f"Current value standardized using prior observations only; minimum "
@@ -906,6 +1101,8 @@ def main() -> None:
         raise ValueError("minimum-models must be between 1 and 3")
     if args.expanding_min_periods < 2:
         raise ValueError("expanding-min-periods must be at least 2")
+    if args.monthly_expanding_min_periods < 2:
+        raise ValueError("monthly-expanding-min-periods must be at least 2")
 
     logger, log_path = configure_logging(args.log_dir.resolve(), args.version)
     logger.info("Starting MSDI build version=%s", args.version)
@@ -917,33 +1114,67 @@ def main() -> None:
     scores = read_scores(scores_path, registry, logger, event_profile)
     aliases = [str(item["alias"]) for item in registry]
 
-    article, diagnostics = build_article_scores(
+    article_base, diagnostics = build_article_scores(
         scores,
         aliases,
         args.minimum_models,
         args.duplicate_penalty,
         logger,
     )
-    article = apply_period_event_weights(article, args.frequency, args.event_penalty)
-    diagnostics["event_clustering"] = {
-        "unique_events": int(article["event_id"].nunique()),
-        "multi_article_events_global_descriptive": int(
-            article.groupby("event_id")["article_id"].nunique().gt(1).sum()
-        ),
-        "articles_in_multi_article_events_global_descriptive": int(
-            article["event_cluster_size"].gt(1).sum()
-        ),
-        "period_local_weighting": args.event_penalty,
-        "event_profile": event_profile,
-        "maximum_event_period_article_count": int(article["event_period_article_count"].max()),
-    }
+    weekly_article = apply_period_event_weights(
+        select_event_profile(article_base, "weekly"), args.frequency, args.event_penalty
+    )
+    monthly_article = apply_period_event_weights(
+        select_event_profile(article_base, "monthly"),
+        args.monthly_frequency,
+        args.event_penalty,
+    )
+    # The canonical article table exposes the monthly-primary generic fields and
+    # retains both frequency-specific audit weights for downstream robustness.
+    article = monthly_article.copy()
+    for column in (
+        "event_period_article_count",
+        "event_period_source_weight_sum",
+        "novelty_weight",
+        "peak_weighted_contribution",
+        "breadth_weighted_contribution",
+    ):
+        article[f"{column}_monthly"] = monthly_article[column]
+        article[f"{column}_weekly"] = weekly_article[column]
+    diagnostics["event_clustering"] = {}
+    for profile, weighted in (("weekly", weekly_article), ("monthly", monthly_article)):
+        eligible_weighted = weighted[weighted["ensemble_eligible"]]
+        diagnostics["event_clustering"][profile] = {
+            "unique_events": int(eligible_weighted["event_id"].nunique()),
+            "multi_article_events_global_descriptive": int(
+                eligible_weighted.groupby("event_id")["article_id"].nunique().gt(1).sum()
+            ),
+            "articles_in_multi_article_events_global_descriptive": int(
+                eligible_weighted["event_cluster_size"].gt(1).sum()
+            ),
+            "period_local_weighting": args.event_penalty,
+            "maximum_event_period_article_count": int(
+                eligible_weighted["event_period_article_count"].max()
+            ),
+            "ineligible_articles_receive_zero_event_weight": True,
+        }
     weekly = aggregate_weekly(
-        article, args.frequency, args.media_correction, args.expanding_min_periods
+        weekly_article, args.frequency, args.media_correction, args.expanding_min_periods
     )
     model_weekly = aggregate_model_weekly(
-        article, aliases, args.frequency, args.media_correction
+        weekly_article, aliases, args.frequency, args.media_correction
     )
-    spread = build_model_spread(model_weekly, aliases)
+    weekly_spread = build_model_spread(model_weekly, aliases, "week_ending")
+    monthly = aggregate_monthly_direct(
+        monthly_article,
+        args.monthly_frequency,
+        args.monthly_expanding_min_periods,
+        ema_span=3,
+    )
+    model_monthly = aggregate_model_monthly_direct(
+        monthly_article, aliases, args.monthly_frequency, ema_span=3
+    )
+    monthly_spread = build_model_spread(model_monthly, aliases, "month_end")
     score_summary = model_score_summary(scores, aliases)
     differences = pairwise_difference_summary(scores, aliases)
     operational = operational_model_table(scores, registry, aliases)
@@ -954,6 +1185,12 @@ def main() -> None:
         len(weekly),
         weekly["week_ending"].min(),
         weekly["week_ending"].max(),
+    )
+    logger.info(
+        "Monthly primary coverage: periods=%s first=%s last=%s",
+        len(monthly),
+        monthly["month_end"].min(),
+        monthly["month_end"].max(),
     )
     for _, row in ranking.iterrows():
         logger.info(
@@ -969,7 +1206,10 @@ def main() -> None:
         article,
         weekly,
         model_weekly,
-        spread,
+        weekly_spread,
+        monthly,
+        model_monthly,
+        monthly_spread,
         score_summary,
         differences,
         ranking,

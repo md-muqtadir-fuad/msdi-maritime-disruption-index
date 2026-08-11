@@ -2,7 +2,7 @@
 
 Stage 10 is presentation-only. It verifies every upstream manifest and source
 artifact before reading results, creates deterministic publication artifacts,
-and preserves three hard boundaries: weekly evidence is primary, monthly
+and preserves three hard boundaries: monthly evidence is primary, weekly
 evidence is robustness, and observational results do not authorize causality.
 """
 
@@ -34,7 +34,7 @@ import yaml
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = PROJECT_ROOT / "configs/publication_outputs.yaml"
 CANONICAL_CONFIG_SHA256 = (
-    "8cd17fa6681376c746b733ea549b354d4f14f461f28b39ed994a0e9fa98fa3da"
+    "6472a2726c0c5c683a59268fdf1b482a2b0c6232e8fd9afdd766350d6c746276"
 )
 
 PUBLICATION_LABELS = {
@@ -42,6 +42,7 @@ PUBLICATION_LABELS = {
     "qwen_3_8b": "Qwen3-8B",
     "qwen_2_5_7b": "Qwen2.5-7B",
     "gemma_2_9b_it": "Gemma 2 9B IT",
+    "glm_4_9b_0414": "GLM-4-9B",
     "forecast_equal_mean": "Equal-weight forecast",
     "forecast_nnls_stack": "NNLS forecast stack",
     "score_mean": "Mean-score ensemble",
@@ -517,7 +518,7 @@ def summarize_sensitivity(
                 "evidence_stream": evidence_stream,
                 "frequency": frequency,
                 "frequency_role": (
-                    "primary" if frequency == "weekly" else "robustness"
+                    "primary" if frequency == "monthly" else "robustness"
                 ),
                 "rows_or_tests": int(len(subset)),
                 "adjusted_rejections_any_registered_stream": int(rejection.sum()),
@@ -631,7 +632,7 @@ def select_forecast_trajectories(
     if not actual_consistency.eq(1).all():
         raise ValueError("Actual SCFI level differs within a trajectory target date")
     selected["frequency_role"] = np.where(
-        selected["frequency"].eq("weekly"), "primary", "robustness"
+        selected["frequency"].eq("monthly"), "primary", "robustness"
     )
     selected["level_error_observed_minus_forecast"] = (
         pd.to_numeric(selected["actual_scfi_level"], errors="raise")
@@ -687,10 +688,10 @@ def build_tables(
                 "publication_eligible_without_human_validation": False,
                 "causal_claim_allowed": False,
                 "role": (
-                    "primary_weekly"
-                    if stage == "weekly_llm"
-                    else "monthly_robustness"
+                    "monthly_primary"
                     if stage == "monthly_llm"
+                    else "weekly_higher_frequency_robustness"
+                    if stage == "weekly_llm"
                     else "supporting_analysis"
                 ),
             }
@@ -710,23 +711,28 @@ def build_tables(
 
     weekly_rank = read_csv_output(audited, "weekly_llm", "llm_ranking")
     weekly_rank["frequency"] = "weekly"
-    weekly_rank["frequency_role"] = "primary"
+    weekly_rank["frequency_role"] = "robustness"
     weekly_rank["formal_superiority_claim_allowed"] = False
     monthly_rank = read_csv_output(audited, "monthly_llm", "llm_ranking")
     monthly_rank["frequency"] = "monthly"
-    monthly_rank["frequency_role"] = "robustness"
+    monthly_rank["frequency_role"] = "primary"
     monthly_rank["formal_superiority_claim_allowed"] = False
+    monthly_primary_rank = monthly_rank.loc[
+        monthly_rank["index_construction"].eq("adapted_pdf_sqrt_ema3")
+    ].copy()
+    if monthly_primary_rank.empty:
+        raise ValueError("Monthly LLM ranking lacks adapted_pdf_sqrt_ema3 primary rows")
 
     weekly_predictor = read_csv_output(
         audited, "weekly_llm", "primary_predictor_ranking"
     )
     weekly_predictor["frequency"] = "weekly"
-    weekly_predictor["frequency_role"] = "primary"
+    weekly_predictor["frequency_role"] = "robustness"
     monthly_predictor = read_csv_output(
         audited, "monthly_llm", "primary_predictor_ranking"
     )
     monthly_predictor["frequency"] = "monthly"
-    monthly_predictor["frequency_role"] = "robustness"
+    monthly_predictor["frequency_role"] = "primary"
     predictor_ranking = pd.concat(
         [weekly_predictor, monthly_predictor], ignore_index=True, sort=False
     )
@@ -766,7 +772,7 @@ def build_tables(
     )
 
     nonlinear = read_csv_output(audited, "nonlinear_forecasts", "pipeline_ranking")
-    nonlinear["weekly_is_primary"] = nonlinear["frequency"].eq("weekly")
+    nonlinear["frequency_is_primary"] = nonlinear["frequency"].eq("monthly")
     nonlinear["ranking_is_point_estimate_not_significance"] = True
     nonlinear_predictions = read_csv_output(
         audited, "nonlinear_forecasts", "predictions"
@@ -779,7 +785,7 @@ def build_tables(
         audited, "time_series_causality", "local_projections"
     )
     local_projection["frequency_role"] = np.where(
-        local_projection["frequency"].eq("weekly"), "primary", "robustness"
+        local_projection["frequency"].eq("monthly"), "primary", "robustness"
     )
     local_projection["causal_claim_allowed"] = False
 
@@ -793,7 +799,7 @@ def build_tables(
     conventional["granger_design"] = "conventional"
     granger = pd.concat([conditional, conventional], ignore_index=True, sort=False)
     granger["frequency_role"] = np.where(
-        granger["frequency"].eq("weekly"), "primary", "robustness"
+        granger["frequency"].eq("monthly"), "primary", "robustness"
     )
     granger["causal_claim_allowed"] = False
 
@@ -816,7 +822,7 @@ def build_tables(
         .reset_index()
     )
     pcmci_summary["frequency_role"] = np.where(
-        pcmci_summary["frequency"].eq("weekly"), "primary", "robustness"
+        pcmci_summary["frequency"].eq("monthly"), "primary", "robustness"
     )
     pcmci_summary["interpretation"] = "temporal_dependence_not_structural_causality"
 
@@ -995,7 +1001,7 @@ def build_tables(
 
     main_tables = {
         "T01_analysis_status": pd.DataFrame(status_rows),
-        "T02_weekly_llm_point_ranking": weekly_rank,
+        "T02_monthly_llm_point_ranking": monthly_primary_rank,
         "T03_predictor_ranking": predictor_ranking,
         "T04_primary_forecast_inference": primary_compact,
         "T05_nonlinear_pipeline_ranking": nonlinear,
@@ -1012,6 +1018,8 @@ def build_tables(
         "T16_monthly_constructions": monthly_construction,
     }
     supplements = {
+        "S00_weekly_llm_point_ranking": weekly_rank,
+        "S00b_all_monthly_llm_point_rankings": monthly_rank,
         "S01_full_ablation": robustness_frames["ablation"],
         "S02_forecast_regime": robustness_frames["forecast_regime"],
         "S03_significant_pcmci_links": pcmci.loc[
@@ -1070,26 +1078,30 @@ def save_figure(
 
 
 def plot_timeline(panel: pd.DataFrame, colors: Mapping[str, str]) -> plt.Figure:
-    required = {
-        "observation_date",
-        "scfi_log",
-        "llm_signal__score_median__overall_disruption_max",
-        "llm_signal__score_median__dimension_mean7",
-    }
+    date_column = "month_ending"
+    scfi_column = "scfi_monthly_mean_log"
+    peak_column = (
+        "llm_monthly_signal__adapted_pdf_sqrt_ema3__score_median__"
+        "overall_disruption_max"
+    )
+    breadth_column = (
+        "llm_monthly_signal__adapted_pdf_sqrt_ema3__score_median__dimension_mean7"
+    )
+    required = {date_column, scfi_column, peak_column, breadth_column}
     missing = required.difference(panel.columns)
     if missing:
-        raise ValueError(f"Weekly panel lacks timeline columns: {sorted(missing)}")
+        raise ValueError(f"Monthly primary panel lacks timeline columns: {sorted(missing)}")
     data = panel.loc[:, sorted(required)].copy()
-    data["observation_date"] = pd.to_datetime(data["observation_date"], errors="raise")
+    data[date_column] = pd.to_datetime(data[date_column], errors="raise")
     series = {
-        "SCFI (log)": "scfi_log",
-        "Peak MSDI (median overall max)": "llm_signal__score_median__overall_disruption_max",
-        "Breadth MSDI (mean of 7 dimensions)": "llm_signal__score_median__dimension_mean7",
+        "SCFI (log)": scfi_column,
+        "Peak MSDI (median overall max)": peak_column,
+        "Breadth MSDI (mean of 7 dimensions)": breadth_column,
     }
     fig, ax = plt.subplots(figsize=(11.5, 5.2))
     palette = [colors["primary"], colors["secondary"], "#2f855a"]
     for (label, column), color in zip(series.items(), palette):
-        ax.plot(data["observation_date"], safe_zscore(data[column]), label=label, color=color, lw=1.35)
+        ax.plot(data[date_column], safe_zscore(data[column]), label=label, color=color, lw=1.35)
     ax.axhline(0.0, color="#6b7280", lw=0.7)
     ax.set(ylabel="Standardized value (descriptive)", xlabel="")
     ax.legend(ncol=3, loc="upper left")
@@ -1256,7 +1268,7 @@ def plot_ablation(ablation: pd.DataFrame, colors: Mapping[str, str]) -> plt.Figu
         ax.axvline(0.0, color="#111827", lw=0.8)
         ax.set_title(
             f"{publication_label(frequency)} "
-            f"({'primary' if frequency == 'weekly' else 'robustness'})"
+            f"({'primary' if frequency == 'monthly' else 'robustness'})"
         )
         ax.set_xlabel("Variant RMSE improvement over baseline (%)")
         ax.tick_params(axis="y", labelsize=7)
@@ -1776,17 +1788,17 @@ def build_figures(
     }
     formats = [str(value).lower() for value in settings["formats"]]
     dpi = int(settings["dpi"])
-    panel = read_csv_output(audited, "weekly_llm", "aligned_panel")
+    panel = read_csv_output(audited, "monthly_llm", "monthly_panel")
     pcmci = read_csv_output(audited, "time_series_causality", "pcmci_links")
     pcmci["significant_fdr_bool"] = strict_bool_series(
         pcmci["significant_fdr"], "significant_fdr"
     )
     irf = read_csv_output(audited, "time_series_causality", "var_impulse_responses")
     figure_specs = [
-        ("figure01_weekly_msdi_scfi_timeline", plot_timeline(panel, colors)),
+        ("figure01_monthly_msdi_scfi_timeline", plot_timeline(panel, colors)),
         (
-            "figure02_weekly_llm_point_ranking",
-            plot_llm_ranking(main_tables["T02_weekly_llm_point_ranking"], colors),
+            "figure02_monthly_llm_point_ranking",
+            plot_llm_ranking(main_tables["T02_monthly_llm_point_ranking"], colors),
         ),
         (
             "figure03_primary_forecast_effects",
@@ -1886,7 +1898,7 @@ def make_results_report(
     supplements: Mapping[str, pd.DataFrame],
     source_audit: pd.DataFrame,
 ) -> str:
-    ranking = main["T02_weekly_llm_point_ranking"].sort_values(
+    ranking = main["T02_monthly_llm_point_ranking"].sort_values(
         "predictive_point_rank"
     )
     best = ranking.iloc[0]
@@ -1927,11 +1939,11 @@ def make_results_report(
         "",
         "## Frozen interpretation",
         "",
-        "Weekly results are primary and monthly results are pre-specified robustness. Forecast ranks are descriptive point ranks. Granger, PCMCI, VAR, local projections, and DML are observational/predictive analyses and do not authorize structural causal claims.",
+        "Monthly results are primary and weekly results are pre-specified higher-frequency robustness. Forecast ranks are descriptive point ranks. Granger, PCMCI, VAR, local projections, and DML are observational/predictive analyses and do not authorize structural causal claims.",
         "",
         "## Main computational findings",
         "",
-        f"- The weekly LLM point-ranking leader is `{best['score_source']}` (rank {int(best['predictive_point_rank'])}; mean relative RMSE versus coverage-only baseline {float(best['mean_relative_rmse_vs_coverage']):.3f}). This is not formal pairwise superiority.",
+        f"- The direct monthly LLM point-ranking leader is `{best['score_source']}` (rank {int(best['predictive_point_rank'])}; mean relative RMSE versus coverage-only baseline {float(best['mean_relative_rmse_vs_coverage']):.3f}). This is not formal pairwise superiority.",
         f"- Across {primary_tests} registered primary forecast hypotheses, {improvements} Holm-adjusted result(s) favor the challenger and {worsenings} favor the baseline. No economic-importance claim is permitted.",
         f"- The ablation registry contains {len(ablation):,} comparisons; {ablation_rejections} rows trigger an adjusted rejection in a registered stream. Direction and magnitude must be read from the corresponding effect columns.",
         f"- PCMCI contains {pcmci_links} FDR-significant link-lag entries and the consolidated Granger table contains {granger_rejections} Holm-adjusted rejection(s). These are temporal-dependence findings only.",
@@ -2075,9 +2087,11 @@ def run(args: argparse.Namespace) -> Path:
     )
     if len(primary_inference) != int(config["expected"]["primary_forecast_hypotheses"]):
         raise ValueError("Primary forecast hypothesis count changed from frozen contract")
-    if adjusted_improvements != int(config["expected"]["adjusted_primary_improvements"]):
+    expected_improvements = config["expected"].get("adjusted_primary_improvements")
+    if expected_improvements is not None and adjusted_improvements != int(expected_improvements):
         raise ValueError("Primary improvement count changed from frozen contract")
-    if adjusted_worsenings != int(config["expected"]["adjusted_primary_worsenings"]):
+    expected_worsenings = config["expected"].get("adjusted_primary_worsenings")
+    if expected_worsenings is not None and adjusted_worsenings != int(expected_worsenings):
         raise ValueError("Primary worsening count changed from frozen contract")
     hashes, sizes = output_inventory(written)
     manifest_path = reports_dir / f"{version}_{output_config['manifest_suffix']}"
@@ -2092,8 +2106,11 @@ def run(args: argparse.Namespace) -> Path:
         "human_validation_required": True,
         "causal_claim_allowed": False,
         "economic_importance_claim_allowed": False,
-        "primary_frequency": "weekly",
-        "monthly_role": "robustness",
+        "primary_frequency": "monthly",
+        "weekly_role": "higher_frequency_robustness",
+        "primary_forecast_hypotheses": int(len(primary_inference)),
+        "adjusted_primary_improvements": adjusted_improvements,
+        "adjusted_primary_worsenings": adjusted_worsenings,
         "source_contracts_all_passed": bool(source_audit["contract_passed"].all()),
         "source_manifest_sha256": {
             stage: item["manifest_sha256"] for stage, item in audited.items()

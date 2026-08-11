@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+import tempfile
 import unittest
 
 import numpy as np
@@ -25,6 +26,49 @@ def msdi_frame(dates: list[str]) -> pd.DataFrame:
 
 
 class BuildModelPanelsTests(unittest.TestCase):
+    def test_obsolete_generic_unctad_control_is_not_silently_substituted(self) -> None:
+        frame = pd.DataFrame(
+            {
+                "variable": [
+                    "cpb_world_trade_volume",
+                    "gscpi",
+                    "unctad_lsbci",
+                    "imf_portwatch_global_container_calls",
+                ],
+                "availability_date": ["2024-01-01"] * 4,
+                "value": [1.0] * 4,
+                "source_frequency": ["monthly", "monthly", "annual", "daily"],
+            }
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "controls.csv"
+            frame.to_csv(path, index=False)
+            with self.assertRaisesRegex(ValueError, "obsolete generic"):
+                MODULE.load_external_controls(path)
+
+    def test_annual_control_is_backward_joined_with_annual_validity(self) -> None:
+        panel = pd.DataFrame(
+            {
+                "observation_date": pd.to_datetime(
+                    ["2025-05-01", "2025-09-01"]
+                )
+            }
+        )
+        controls = pd.DataFrame(
+            {
+                "variable": ["unctad_china_core_lane_lsbci"],
+                "availability_date": pd.to_datetime(["2024-05-15"]),
+                "value": [0.7],
+                "source_frequency": ["annual"],
+            }
+        )
+        result, audit = MODULE.attach_external_controls(panel, controls)
+        self.assertEqual(result.loc[0, "unctad_china_core_lane_lsbci"], 0.7)
+        self.assertTrue(pd.isna(result.loc[1, "unctad_china_core_lane_lsbci"]))
+        self.assertEqual(
+            audit["unctad_china_core_lane_lsbci"]["maximum_age_days"], 455
+        )
+
     def test_backward_join_never_uses_future_or_stale_features(self) -> None:
         left = pd.DataFrame(
             {"observation_date": pd.to_datetime(["2024-01-08", "2024-01-15"])}
@@ -86,6 +130,32 @@ class BuildModelPanelsTests(unittest.TestCase):
         self.assertEqual(february["msdi_available_weeks"], 0)
         self.assertTrue(np.isnan(february["peak_score_media_corrected_sum"]))
         self.assertTrue(np.isnan(february["article_count_sum"]))
+
+    def test_direct_monthly_msdi_replaces_weekly_monthly_average(self) -> None:
+        weekly = pd.DataFrame(
+            {
+                "observation_date": pd.to_datetime(["2024-01-08", "2024-01-15"]),
+                "scfi": [100.0, 101.0],
+                "brent_price": [70.0, 71.0],
+            }
+        )
+        for column in MODULE.MSDI_BASE_COLUMNS:
+            weekly[column] = 99.0
+        direct = pd.DataFrame(
+            {
+                "month_ending": pd.to_datetime(["2024-01-31"]),
+                "article_count": [10],
+                "event_count": [8],
+                "source_count": [4],
+                "effective_article_count": [8.0],
+                "peak_score_media_corrected": [2.5],
+                "breadth_score_media_corrected": [1.5],
+            }
+        )
+        monthly, _ = MODULE.build_monthly_panel(weekly, direct)
+        self.assertEqual(monthly.loc[0, "peak_score_media_corrected_mean"], 2.5)
+        self.assertEqual(monthly.loc[0, "breadth_score_media_corrected_mean"], 1.5)
+        self.assertEqual(monthly.loc[0, "article_count_sum"], 10)
 
 
 if __name__ == "__main__":

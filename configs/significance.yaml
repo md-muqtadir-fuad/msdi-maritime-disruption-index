@@ -11,9 +11,9 @@ identification:
 analysis:
   alpha: 0.05
   confidence_level: 0.95
-  primary_frequency: weekly
-  monthly_role: robustness
-  frozen_common_article_cohort: 6481
+  primary_frequency: monthly
+  weekly_role: higher_frequency_robustness
+  frozen_common_article_cohort: 6480
 
 inputs:
   error_diagnostics_manifest: outputs/diagnostics/error_diagnostics_v001_manifest.json
@@ -56,16 +56,14 @@ inputs:
       manifest_version: llm_scfi_v001
       manifest_status: provisional_pending_human_validation
       output_key: statistical_tests
-      expected_rows: 1125
-      legacy_fallback_rows: 1125
-      legacy_fallback_sha256: 880154b9b0ad81c9a27a1cbf69b046f14439c397587e020a76600921c63862a2
+      expected_rows: null
+      require_manifest_output_contract: true
     monthly_llm:
       manifest_version: llm_scfi_monthly_v001
       manifest_status: provisional_pending_human_validation
       output_key: statistical_tests
-      expected_rows: 1620
-      legacy_fallback_rows: 1620
-      legacy_fallback_sha256: 703367d2309e9a85b8c263cad930719242216e543c330f11e14360d7ee330a31
+      expected_rows: null
+      require_manifest_output_contract: true
 
 upstream_contracts:
   error_diagnostics_version: error_diagnostics_v001
@@ -79,21 +77,22 @@ upstream_contracts:
   require_causal_claim_allowed_false: true
   fail_closed: true
 
-# Earliest frozen family ownership is retained. Stage 09's five-row peak-only
-# family is a semantic subset of the 40-row Stage 07b hybrid family and may not
+# Earliest frozen family ownership is retained. Stage 09's three-row direct
+# monthly peak-only family is a semantic subset of the Stage 07c hybrid family and may not
 # be used to shrink the multiplicity burden after results are known.
 confirmatory_primary_families:
-  source_table: weekly_llm_statistical_tests
+  source_table: stage07c_monthly_llm_statistical_tests
   family_ids:
-    - primary_hybrid_vs_baseline__diebold_mariano_squared
-    - primary_llm_pairwise__diebold_mariano_squared
-    - primary_llm_vs_baseline__diebold_mariano_squared
+    - monthly_primary_hybrid_vs_coverage__diebold_mariano_squared
+    - monthly_primary_llm_pairwise__diebold_mariano_squared
+    - monthly_primary_llm_vs_coverage__diebold_mariano_squared
   expected_family_sizes:
-    primary_hybrid_vs_baseline__diebold_mariano_squared: 40
-    primary_llm_pairwise__diebold_mariano_squared: 30
-    primary_llm_vs_baseline__diebold_mariano_squared: 30
-  frequency: weekly
-  horizons: [1, 2, 4, 8, 12]
+    monthly_primary_hybrid_vs_coverage__diebold_mariano_squared: 24
+    monthly_primary_llm_pairwise__diebold_mariano_squared: 36
+    monthly_primary_llm_vs_coverage__diebold_mariano_squared: 24
+  frequency: monthly
+  index_construction: adapted_pdf_sqrt_ema3
+  horizons: [1, 3, 6]
   main_test: diebold_mariano_hac_two_sided
   effect_convention: baseline_loss_minus_challenger_loss
   positive_effect_interpretation: challenger_improves_forecast_accuracy
@@ -129,8 +128,8 @@ semantic_duplicate_contract:
   expected_stage09_duplicate_rows_by_frequency:
     weekly: 20
     monthly: 24
-  expected_reassigned_primary_rows: 5
-  stage09_reassigned_family_id: primary_weekly_peak_vs_no_msdi
+  expected_reassigned_primary_rows: 3
+  stage09_reassigned_family_id: primary_monthly_peak_vs_no_msdi
   retain_stage09_bootstrap_and_clark_west_as_sensitivity: true
   duplicate_rows_excluded_from_canonical_discoveries: true
   duplicate_rows_retained_in_original_family_reconciliation: true
@@ -208,45 +207,18 @@ registry_sources:
     exploratory_prefix: exploratory_
     preserve_upstream_family_and_method: true
   stage07c_monthly_llm:
-    monthly_primary_role: prespecified_secondary
+    monthly_primary_role: confirmatory_primary_for_direct_monthly_construction
     monthly_exploratory_role: exploratory
     preserve_upstream_family_and_method: true
   stage09b_raw_handoff:
     include_all_valid_rows: true
-    expected_rows: 6910
+    expected_rows: null
     final_primary_family_true_role: primary_diagnostic
     final_primary_family_false_role: exploratory
     upstream_primary_family_is_audit_only: true
     correction_key_includes_role: true
-    expected_diagnostic_family_sizes:
-      forecast_arch_lm__monthly: 342
-      forecast_arch_lm__weekly: 285
-      forecast_bias__monthly: 510
-      forecast_bias__weekly: 450
-      forecast_calibration__monthly: 342
-      forecast_calibration__weekly: 285
-      forecast_error_drivers__monthly: 418
-      forecast_error_drivers__weekly: 1045
-      forecast_jarque_bera__monthly: 114
-      forecast_jarque_bera__weekly: 95
-      forecast_ljung_box__monthly: 342
-      forecast_ljung_box__weekly: 285
-      forecast_stability_cusum__monthly: 114
-      forecast_stability_cusum__weekly: 95
-      forecast_stability_regime__monthly: 114
-      forecast_stability_regime__weekly: 95
-      forecast_stability_trend__monthly: 114
-      forecast_stability_trend__weekly: 95
-    expected_primary_diagnostic_family_sizes:
-      forecast_arch_lm__weekly: 60
-      forecast_bias__weekly: 20
-      forecast_calibration__weekly: 60
-      forecast_error_drivers__weekly: 220
-      forecast_jarque_bera__weekly: 20
-      forecast_ljung_box__weekly: 60
-      forecast_stability_cusum__weekly: 20
-      forecast_stability_regime__weekly: 20
-      forecast_stability_trend__weekly: 20
+    expected_diagnostic_family_sizes: {}
+    expected_primary_diagnostic_family_sizes: {}
   stage09_ablation:
     p_value: dm_hac_p_value
     effect_size: mean_loss_difference
@@ -258,7 +230,7 @@ registry_sources:
       - index_construction
       - sample_subset
       - loss
-    expected_rows: 1806
+    expected_rows: null
     supporting_streams_are_metadata_not_registry_rows: true
   stage09_nonlinear:
     p_value: p_value
@@ -266,7 +238,7 @@ registry_sources:
     standard_error: standard_error
     role: prespecified_secondary
     preserve_upstream_holm: true
-    expected_rows: 1540
+    expected_rows: null
     expected_algorithms: [glm, lstm, prophet, random_forest, xgboost]
   stage09_peak_breadth:
     p_value: shared_bootstrap_p_value
@@ -321,9 +293,9 @@ registry_sources:
       stage09_future_lead_placebos: 16
 
 expected_registry_counts:
-  main_rows_before_semantic_deduplication: 13993
-  semantic_duplicate_rows: 335
-  canonical_main_rows: 13658
+  main_rows_before_semantic_deduplication: null
+  semantic_duplicate_rows: null
+  canonical_main_rows: null
   supporting_bootstrap_and_clark_west_are_not_main_rows: true
 
 claim_guardrails:
@@ -374,7 +346,7 @@ output_contract:
     - upstream_adjustment_coverage
     - all_uncertainty_effect_size_gates
     - no_causal_claim_allowed
-    - monthly_robustness_present
+    - monthly_primary_present
   required_registry_fields:
     - hypothesis_id
     - semantic_key

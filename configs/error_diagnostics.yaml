@@ -8,9 +8,9 @@ identification:
   diagnostic_pass_does_not_validate_identification: true
 
 analysis:
-  primary_frequency: weekly
-  monthly_role: robustness
-  frozen_common_article_cohort: 6481
+  primary_frequency: monthly
+  weekly_role: higher_frequency_robustness
+  frozen_common_article_cohort: 6480
   common_cohort_required: true
   score_scale: [0, 4]
   weekly_index_construction: weekly_log_volume
@@ -287,22 +287,9 @@ output_contract:
   atomic_writes: true
   publication_run_rejects_debug_limits: true
   manifest_causal_claim_allowed: false
-  # Design-derived row counts for the canonical five-algorithm diagnostic run.
-  # Debug/subset runs are never compared with these publication-scope counts.
-  expected_full_row_counts:
-    forecast_error_observations: 187040
-    forecast_error_summary: 960
-    forecast_error_by_operational_regime: 513
-    forecast_error_by_volatility_regime: 418
-    forecast_error_by_disruption_type: 1330
-    forecast_residual_tests: 1463
-    mincer_zarnowitz_calibration: 209
-    forecast_stability: 627
-    forecast_influence_summary: 209
-    error_driver_coefficients: 2508
-    error_driver_performance: 418
-    extreme_forecast_cases: 880
-    raw_significance_handoff: 6910
+  # Four-model output sizes are frozen in this stage's manifest after the
+  # complete run. Do not inherit row counts from an earlier scorer set.
+  expected_full_row_counts: {}
   tables:
     - forecast_error_summary
     - forecast_error_by_operational_regime

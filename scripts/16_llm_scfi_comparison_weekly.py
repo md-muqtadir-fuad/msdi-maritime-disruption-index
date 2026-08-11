@@ -1,4 +1,4 @@
-"""Compare three LLM score paths and leakage-safe hybrids for SCFI prediction.
+"""Compare four LLM score paths and leakage-safe hybrids for SCFI prediction.
 
 This stage answers a measurement-model question that the consensus forecast
 benchmark cannot answer: which individual LLM score series contains the most
@@ -69,7 +69,11 @@ PRIMARY_SIGNALS = (PRIMARY_SCORE_COLUMN, "dimension_mean7")
 SIGNALS = (PRIMARY_SCORE_COLUMN, "dimension_mean7", *DIMENSION_COLUMNS)
 SCORE_HYBRID_SOURCES = ("score_median", "score_mean")
 PRICE_OVERLAP_SIGNAL = "freight_cost_disruption_score"
-EXPECTED_COMMON_COHORT_SIZE = 6481
+EXPECTED_COMMON_COHORT_SIZE = 6480
+NOVELTY_WEIGHTING_PROVENANCE = (
+    "source duplicate weights are renormalized within each weekly event "
+    "using only the frozen common article cohort"
+)
 
 AR_FEATURES = (
     "scfi_log",
@@ -150,7 +154,7 @@ def parse_args() -> argparse.Namespace:
         type=int,
         default=EXPECTED_COMMON_COHORT_SIZE,
         help=(
-            "Fail closed unless the frozen all-three-LLM complete cohort has this size. "
+            "Fail closed unless the frozen all-four-LLM complete cohort has this size. "
             "Change only when intentionally versioning a new input dataset."
         ),
     )
@@ -216,8 +220,8 @@ def load_model_aliases(path: Path) -> list[str]:
 
 def validate_model_aliases(aliases: Iterable[str]) -> list[str]:
     result = list(aliases)
-    if len(result) != 3:
-        raise ValueError(f"Exactly three model aliases are required; found {result}")
+    if len(result) != 4:
+        raise ValueError(f"Exactly four model aliases are required; found {result}")
     if any(not alias for alias in result):
         raise ValueError("Model aliases cannot be blank")
     if len(set(result)) != len(result):
@@ -262,10 +266,17 @@ def load_article_scores(
         for alias in aliases
         for signal in (PRIMARY_SCORE_COLUMN, *DIMENSION_COLUMNS)
     ]
+    available = set(pd.read_csv(resolved, nrows=0).columns)
+    event_weight_columns = [
+        "source_duplicate_weight",
+        "event_id_weekly",
+        "event_id_monthly",
+    ]
+    has_profile_event_fields = set(event_weight_columns).issubset(available)
     required = [
         "article_id",
         "publication_date",
-        "novelty_weight",
+        *(event_weight_columns if has_profile_event_fields else ["novelty_weight"]),
         *required_score_columns,
     ]
     frame = pd.read_csv(resolved, usecols=required, low_memory=False)
@@ -276,9 +287,19 @@ def load_article_scores(
     frame["publication_date"] = pd.to_datetime(
         frame["publication_date"], format="mixed", errors="coerce"
     )
-    frame["novelty_weight"] = pd.to_numeric(frame["novelty_weight"], errors="coerce")
-    if frame["novelty_weight"].isna().any() or frame["novelty_weight"].le(0).any():
-        raise ValueError("novelty_weight must be positive and nonmissing")
+    if not has_profile_event_fields:
+        # Read-only compatibility for already-generated legacy artifacts. A new
+        # Stage 13 run is required for publication analysis.
+        frame["source_duplicate_weight"] = frame.pop("novelty_weight")
+        frame["event_id_weekly"] = "ARTICLE_" + frame["article_id"].astype(str)
+        frame["event_id_monthly"] = frame["event_id_weekly"]
+    frame["source_duplicate_weight"] = pd.to_numeric(
+        frame["source_duplicate_weight"], errors="coerce"
+    )
+    if frame["source_duplicate_weight"].isna().any() or frame[
+        "source_duplicate_weight"
+    ].le(0).any():
+        raise ValueError("source_duplicate_weight must be positive and nonmissing")
     for column in required_score_columns:
         frame[column] = pd.to_numeric(frame[column], errors="coerce")
         invalid = frame[column].notna() & ~frame[column].between(0, 4)
@@ -291,7 +312,7 @@ def load_article_scores(
         required_score_columns
     ].notna().all(axis=1)
     if not common_mask.any():
-        raise ValueError("No common complete articles exist across all three LLMs")
+        raise ValueError("No common complete articles exist across all four LLMs")
     common_count = int(common_mask.sum())
     if expected_common_articles is not None and common_count != expected_common_articles:
         raise ValueError(
@@ -311,6 +332,7 @@ def load_article_scores(
         "common_first_date": frame.loc[common_mask, "publication_date"].min(),
         "common_last_date": frame.loc[common_mask, "publication_date"].max(),
         "model_availability": {},
+        "profile_specific_event_fields_present": has_profile_event_fields,
     }
     for alias in aliases:
         alias_columns = [
@@ -321,6 +343,21 @@ def load_article_scores(
             "overall_score": int(frame[f"{PRIMARY_SCORE_COLUMN}__{alias}"].notna().sum()),
         }
     frame["llm_common_complete"] = common_mask
+    frame["novelty_weight"] = 0.0
+    common = frame.loc[common_mask].copy()
+    common["_period"] = common["publication_date"].dt.to_period("W-FRI").astype(str)
+    event_id = common["event_id_weekly"].astype("string").str.strip()
+    event_id = event_id.mask(
+        event_id.isna() | event_id.eq(""), "ARTICLE_" + common["article_id"].astype(str)
+    )
+    common["_event"] = event_id
+    denominator = common.groupby(["_period", "_event"], sort=False)[
+        "source_duplicate_weight"
+    ].transform("sum")
+    common["novelty_weight"] = common["source_duplicate_weight"].div(denominator)
+    if common["novelty_weight"].isna().any() or common["novelty_weight"].le(0).any():
+        raise AssertionError("Common weekly event weights must be positive and nonmissing")
+    frame.loc[common.index, "novelty_weight"] = common["novelty_weight"]
     return frame, report
 
 
@@ -928,7 +965,7 @@ def derived_forecast_row(
         "target_date": template["target_date"],
         "horizon_weeks": int(template["horizon_weeks"]),
         "model_id": model_id,
-        "feature_set": f"forecast_hybrid_from_three_llms_{signal_name}",
+        "feature_set": f"forecast_hybrid_from_four_llms_{signal_name}",
         "source_type": "forecast_hybrid",
         "score_source": score_source,
         "signal_name": signal_name,
@@ -1612,6 +1649,9 @@ def build_common_article_export(
         "article_id",
         "publication_date",
         "novelty_weight",
+        "source_duplicate_weight",
+        "event_id_weekly",
+        "event_id_monthly",
         *[
             f"{signal}__{alias}"
             for alias in aliases
@@ -2020,7 +2060,7 @@ def main() -> None:
             "model_aliases": aliases,
             "common_article_rule": (
                 "publication date plus overall and all seven dimension scores "
-                "available for every one of the three LLMs"
+                "available for every one of the four LLMs"
             ),
             "common_cohort_is_only_score_input": True,
             "expected_common_articles": args.expected_common_articles,
@@ -2029,25 +2069,22 @@ def main() -> None:
             "model_specific_unequal_coverage_indices_used": False,
             "score_scale": [0, 4],
             "weekly_frequency": "W-FRI, right-labeled and right-closed",
-            "novelty_weighting": (
-                "input novelty_weight combines exact-duplicate correction with "
-                "availability-safe within-week canonical-event weighting"
-            ),
+            "novelty_weighting": NOVELTY_WEIGHTING_PROVENANCE,
             "media_correction": "novelty-weighted sum / log1p(common article count)",
             "signals": list(SIGNALS),
             "primary_signals": list(PRIMARY_SIGNALS),
             "score_hybrids": {
                 "score_median": (
-                    "article-level median across three LLMs; dimension_mean7 is "
+                    "article-level median across four LLMs; dimension_mean7 is "
                     "equal mean of seven dimension-specific medians"
                 ),
                 "score_mean": (
-                    "article-level equal mean across three LLMs; dimension_mean7 "
+                    "article-level equal mean across four LLMs; dimension_mean7 "
                     "is equal mean of seven dimension-specific means"
                 ),
             },
             "forecast_hybrids": {
-                "equal_mean": "equal mean of the three individual LLM forecasts",
+                "equal_mean": "equal mean of the four individual LLM forecasts",
                 "past_only_nnls": (
                     "nonnegative weights estimated only from prior OOS forecasts "
                     "whose target dates are observed by the current origin, normalized to sum one"

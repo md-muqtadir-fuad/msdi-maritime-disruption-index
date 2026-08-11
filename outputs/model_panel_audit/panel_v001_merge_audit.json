@@ -22,7 +22,7 @@
     },
     "msdi": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\05_indices\\weekly\\msdi_weekly.csv",
-      "sha256": "63ad06b71f543ec5eefa3c3be82222340783db9d4e4c217b3ca7a7dd38b3a9d3",
+      "sha256": "46e111bca8d0bb6fec1fc5a51c888197935e819bab2eedcbd988311ecc5dc921",
       "report": {
         "input_rows": 575,
         "usable_rows": 575,
@@ -35,6 +35,7 @@
         ],
         "missingness": {
           "article_count": 0,
+          "event_count": 0,
           "source_count": 0,
           "effective_article_count": 0,
           "peak_active_article_count": 0,
@@ -60,6 +61,22 @@
         }
       }
     },
+    "monthly_msdi": {
+      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\05_indices\\monthly\\msdi_monthly.csv",
+      "sha256": "4df88e6890c6c310d571f4a6a2bcfee18d79aece396b0a1806fa06fed6158f72",
+      "report": {
+        "input_rows": 133,
+        "usable_rows": 133,
+        "invalid_dates": 0,
+        "first_date": "2015-01-31T00:00:00",
+        "last_date": "2026-01-31T00:00:00",
+        "excluded_full_sample_standardized_columns": [
+          "peak_msdi_z_full_sample_descriptive",
+          "breadth_msdi_z_full_sample_descriptive"
+        ],
+        "construction": "direct_article_monthly_sqrt_effective_volume_causal_ema3"
+      }
+    },
     "brent": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\01_raw\\controls\\brent\\brent_weekly_legacy.csv",
       "sha256": "51d11e0831e2672004aaa8fbc4f2c40ee6aa18c5f00715e524f0e4222612d493",
@@ -71,6 +88,21 @@
         "first_date": "1987-05-29T00:00:00",
         "last_date": "2026-05-15T00:00:00"
       }
+    },
+    "external_controls": {
+      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\02_interim\\controls\\external_controls_clean_long.csv",
+      "sha256": "368d6ac64f3ae01706b45484750afc5499692916d700062d70713e136a93c023",
+      "report": {
+        "rows": 3442,
+        "variables": [
+          "cpb_world_trade_volume",
+          "gscpi",
+          "imf_portwatch_global_container_calls",
+          "unctad_china_core_lane_lsbci"
+        ],
+        "first_available": "1998-02-05",
+        "last_available": "2026-07-26"
+      }
     }
   },
   "alignment": {
@@ -78,7 +110,8 @@
     "maximum_feature_age_days": 6,
     "future_feature_violations": {
       "msdi": 0,
-      "brent": 0
+      "brent": 0,
+      "external_controls": 0
     },
     "panel_report": {
       "msdi_join": {
@@ -121,6 +154,36 @@
           "3": 522
         }
       },
+      "external_control_join": {
+        "cpb_world_trade_volume": {
+          "frequency": "monthly",
+          "maximum_age_days": 75,
+          "matched": 522,
+          "stale_rejected": 0,
+          "future_matches": 0
+        },
+        "gscpi": {
+          "frequency": "monthly",
+          "maximum_age_days": 75,
+          "matched": 522,
+          "stale_rejected": 0,
+          "future_matches": 0
+        },
+        "imf_portwatch_global_container_calls": {
+          "frequency": "daily",
+          "maximum_age_days": 7,
+          "matched": 370,
+          "stale_rejected": 0,
+          "future_matches": 0
+        },
+        "unctad_china_core_lane_lsbci": {
+          "frequency": "annual",
+          "maximum_age_days": 455,
+          "matched": 522,
+          "stale_rejected": 0,
+          "future_matches": 0
+        }
+      },
       "weekly_rows": 522,
       "rows_with_both_msdi_paths": 518,
       "base_model_complete_rows": 518,
@@ -129,6 +192,8 @@
     }
   },
   "forecast_design": {
+    "primary_frequency": "monthly",
+    "weekly_role": "higher_frequency_robustness",
     "weekly_horizons": [
       1,
       2,
@@ -144,7 +209,8 @@
     "random_split_created": false,
     "full_sample_zscores_included": false,
     "primary_msdi_path": "peak_score_media_corrected",
-    "secondary_msdi_path": "breadth_score_media_corrected"
+    "secondary_msdi_path": "breadth_score_media_corrected",
+    "monthly_primary_construction": "direct_article_monthly_sqrt_effective_volume_causal_ema3"
   },
   "availability": {
     "aggregate_scfi": true,

@@ -4,53 +4,69 @@
   "inputs": {
     "weekly_common_cohort_panel": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\llm_specific_scfi_weekly_panel.csv",
-      "sha256": "faeab464efecf9ffb8fb4f65adf60ccc1c989844555b35177013c5a7d872d524",
+      "sha256": "bcada4e880cd3efa9a0fb27c1421fa2f9cb80a2b526aa5f449147e4fb27a4981",
       "rows": 522
     },
     "weekly_manifest": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_manifest.json",
-      "sha256": "bf5e0590cf1d49c0eac7ebc606ed480c649d02ece691cdbbba40c5b952ab7437",
+      "sha256": "fb3219eb8d1bb5744ab20ea823d4f4125c8bae5eb969dcafbb13c62336c46489",
       "version": "llm_scfi_v001"
+    },
+    "frozen_common_article_cohort": {
+      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_common_article_cohort.csv",
+      "sha256": "d036ac64fa31540e0c309f19f08ff0e354c6f6458b039a2715b60834f6552891",
+      "rows": 6480
     },
     "model_registry": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\configs\\model_registry.yaml",
-      "sha256": "02db68a51d3c7eeab5712d7f40d52fe6e7fceac42c6f69d722e9660227a78882"
+      "sha256": "1e9c6ea271e16f4f700d79a29169a7e5eec11d95c974d4e79283c7cd5d51481a"
     },
     "code": {
-      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\scripts\\07c_monthly_llm_scfi_comparison.py",
-      "sha256": "9532233000254a22d1ac673957991f8df4bc6c102918bf6936a4a7f4cf96625a"
+      "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\scripts\\17_llm_scfi_comparison_monthly.py",
+      "sha256": "5db87f92d25dbe4610859151a94222468632e6c189de18072b1d1f3fe163d7a3"
     }
   },
   "provenance_audit": {
     "weekly_manifest_status": "provisional_pending_human_validation",
     "weekly_manifest_version": "llm_scfi_v001",
-    "common_complete_articles": 6481,
+    "common_complete_articles": 6480,
     "common_cohort_check_passed": true,
     "common_cohort_only": true,
     "broader_consensus_used": false,
     "model_aliases": [
       "gemma_2_9b_it",
       "qwen_3_8b",
-      "qwen_2_5_7b"
+      "qwen_2_5_7b",
+      "glm_4_9b_0414"
     ],
-    "weekly_manifest_sha256": "bf5e0590cf1d49c0eac7ebc606ed480c649d02ece691cdbbba40c5b952ab7437",
-    "weekly_panel_sha256": "faeab464efecf9ffb8fb4f65adf60ccc1c989844555b35177013c5a7d872d524"
+    "weekly_manifest_sha256": "fb3219eb8d1bb5744ab20ea823d4f4125c8bae5eb969dcafbb13c62336c46489",
+    "weekly_panel_sha256": "bcada4e880cd3efa9a0fb27c1421fa2f9cb80a2b526aa5f449147e4fb27a4981"
   },
   "weekly_input_audit": {
     "rows": 522,
     "first_monday": "2016-02-08T00:00:00",
     "last_monday": "2026-02-02T00:00:00",
-    "complete_weekly_rows": 518,
+    "complete_weekly_rows": 506,
     "future_signal_matches": 0,
     "unsafe_signal_ages": 0,
     "signal_age_counts": {
       "3.0": 518
     },
-    "aligned_weekly_article_count_sum": 6075,
-    "raw_signal_columns_selected": 45,
+    "aligned_weekly_article_count_sum": 6074,
+    "raw_signal_columns_selected": 54,
     "target_columns_excluded": 10,
-    "weekly_derived_signal_columns_excluded": 630,
+    "weekly_derived_signal_columns_excluded": 756,
     "broader_consensus_predictor_columns_selected": 0
+  },
+  "direct_monthly_article_audit": {
+    "common_articles": 6480,
+    "article_count_conserved": 6480,
+    "calendar_months": 133,
+    "first_month": "2015-01-31T00:00:00",
+    "last_month": "2026-01-31T00:00:00",
+    "event_profile": "monthly",
+    "event_weighting": "fixed total per event within month on frozen common cohort",
+    "formula": "weighted article score sum / sqrt(effective article count), then causal EMA(3)"
   },
   "monthly_aggregation_audit": {
     "calendar_months": 121,
@@ -58,14 +74,15 @@
     "last_month": "2026-02-28T00:00:00",
     "scfi_complete_months": 119,
     "brent_complete_months": 119,
-    "llm_complete_months": 118,
-    "analysis_complete_months": 118,
+    "llm_complete_months": 116,
+    "analysis_complete_months": 116,
     "index_constructions": [
       "mean_safe_weekly",
       "adapted_pdf_sqrt_ema3"
     ],
     "mean_safe_weekly_formula": "mean over every expected Monday of the already leakage-safe weekly novelty-weighted-sum/log1p(common-count) index",
-    "adapted_pdf_formula": "EMA(span=3, alpha=0.5, adjust=False) of monthly recovered novelty-weighted score sum divided by sqrt(monthly effective article count); EMA restarts after gaps",
+    "adapted_pdf_formula": "Direct publication-month article score sum with monthly-profile fixed-event weights, divided by sqrt(monthly effective article count), followed by EMA(span=3, alpha=0.5, adjust=False); EMA restarts after gaps",
+    "adapted_pdf_uses_direct_articles": true,
     "adapted_pdf_is_literal_replication": false,
     "zero_effective_volume_months": 0,
     "incomplete_months": [
@@ -75,6 +92,22 @@
         "observed_mondays": 4,
         "monthly_scfi_complete": false,
         "monthly_brent_complete": false,
+        "monthly_llm_complete": false
+      },
+      {
+        "month_ending": "2016-03-31T00:00:00",
+        "expected_mondays": 4,
+        "observed_mondays": 4,
+        "monthly_scfi_complete": true,
+        "monthly_brent_complete": true,
+        "monthly_llm_complete": false
+      },
+      {
+        "month_ending": "2016-04-30T00:00:00",
+        "expected_mondays": 4,
+        "observed_mondays": 4,
+        "monthly_scfi_complete": true,
+        "monthly_brent_complete": true,
         "monthly_llm_complete": false
       },
       {
@@ -97,8 +130,8 @@
   },
   "monthly_panel_audit": {
     "rows": 121,
-    "complete_model_origins": 118,
-    "first_complete_month": "2016-03-31T00:00:00",
+    "complete_model_origins": 116,
+    "first_complete_month": "2016-05-31T00:00:00",
     "last_complete_month": "2025-12-31T00:00:00",
     "target_nonmissing": {
       "1": 118,
@@ -111,20 +144,21 @@
       "mean_safe_weekly",
       "adapted_pdf_sqrt_ema3"
     ],
-    "raw_monthly_signal_columns": 90
+    "raw_monthly_signal_columns": 108
   },
   "design": {
-    "weekly_analysis_is_primary": true,
-    "monthly_analysis_role": "pre_specified_slower_dynamics_robustness",
+    "primary_frequency": "monthly",
+    "weekly_analysis_role": "higher_frequency_robustness",
     "model_aliases": [
       "gemma_2_9b_it",
       "qwen_3_8b",
-      "qwen_2_5_7b"
+      "qwen_2_5_7b",
+      "glm_4_9b_0414"
     ],
     "common_cohort_is_only_score_input": true,
-    "frozen_common_articles": 6481,
-    "safe_weekly_overlap_articles": 6075,
-    "complete_month_articles": 6040,
+    "frozen_common_articles": 6480,
+    "safe_weekly_overlap_articles": 6074,
+    "complete_month_articles": 5997,
     "score_scale": [
       0,
       4
@@ -133,15 +167,15 @@
     "partial_month_policy": "missing; never zero-filled",
     "index_constructions": {
       "mean_safe_weekly": {
-        "role": "previous_monthly_concept",
+        "role": "weekly_derived_monthly_sensitivity",
         "formula": "complete-month arithmetic mean of leakage-safe weekly indices, where weekly index = novelty-weighted score sum / log1p(common article count)"
       },
       "adapted_pdf_sqrt_ema3": {
-        "role": "pre_specified_adapted_equation_sensitivity",
-        "formula": "U_t = sum_w[I_w*log1p(n_w)]/sqrt(sum_w effective_count_w); B_t = 0.5*U_t + 0.5*B_(t-1)",
+        "role": "monthly_primary",
+        "formula": "U_t = sum_i[w_i,t*S_i]/sqrt(sum_i[w_i,t]); B_t = 0.5*U_t + 0.5*B_(t-1)",
         "ema": "one-sided span=3, alpha=0.5, adjust=False, restart after missing month",
         "literal_pdf_replication": false,
-        "adaptations": "frozen common cohort, novelty-weighted numerator, effective volume, safe Monday-month timing"
+        "adaptations": "frozen common cohort, direct publication-month article aggregation, monthly event map, period-local fixed-event weights"
       }
     },
     "construction_selection": "both paths are always reported; no selection by full-sample SCFI correlation",
@@ -188,7 +222,7 @@
     "algorithm": "Ridge",
     "ridge_alpha": 1.0,
     "forecast_hybrids": {
-      "equal_mean": "equal mean of three LLM forecasts within each construction",
+      "equal_mean": "equal mean of four LLM forecasts within each construction",
       "past_only_nnls": "nonnegative weights use only prior OOS forecasts with targets observed by the current origin; constructions are never mixed",
       "minimum_stacking_history": 24
     },
@@ -199,25 +233,25 @@
   "origin_audit": [
     {
       "horizon_months": 1,
-      "models_checked": 94,
-      "common_forecast_origins": 58,
-      "first_origin_date": "2021-03-31T00:00:00",
+      "models_checked": 112,
+      "common_forecast_origins": 56,
+      "first_origin_date": "2021-05-31T00:00:00",
       "last_origin_date": "2025-12-31T00:00:00",
       "origin_sets_identical": true
     },
     {
       "horizon_months": 3,
-      "models_checked": 94,
-      "common_forecast_origins": 54,
-      "first_origin_date": "2021-05-31T00:00:00",
+      "models_checked": 112,
+      "common_forecast_origins": 52,
+      "first_origin_date": "2021-07-31T00:00:00",
       "last_origin_date": "2025-10-31T00:00:00",
       "origin_sets_identical": true
     },
     {
       "horizon_months": 6,
-      "models_checked": 94,
-      "common_forecast_origins": 48,
-      "first_origin_date": "2021-08-31T00:00:00",
+      "models_checked": 112,
+      "common_forecast_origins": 46,
+      "first_origin_date": "2021-10-31T00:00:00",
       "last_origin_date": "2025-07-31T00:00:00",
       "origin_sets_identical": true
     }
@@ -227,15 +261,15 @@
       "index_construction": "adapted_pdf_sqrt_ema3",
       "score_source": "qwen_3_8b",
       "primary_comparison_cells": 6,
-      "mean_rmse_rank": 1.1666666666666667,
-      "mean_mae_rank": 1.3333333333333333,
-      "mean_skill_rank": 1.1666666666666667,
-      "mean_rmse_log_change": 0.5312218199613385,
-      "mean_relative_rmse_vs_coverage": 1.0538235600910715,
-      "mean_oos_r2_vs_coverage": -0.12752884197138048,
-      "mean_directional_accuracy": 0.6444098552575565,
-      "rmse_cell_wins": 5,
-      "adjusted_dm_squared_pairwise_wins": 1,
+      "mean_rmse_rank": 1.3333333333333333,
+      "mean_mae_rank": 1.6666666666666667,
+      "mean_skill_rank": 1.3333333333333333,
+      "mean_rmse_log_change": 0.5225170733284008,
+      "mean_relative_rmse_vs_coverage": 0.9571633077695733,
+      "mean_oos_r2_vs_coverage": 0.07400677645739996,
+      "mean_directional_accuracy": 0.6222627010670488,
+      "rmse_cell_wins": 4,
+      "adjusted_dm_squared_pairwise_wins": 0,
       "adjusted_dm_squared_pairwise_losses": 0,
       "predictive_point_rank": 1,
       "ranking_scope": "equal-weight ranks over overall-max and dimension-mean7 at 1, 3, and 6 months; reported separately by construction plus a pooled robustness summary"
@@ -244,14 +278,14 @@
       "index_construction": "mean_safe_weekly",
       "score_source": "gemma_2_9b_it",
       "primary_comparison_cells": 6,
-      "mean_rmse_rank": 1.3333333333333333,
-      "mean_mae_rank": 1.5,
-      "mean_skill_rank": 1.3333333333333333,
-      "mean_rmse_log_change": 0.4838773573887107,
-      "mean_relative_rmse_vs_coverage": 0.9939079033222192,
-      "mean_oos_r2_vs_coverage": 0.008181112175034052,
-      "mean_directional_accuracy": 0.6265698169433801,
-      "rmse_cell_wins": 4,
+      "mean_rmse_rank": 1.8333333333333333,
+      "mean_mae_rank": 1.8333333333333333,
+      "mean_skill_rank": 1.8333333333333333,
+      "mean_rmse_log_change": 0.5215882732964204,
+      "mean_relative_rmse_vs_coverage": 0.9745242857770466,
+      "mean_oos_r2_vs_coverage": 0.04514990593179822,
+      "mean_directional_accuracy": 0.6092530657748049,
+      "rmse_cell_wins": 2,
       "adjusted_dm_squared_pairwise_wins": 0,
       "adjusted_dm_squared_pairwise_losses": 0,
       "predictive_point_rank": 1,
@@ -261,26 +295,26 @@
       "index_construction": "pooled_monthly_robustness",
       "score_source": "qwen_3_8b",
       "primary_comparison_cells": 12,
-      "mean_rmse_rank": 1.4166666666666667,
-      "mean_mae_rank": 1.4166666666666667,
-      "mean_skill_rank": 1.4166666666666667,
-      "mean_rmse_log_change": 0.5308917748254047,
-      "mean_relative_rmse_vs_coverage": 1.0526397761477568,
-      "mean_oos_r2_vs_coverage": -0.12458409164363782,
-      "mean_directional_accuracy": 0.6386427735206471,
+      "mean_rmse_rank": 1.5833333333333333,
+      "mean_mae_rank": 1.9166666666666667,
+      "mean_skill_rank": 1.5833333333333333,
+      "mean_rmse_log_change": 0.538691188924033,
+      "mean_relative_rmse_vs_coverage": 0.9814959620149558,
+      "mean_oos_r2_vs_coverage": 0.02280748439503689,
+      "mean_directional_accuracy": 0.6155289456919891,
       "rmse_cell_wins": 7,
-      "adjusted_dm_squared_pairwise_wins": 1,
+      "adjusted_dm_squared_pairwise_wins": 0,
       "adjusted_dm_squared_pairwise_losses": 0,
       "predictive_point_rank": 1,
       "ranking_scope": "equal-weight ranks over overall-max and dimension-mean7 at 1, 3, and 6 months; reported separately by construction plus a pooled robustness summary"
     }
   ],
   "adjusted_significant_positive_primary_confirmatory_dm_squared_tests": 0,
-  "adjusted_significant_positive_primary_sensitivity_tests": 3,
-  "primary_construction_pairwise_tests": 60,
+  "adjusted_significant_positive_primary_sensitivity_tests": 7,
+  "primary_construction_pairwise_tests": 72,
   "interpretation_limits": {
     "causal_claim": false,
-    "monthly_results_are_secondary_to_weekly": true,
+    "monthly_results_are_primary": true,
     "adapted_pdf_path_is_not_literal_replication": true,
     "point_rank_does_not_establish_statistical_superiority": true,
     "freight_cost_dimension_price_overlap_risk": true,
@@ -304,6 +338,39 @@
     "construction_summary": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_monthly_v001_index_construction_summary.csv",
     "feature_sets": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_monthly_v001_feature_sets.json",
     "manifest": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_monthly_v001_manifest.json"
+  },
+  "output_sha256": {
+    "monthly_signal_audit": "ad99f1803225d2858ff78e279749c4375e768edad2a79c86611690b0c65c052b",
+    "signal_differences": "a6d12d55e3ba9ff2fc4715949dd797de7076310609e921651f45b7e058688b9f",
+    "monthly_panel": "371a6a9ebcbd7c6bd7fce05d1c87c998b17cdd367318c4a585ee5a75969505e9",
+    "forecasts": "e7ae74a14dea9b2cc3d205b1fc3bc53a640b9dab1382a05eb4a391d8b9d5fb41",
+    "metrics": "d864100e13735464343b1fcf79ad26f4abc48dfa55a819b1031c5571384f213a",
+    "statistical_tests": "c5f110211bd33d8ed423fb42d56ea96dafeb6e88451147fa17e17fa2a674fb84",
+    "fit_audit": "243b9ede16a70f8dd6d42c24d80545877274d1a419b23042856e15e4d78ec8f0",
+    "origin_audit": "42032a0fb2421d3d5ab4c36131e271fdf230e51e78f7253e05dcb0161dc25099",
+    "hybrid_weights": "fd63593e6ffbf7198c0d267fb5b54483481a10d46bee641dcc2ba6553b40a99a",
+    "llm_ranking": "e71ec50f4fe9d435f3c9f46f57c035a1058698921e4f73ea3e4ee89b9b6cf840",
+    "llm_ranking_cells": "aa7ac59b7de77c1990dfd4e1c8da3a6b5c79b3258379617c83117cbb8ce4562c",
+    "primary_predictor_ranking": "e228bb8a39c032730fa2bc97c7e57cb7fff6fe0c09ea5d37cb65ed7b30388cd7",
+    "dimension_summary": "ca825d015e042cf4462a059c9ac007d4fae3e0aa3d09a3e194989308a9bbf84c",
+    "construction_summary": "dbbd13943bd69e3073c7655e6139c5242841063d1f447899b754c1f26af9d876",
+    "feature_sets": "c8896a5843ba9b9acb3c456329d32d781e3d7e0f5d53901ef961071a60caf66f"
+  },
+  "output_row_counts": {
+    "monthly_signal_audit": 13068,
+    "signal_differences": 108,
+    "monthly_panel": 121,
+    "forecasts": 21370,
+    "metrics": 444,
+    "statistical_tests": 2160,
+    "fit_audit": 5830,
+    "origin_audit": 3,
+    "hybrid_weights": 5400,
+    "llm_ranking": 12,
+    "llm_ranking_cells": 48,
+    "primary_predictor_ranking": 14,
+    "dimension_summary": 112,
+    "construction_summary": 2
   },
   "log": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\logs\\07c_monthly_llm_scfi_comparison_llm_scfi_monthly_v001.log",
   "software": {

@@ -2,7 +2,7 @@
 
 The stage estimates partially linear Double/Debiased ML (DML) models with
 expanding-window cross-fitting and a horizon purge. Weekly estimates are
-primary; monthly estimates are robustness checks. The treatment nuisance is
+monthly-primary; weekly estimates are higher-frequency robustness checks. The treatment nuisance is
 learned from the raw first difference of each MSDI path, so the resulting
 innovation is genuinely out of fold. Full-sample innovations produced by
 ``19_time_series_causality.py`` are used only for a transparent comparison audit.
@@ -138,7 +138,7 @@ class ExpandingFold:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Estimate weekly-primary, time-aware DML effects and diagnostics."
+            "Estimate monthly-primary, time-aware DML effects and diagnostics."
         )
     )
     parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
@@ -1406,7 +1406,7 @@ def add_primary_simultaneous_bands(
     result["simultaneous_band_available"] = False
     result["simultaneous_band_significant"] = False
     family_mask = (
-        result["frequency"].eq("weekly")
+        result["frequency"].eq("monthly")
         & result["msdi_path"].eq("peak")
         & result["learner"].eq(primary_learner)
     )
@@ -1416,7 +1416,7 @@ def add_primary_simultaneous_bands(
     horizons = [int(item) for item in family["horizon"]]
     groups = {
         horizon: predictions[
-            predictions["frequency"].eq("weekly")
+            predictions["frequency"].eq("monthly")
             & predictions["msdi_path"].eq("peak")
             & predictions["learner"].eq(primary_learner)
             & predictions["horizon"].eq(horizon)
@@ -1437,7 +1437,7 @@ def add_primary_simultaneous_bands(
     scale = family.set_index("horizon")[
         "effect_scale_frozen_calibration_residual_sd"
     ].to_dict()
-    rng = np.random.default_rng(stable_seed(seed, "weekly", "peak", "joint_band"))
+    rng = np.random.default_rng(stable_seed(seed, "monthly", "peak", "joint_band"))
     sup_statistics: list[float] = []
     for _ in range(bootstrap_repetitions):
         indices = moving_block_indices(n, block_length, rng)
@@ -1463,7 +1463,7 @@ def add_primary_simultaneous_bands(
     if not sup_statistics:
         return result
     critical = float(np.quantile(sup_statistics, 1 - alpha))
-    family_id = "primary_dml__weekly__peak__all_horizons"
+    family_id = "primary_dml__monthly__peak__all_horizons"
     for index in family.index:
         estimate = float(result.at[index, "effect_log_points_per_one_sd_innovation"])
         se = float(result.at[index, "standard_error_hac"])
@@ -1506,7 +1506,7 @@ def add_effect_multiplicity(
             result.loc[indices, "p_value"], "holm"
         )
     primary = (
-        result["frequency"].eq("weekly")
+        result["frequency"].eq("monthly")
         & result["msdi_path"].eq("peak")
         & result["learner"].eq(primary_learner)
     )
@@ -1613,8 +1613,8 @@ def heterogeneous_group_effects(
     alpha: float,
     seed: int,
 ) -> pd.DataFrame:
-    primary_all = predictions[predictions["learner"].eq(primary_learner)].copy()
-    primary = primary_all[primary_all["frequency"].eq("weekly")].copy()
+    learner_all = predictions[predictions["learner"].eq(primary_learner)].copy()
+    weekly_robustness = learner_all[learner_all["frequency"].eq("weekly")].copy()
     effect_scale = {
         (row.frequency, row.msdi_path, int(row.horizon)): float(
             row.effect_scale_frozen_calibration_residual_sd
@@ -1622,7 +1622,7 @@ def heterogeneous_group_effects(
         for row in effects.loc[effects["learner"].eq(primary_learner)].itertuples()
     }
     rows: list[dict[str, Any]] = []
-    for key, group in primary_all[primary_all["frequency"].eq("monthly")].groupby(
+    for key, group in learner_all[learner_all["frequency"].eq("monthly")].groupby(
         ["frequency", "frequency_role", "msdi_path", "horizon"], sort=True
     ):
         rows.append(
@@ -1638,13 +1638,13 @@ def heterogeneous_group_effects(
                 "minimum_group_rows": math.nan,
                 "estimation_status": "skipped_monthly_low_power",
                 "interpretation": (
-                    "monthly_aggregate_sample_is_robustness_only_and_too_small_for_"
+                    "monthly_primary_sample_is_too_small_for_"
                     "credible_heterogeneity"
                 ),
             }
         )
     keys = ["frequency", "frequency_role", "msdi_path", "horizon"]
-    for key, group in primary.groupby(keys, sort=True):
+    for key, group in weekly_robustness.groupby(keys, sort=True):
         frequency, role, path_name, horizon = key
         scale = effect_scale[(frequency, path_name, int(horizon))]
         if int(horizon) not in {int(item) for item in requested_horizons[frequency]}:
@@ -2308,8 +2308,8 @@ def main() -> None:
         "status": status,
         "publication_scope_complete": complete_scope,
         "causal_claim_allowed": False,
-        "primary_frequency": "weekly",
-        "monthly_role": "robustness_only",
+        "primary_frequency": "monthly",
+        "weekly_role": "higher_frequency_robustness",
         "inputs": {
             name: {"path": str(path), "sha256": sha256_file(path)}
             for name, path in input_paths.items()

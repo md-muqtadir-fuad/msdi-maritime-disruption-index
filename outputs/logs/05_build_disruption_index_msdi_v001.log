@@ -1,21 +1,28 @@
-2026-08-01 01:30:10,274 | INFO | Starting MSDI build version=msdi_v001
-2026-08-01 01:30:10,275 | INFO | Arguments: {'scores': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/03_processed/model_scores/llm_scores_merged.csv'), 'output_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/05_indices'), 'model_config': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/configs/model_registry.yaml'), 'log_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/logs'), 'version': 'msdi_v001', 'frequency': 'W-FRI', 'minimum_models': 2, 'duplicate_penalty': 'sqrt', 'media_correction': 'log', 'expanding_min_periods': 26, 'human_metrics': None}
-2026-08-01 01:30:13,900 | INFO | Loaded 19,626 rows and 6,542 unique articles
-2026-08-01 01:30:13,910 | INFO | Model gemma_2_9b_it: rows=6,542 success=6,523 failed=19
-2026-08-01 01:30:13,913 | INFO | Model qwen_2_5_7b: rows=6,542 success=6,510 failed=32
-2026-08-01 01:30:13,917 | INFO | Model qwen_3_8b: rows=6,542 success=6,515 failed=27
-2026-08-01 01:30:16,021 | INFO | Article consensus: eligible=6,522 excluded_model_count=20 unparsed_dates=3
-2026-08-01 01:30:19,290 | INFO | Weekly coverage: periods=575 first=2015-01-02 00:00:00 last=2026-01-02 00:00:00
-2026-08-01 01:30:19,291 | INFO | TOPSIS operational rank 1: qwen_2_5_7b score=0.895257
-2026-08-01 01:30:19,292 | INFO | TOPSIS operational rank 2: qwen_3_8b score=0.699654
-2026-08-01 01:30:19,292 | INFO | TOPSIS operational rank 3: gemma_2_9b_it score=0.034213
-2026-08-01 01:30:22,558 | INFO | Output article_consensus: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\article_level\article_consensus_scores.csv
-2026-08-01 01:30:22,558 | INFO | Output weekly_indices: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\weekly\msdi_weekly.csv
-2026-08-01 01:30:22,559 | INFO | Output weekly_model_specific: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\weekly\msdi_weekly_model_specific.csv
-2026-08-01 01:30:22,559 | INFO | Output weekly_model_spread: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\uncertainty_bands\msdi_weekly_model_spread.csv
-2026-08-01 01:30:22,559 | INFO | Output model_score_summary: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\disruption_index_versions\msdi_v001_model_score_summary.csv
-2026-08-01 01:30:22,560 | INFO | Output pairwise_score_differences: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\disruption_index_versions\msdi_v001_pairwise_score_differences.csv
-2026-08-01 01:30:22,560 | INFO | Output topsis_model_ranking: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\disruption_index_versions\msdi_v001_topsis_model_ranking.csv
-2026-08-01 01:30:22,560 | INFO | Output topsis_calculation_details: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\disruption_index_versions\msdi_v001_topsis_calculation_details.csv
-2026-08-01 01:30:22,560 | INFO | Output manifest: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\disruption_index_versions\msdi_v001_manifest.json
-2026-08-01 01:30:22,561 | INFO | MSDI build completed successfully
+2026-08-11 13:21:04,187 | INFO | Starting MSDI build version=msdi_v001
+2026-08-11 13:21:04,188 | INFO | Arguments: {'scores': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/03_processed/model_scores/llm_scores_merged.csv'), 'output_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/05_indices'), 'model_config': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/configs/model_registry.yaml'), 'log_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/logs'), 'version': 'msdi_v001', 'frequency': 'W-FRI', 'monthly_frequency': 'ME', 'event_profile': 'auto', 'minimum_models': 2, 'duplicate_penalty': 'sqrt', 'event_penalty': 'fixed', 'media_correction': 'log', 'expanding_min_periods': 26, 'monthly_expanding_min_periods': 24}
+2026-08-11 13:21:04,218 | INFO | Using weekly semantic-event assignment
+2026-08-11 13:21:07,214 | INFO | Loaded 26,168 rows and 6,542 unique articles
+2026-08-11 13:21:07,224 | INFO | Model gemma_2_9b_it: rows=6,542 success=6,523 failed=19
+2026-08-11 13:21:07,228 | INFO | Model glm_4_9b_0414: rows=6,542 success=6,519 failed=23
+2026-08-11 13:21:07,230 | INFO | Model qwen_2_5_7b: rows=6,542 success=6,510 failed=32
+2026-08-11 13:21:07,235 | INFO | Model qwen_3_8b: rows=6,542 success=6,515 failed=27
+2026-08-11 13:21:09,600 | INFO | Article consensus: eligible=6,523 excluded_model_count=19 unparsed_dates=3
+2026-08-11 13:21:12,932 | INFO | Weekly coverage: periods=575 first=2015-01-02 00:00:00 last=2026-01-02 00:00:00
+2026-08-11 13:21:12,933 | INFO | Monthly primary coverage: periods=133 first=2015-01-31 00:00:00 last=2026-01-31 00:00:00
+2026-08-11 13:21:12,934 | INFO | TOPSIS operational rank 1: qwen_2_5_7b score=0.889866
+2026-08-11 13:21:12,935 | INFO | TOPSIS operational rank 2: qwen_3_8b score=0.701113
+2026-08-11 13:21:12,935 | INFO | TOPSIS operational rank 3: glm_4_9b_0414 score=0.636358
+2026-08-11 13:21:12,936 | INFO | TOPSIS operational rank 4: gemma_2_9b_it score=0.053495
+2026-08-11 13:21:16,764 | INFO | Output article_consensus: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\article_level\article_consensus_scores.csv
+2026-08-11 13:21:16,764 | INFO | Output weekly_indices: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\weekly\msdi_weekly.csv
+2026-08-11 13:21:16,765 | INFO | Output weekly_model_specific: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\weekly\msdi_weekly_model_specific.csv
+2026-08-11 13:21:16,765 | INFO | Output weekly_model_spread: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\uncertainty_bands\msdi_weekly_model_spread.csv
+2026-08-11 13:21:16,765 | INFO | Output monthly_indices: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\monthly\msdi_monthly.csv
+2026-08-11 13:21:16,766 | INFO | Output monthly_model_specific: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\monthly\msdi_monthly_model_specific.csv
+2026-08-11 13:21:16,766 | INFO | Output monthly_model_spread: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\uncertainty_bands\msdi_monthly_model_spread.csv
+2026-08-11 13:21:16,766 | INFO | Output model_score_summary: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\disruption_index_versions\msdi_v001_model_score_summary.csv
+2026-08-11 13:21:16,766 | INFO | Output pairwise_score_differences: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\disruption_index_versions\msdi_v001_pairwise_score_differences.csv
+2026-08-11 13:21:16,767 | INFO | Output topsis_model_ranking: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\disruption_index_versions\msdi_v001_topsis_model_ranking.csv
+2026-08-11 13:21:16,767 | INFO | Output topsis_calculation_details: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\disruption_index_versions\msdi_v001_topsis_calculation_details.csv
+2026-08-11 13:21:16,768 | INFO | Output manifest: C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\05_indices\disruption_index_versions\msdi_v001_manifest.json
+2026-08-11 13:21:16,768 | INFO | MSDI build completed successfully

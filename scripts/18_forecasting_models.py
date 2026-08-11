@@ -3,8 +3,8 @@
 This stage extends the frozen common-cohort panels produced by 07b and 07c.
 A Gaussian identity-link GLM, random forests, XGBoost, a small PyTorch LSTM,
 and Prophet all predict the same direct target: the forward SCFI log change
-known only after the forecast origin.  Weekly results are primary; monthly
-results are robustness evidence.
+known only after the forecast origin. Monthly results are primary; weekly
+results are higher-frequency robustness evidence.
 
 The normal run uses the fixed, pre-specified parameters in
 ``configs/nonlinear_forecasting.yaml``.  ``--tune`` is deliberately opt-in and
@@ -402,7 +402,7 @@ def frequency_specs(
             minimum_training_rows=int(weekly["minimum_training_rows"]),
             refit_every=int(weekly["refit_every"]),
             sequence_length=int(weekly["sequence_length"]),
-            primary=True,
+            primary=str(weekly.get("role", "")).lower() == "primary",
         ),
         "monthly": FrequencySpec(
             name="monthly",
@@ -419,7 +419,7 @@ def frequency_specs(
             minimum_training_rows=int(monthly["minimum_training_rows"]),
             refit_every=int(monthly["refit_every"]),
             sequence_length=int(monthly["sequence_length"]),
-            primary=False,
+            primary=str(monthly.get("role", "")).lower() == "primary",
         ),
     }
 
@@ -531,9 +531,9 @@ def load_model_aliases(path: Path) -> list[str]:
     registry = load_yaml(path)
     rows = registry.get("active_scoring_models", [])
     aliases = [str(row.get("alias", "")).strip() for row in rows]
-    if len(aliases) != 3 or any(not alias for alias in aliases):
-        raise ValueError("model_registry.yaml must define exactly three active aliases")
-    if len(set(aliases)) != 3:
+    if len(aliases) != 4 or any(not alias for alias in aliases):
+        raise ValueError("model_registry.yaml must define exactly four active aliases")
+    if len(set(aliases)) != 4:
         raise ValueError("Active scoring aliases must be unique")
     return aliases
 
@@ -615,9 +615,9 @@ def validate_upstream_manifest(
         "expected_common_articles",
         manifest.get("design", {}).get("frozen_common_articles"),
     )
-    if cohort is not None and int(cohort) != 6481:
+    if cohort is not None and int(cohort) != 6480:
         raise ValueError(
-            f"{spec.name} manifest is not the frozen 6,481-article cohort: {cohort}"
+            f"{spec.name} manifest is not the frozen 6,480-article cohort: {cohort}"
         )
     output_key = "aligned_panel" if spec.name == "weekly" else "monthly_panel"
     recorded_panel = manifest.get("outputs", {}).get(output_key)
@@ -632,7 +632,7 @@ def validate_upstream_manifest(
         "path": str(path),
         "sha256": sha256_file(path),
         "status": status,
-        "frozen_common_articles": 6481,
+        "frozen_common_articles": 6480,
         "panel_path_verified": True,
     }
 
@@ -1321,7 +1321,7 @@ def inference_tier(
         return "exploratory_dimension"
     # The frozen Q1 blueprint pre-specifies the Ridge comparison as primary.
     # All estimators in this extended forecasting stage remain secondary
-    # robustness paths, even at the primary weekly frequency.
+    # robustness paths, including the higher-frequency weekly specification.
     return "secondary_predictive_robustness"
 
 
@@ -1357,7 +1357,7 @@ def direct_forecast_row(
         raise AssertionError("A forecast fit used a not-yet-observable target label")
     return {
         "frequency": spec.name,
-        "weekly_is_primary": spec.primary,
+        "frequency_is_primary": spec.primary,
         "algorithm": algorithm,
         "model_id": configuration.model_id(algorithm),
         "is_direct_model": True,
@@ -1500,7 +1500,7 @@ def rolling_forecasts(
             {
                 "fit_id": fit_id,
                 "frequency": spec.name,
-                "weekly_is_primary": spec.primary,
+                "frequency_is_primary": spec.primary,
                 "algorithm": algorithm,
                 "model_id": model_id,
                 "index_construction": configuration.index_construction,
@@ -1626,7 +1626,7 @@ def derived_hybrid_row(
             "squared_error": (actual - float(prediction)) ** 2,
             "predicted_scfi_level": predicted_level,
             "level_error": actual_level - predicted_level,
-            "feature_set": "forecast_hybrid_from_three_llm_predictions",
+            "feature_set": "forecast_hybrid_from_four_llm_predictions",
             "feature_count": 3,
             "training_rows": int(training_rows),
             "training_label_end_date": training_label_end_date,
@@ -1666,7 +1666,7 @@ def build_forecast_hybrids(
         frequency, algorithm, construction, horizon, signal = keys
         if set(group["score_source"].unique()) != set(aliases):
             # Deliberately limited/debug runs may omit some LLM configurations.
-            # A hybrid is meaningful only when all three frozen paths are present.
+            # A hybrid is meaningful only when all four frozen paths are present.
             continue
         wide = group.pivot(
             index="origin_date", columns="score_source", values="predicted_log_change"
@@ -1931,7 +1931,7 @@ def calculate_metrics(forecasts: pd.DataFrame) -> pd.DataFrame:
         rows.append(
             {
                 "frequency": keys[0],
-                "weekly_is_primary": bool(metadata["weekly_is_primary"]),
+                "frequency_is_primary": bool(metadata["frequency_is_primary"]),
                 "algorithm": keys[1],
                 "index_construction": keys[2],
                 "horizon_steps": int(keys[3]),
@@ -2804,9 +2804,9 @@ def main() -> None:
         maximum_configurations=maximum_configurations,
         maximum_origins=maximum_origins,
     )
-    significant_weekly_secondary = (
+    significant_monthly_primary = (
         tests[
-            tests.get("frequency", pd.Series(dtype=str)).eq("weekly")
+            tests.get("frequency", pd.Series(dtype=str)).eq("monthly")
             & tests.get("signal_name", pd.Series(dtype=str)).isin(PRIMARY_SIGNALS)
             & tests.get("test", pd.Series(dtype=str)).eq(
                 "diebold_mariano_squared"
@@ -2822,8 +2822,8 @@ def main() -> None:
         "status": status,
         "inputs": input_audit,
         "design": {
-            "weekly_analysis_is_primary": True,
-            "monthly_analysis_role": "frequency robustness and slower dynamics",
+            "primary_frequency": "monthly",
+            "weekly_analysis_role": "higher-frequency robustness",
             "selected_frequencies": selected_frequencies,
             "requested_algorithms": requested_algorithms,
             "executed_algorithms": selected_algorithms,
@@ -2851,7 +2851,7 @@ def main() -> None:
             "predefined_parameter_source": str(config_path),
             "inner_splits": inner_splits,
             "forecast_hybrids": {
-                "equal_mean": "equal mean of three individual-LLM forecasts",
+                "equal_mean": "equal mean of four individual-LLM forecasts",
                 "past_only_nnls": (
                     "nonnegative weights learned only from prior OOS forecasts "
                     "whose target dates are observed by the current origin"
@@ -2875,15 +2875,15 @@ def main() -> None:
             "nested_tuning_rows": len(tuning_audit),
             "statistical_tests": len(tests),
             "confirmatory_tests": 0,
-            "adjusted_significant_positive_weekly_secondary_tests": len(
-                significant_weekly_secondary
+            "adjusted_significant_positive_monthly_primary_tests": len(
+                significant_monthly_primary
             ),
         },
         "interpretation_limits": {
             "causal_claim": False,
             "best_predictive_llm_is_separate_from_algorithm_rank": True,
             "point_rank_does_not_establish_statistical_superiority": True,
-            "weekly_is_primary": True,
+            "monthly_is_primary": True,
             "monthly_small_sample_overfit_risk": True,
             "lstm_and_prophet_are_sensitivity_models": True,
             "glm_is_gaussian_identity_link_with_l2_regularization": True,

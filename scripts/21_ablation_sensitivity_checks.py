@@ -7,9 +7,10 @@ This stage deliberately separates three questions:
 3. Are the orthogonalized predictive effects from stage 08b stable to learners,
    inference methods, and strictly future treatment-lead falsification tests?
 
-Weekly forecasts are primary. Monthly forecasts retain both pre-specified index
-constructions and are robustness evidence only. All comparisons are evaluated
-on matched origin/target dates. Nothing in this script licenses a causal claim.
+Monthly forecasts using the direct square-root-volume plus causal EMA(3)
+construction are primary. Weekly forecasts and the weekly-derived monthly mean
+are pre-specified robustness paths. All comparisons are evaluated on matched
+origin/target dates. Nothing in this script licenses a causal claim.
 """
 
 from __future__ import annotations
@@ -358,8 +359,8 @@ def load_model_aliases(path: Path) -> list[str]:
     aliases = [
         str(item["alias"]) for item in payload.get("active_scoring_models", [])
     ]
-    if len(aliases) != 3 or len(set(aliases)) != 3:
-        raise ValueError(f"Expected exactly three unique model aliases; found {aliases}")
+    if len(aliases) != 4 or len(set(aliases)) != 4:
+        raise ValueError(f"Expected exactly four unique model aliases; found {aliases}")
     return aliases
 
 
@@ -372,10 +373,10 @@ def validate_args(args: argparse.Namespace, config: Mapping[str, Any]) -> None:
             raise ValueError(f"--{name.replace('_', '-')} must be positive")
     if config.get("identification", {}).get("causal_claim_allowed") is not False:
         raise ValueError("Robustness configuration must explicitly prohibit causal claims")
-    if config.get("analysis", {}).get("primary_frequency") != "weekly":
-        raise ValueError("Weekly frequency must remain primary")
-    if config.get("analysis", {}).get("monthly_role") != "robustness":
-        raise ValueError("Monthly frequency must remain robustness-only")
+    if config.get("analysis", {}).get("primary_frequency") != "monthly":
+        raise ValueError("Monthly frequency must remain primary")
+    if config.get("analysis", {}).get("weekly_role") != "higher_frequency_robustness":
+        raise ValueError("Weekly frequency must remain higher-frequency robustness")
     analysis = config.get("analysis", {})
     measurement = config.get("measurement_variants", {})
     inference = config.get("inference", {})
@@ -454,8 +455,8 @@ def validate_upstream_manifests(args: argparse.Namespace) -> tuple[pd.DataFrame,
                 "expected_common_articles",
                 payload.get("design", {}).get("frozen_common_articles"),
             )
-            passed = passed and int(cohort or -1) == 6481
-            reason = "passed" if passed else "weekly_common_cohort_not_6481"
+            passed = passed and int(cohort or -1) == 6480
+            reason = "passed" if passed else "weekly_common_cohort_not_6480"
         if name == "monthly_llm":
             methods = set(
                 payload.get("design", {}).get("index_constructions", {}).keys()
@@ -520,10 +521,8 @@ def load_common_articles(
         "source_domain",
         "source_name",
         "duplicate_group_size",
-        "event_id",
-        "event_cluster_size",
-        "source_duplicate_weight",
-        "novelty_weight",
+        "event_id_weekly",
+        "event_id_monthly",
     ]
     required = [*metadata_columns, *score_columns]
     missing = sorted(set(required).difference(header.columns))
@@ -538,9 +537,6 @@ def load_common_articles(
     for column in [
         *score_columns,
         "duplicate_group_size",
-        "event_cluster_size",
-        "source_duplicate_weight",
-        "novelty_weight",
     ]:
         article[column] = pd.to_numeric(article[column], errors="coerce")
     common = article.loc[
@@ -549,7 +545,7 @@ def load_common_articles(
     ].copy()
     if len(common) != expected_rows:
         raise ValueError(
-            f"Frozen all-three-LLM cohort mismatch: expected={expected_rows} "
+            f"Frozen all-four-LLM cohort mismatch: expected={expected_rows} "
             f"found={len(common)}"
         )
     invalid = common[score_columns].lt(0) | common[score_columns].gt(4)
@@ -638,6 +634,7 @@ def period_event_weights(
     source_weight: pd.Series,
     frequency: str,
     method: str,
+    event_column: str = "event_id_weekly",
 ) -> pd.Series:
     """Availability-safe event coverage weights for one aggregation period."""
     if method not in {"fixed", "sqrt", "none"}:
@@ -645,9 +642,15 @@ def period_event_weights(
     base = pd.to_numeric(source_weight, errors="coerce").fillna(1.0)
     if method == "none":
         return base
-    event = frame["event_id"].astype("string").str.strip()
+    if event_column not in frame.columns:
+        if "event_id" in frame.columns:
+            event_column = "event_id"
+        else:
+            raise ValueError(f"Article table lacks {event_column}")
+    event = frame[event_column].astype("string").str.strip()
     event = event.mask(event.isna() | event.eq(""), "ARTICLE_" + frame["article_id"].astype(str))
-    period = frame["publication_date"].dt.to_period(frequency).astype(str)
+    period_frequency = "M" if frequency.upper().startswith("M") else frequency
+    period = frame["publication_date"].dt.to_period(period_frequency).astype(str)
     helper = pd.DataFrame(
         {"period": period, "event": event, "base": base, "article_id": frame["article_id"]},
         index=frame.index,
@@ -789,7 +792,11 @@ def aggregate_weekly_variant(
             work["publication_date"].to_numpy()
         )
     work["novelty_weight"] = period_event_weights(
-        work, work["duplicate_weight"], frequency, variant.event_penalty
+        work,
+        work["duplicate_weight"],
+        frequency,
+        variant.event_penalty,
+        event_column="event_id_weekly",
     )
     work["weighted_score"] = work["article_score"] * work["novelty_weight"]
     grouped = work.set_index("publication_date").resample(
@@ -1124,6 +1131,69 @@ def aggregate_all_weekly_variants(
     return result.sort_values(["variant_id", "week_ending"]).reset_index(drop=True)
 
 
+def aggregate_all_monthly_variants_direct(
+    article: pd.DataFrame,
+    variants: Sequence[IndexVariant],
+    aliases: Sequence[str],
+    seed: int,
+) -> pd.DataFrame:
+    """Build every monthly sensitivity directly from publication-month articles."""
+    periods = pd.period_range(
+        article["publication_date"].min().to_period("M"),
+        article["publication_date"].max().to_period("M"),
+        freq="M",
+    )
+    rows: list[pd.DataFrame] = []
+    for variant in variants:
+        mask = variant_article_mask(article, variant)
+        work = article.loc[mask].copy()
+        work["article_score"] = article_variant_scores(work, variant, aliases)
+        work["duplicate_weight"] = duplicate_weights(
+            work["duplicate_group_size"], variant.duplicate_penalty
+        )
+        if variant.permute_dates:
+            rng = np.random.default_rng(stable_seed(seed, variant.variant_id, "dates"))
+            work["publication_date"] = rng.permutation(work["publication_date"].to_numpy())
+        work["novelty_weight"] = period_event_weights(
+            work,
+            work["duplicate_weight"],
+            "M",
+            variant.event_penalty,
+            event_column="event_id_monthly",
+        )
+        work["weighted_score"] = work["article_score"] * work["novelty_weight"]
+        grouped = work.assign(
+            month_period=work["publication_date"].dt.to_period("M")
+        ).groupby("month_period", sort=True).agg(
+            direct_article_count=("article_id", "nunique"),
+            direct_source_count=("source_domain", "nunique"),
+            direct_effective_article_count=("novelty_weight", "sum"),
+            direct_weighted_score_sum=("weighted_score", "sum"),
+        ).reindex(periods)
+        denominator = np.sqrt(
+            grouped["direct_effective_article_count"].where(lambda value: value.gt(0))
+        )
+        grouped["direct_adapted_pdf_sqrt_base"] = grouped[
+            "direct_weighted_score_sum"
+        ].div(denominator)
+        grouped["direct_signal_adapted_pdf_sqrt_ema3"] = _ema_restart_after_gaps(
+            grouped["direct_adapted_pdf_sqrt_base"], 3
+        )
+        grouped["direct_signal_adapted_pdf_sqrt_ema3"] = _standardize_past_only(
+            grouped["direct_signal_adapted_pdf_sqrt_ema3"], variant.standardization
+        )
+        grouped["variant_id"] = variant.variant_id
+        grouped["path"] = variant.path
+        grouped.index.name = "month_period"
+        part = grouped.reset_index()
+        part["month_ending"] = part.pop("month_period").dt.to_timestamp("M")
+        rows.append(part)
+    result = pd.concat(rows, ignore_index=True)
+    if result.duplicated(["variant_id", "month_ending"]).any():
+        raise AssertionError("Direct monthly variants contain duplicate keys")
+    return result.sort_values(["variant_id", "month_ending"]).reset_index(drop=True)
+
+
 def load_weekly_base_panel(path: Path) -> pd.DataFrame:
     resolved = require_file(path, "Weekly SCFI panel")
     required = {
@@ -1265,6 +1335,7 @@ def build_monthly_variant_panel(
     weekly_aligned: pd.DataFrame,
     monthly_base: pd.DataFrame,
     variants: Sequence[IndexVariant],
+    direct_monthly_long: pd.DataFrame | None = None,
     ema_span: int = 3,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     weekly = weekly_aligned.copy()
@@ -1331,6 +1402,25 @@ def build_monthly_variant_panel(
         grouped["signal_adapted_pdf_sqrt_ema3"] = _ema_restart_after_gaps(
             grouped["adapted_pdf_sqrt_base"], ema_span
         )
+        if direct_monthly_long is not None:
+            direct = direct_monthly_long[
+                direct_monthly_long["variant_id"].eq(variant.variant_id)
+            ].set_index("month_ending")
+            direct_columns = [
+                "direct_article_count",
+                "direct_source_count",
+                "direct_effective_article_count",
+                "direct_weighted_score_sum",
+                "direct_adapted_pdf_sqrt_base",
+                "direct_signal_adapted_pdf_sqrt_ema3",
+            ]
+            grouped = grouped.join(direct[direct_columns], how="left")
+            grouped["adapted_pdf_sqrt_base"] = grouped[
+                "direct_adapted_pdf_sqrt_base"
+            ]
+            grouped["signal_adapted_pdf_sqrt_ema3"] = grouped[
+                "direct_signal_adapted_pdf_sqrt_ema3"
+            ]
         grouped["variant_id"] = variant.variant_id
         grouped["path"] = variant.path
         long = grouped.reset_index()
@@ -1342,15 +1432,25 @@ def build_monthly_variant_panel(
             monthly[_variant_column("signal", variant.variant_id, construction)] = (
                 grouped[source]
             )
-            monthly[
-                _variant_column("article_count", variant.variant_id, construction)
-            ] = grouped["article_count_sum"]
+            direct_construction = (
+                construction == "adapted_pdf_sqrt_ema3"
+                and direct_monthly_long is not None
+            )
+            monthly[_variant_column("article_count", variant.variant_id, construction)] = grouped[
+                "direct_article_count" if direct_construction else "article_count_sum"
+            ]
             monthly[
                 _variant_column("effective_count", variant.variant_id, construction)
-            ] = grouped["effective_article_count_sum"]
+            ] = grouped[
+                "direct_effective_article_count"
+                if direct_construction
+                else "effective_article_count_sum"
+            ]
             monthly[
                 _variant_column("source_count", variant.variant_id, construction)
-            ] = grouped["source_count_mean"]
+            ] = grouped[
+                "direct_source_count" if direct_construction else "source_count_mean"
+            ]
     long_frame = pd.concat(long_rows, ignore_index=True)
     monthly = monthly.reset_index()
     audit = pd.DataFrame(
@@ -1368,7 +1468,11 @@ def build_monthly_variant_panel(
                 "constructions": "|".join(MONTHLY_CONSTRUCTIONS),
                 "partial_months_zero_filled": False,
                 "ema_span": ema_span,
-                "month_assignment": "calendar_month_of_safe_monday_information_date",
+                "month_assignment": (
+                    "direct publication month for adapted_pdf_sqrt_ema3; "
+                    "calendar month of safe Monday for mean_safe_weekly"
+                ),
+                "direct_monthly_article_construction": direct_monthly_long is not None,
             }
         ]
     )
@@ -1396,7 +1500,7 @@ def build_common_cohort_analysis_panels(
             ],
         }
     )
-    construction = "mean_safe_weekly"
+    construction = "adapted_pdf_sqrt_ema3"
     monthly = pd.DataFrame(
         {
             "month_ending": monthly_aligned["month_ending"],
@@ -1823,11 +1927,11 @@ def build_forecast_specifications(
     comparisons: list[PairedComparison] = [
         PairedComparison(
             comparison_id="peak_vs_no_msdi",
-            family_id="primary_weekly_peak_vs_no_msdi",
+            family_id="primary_monthly_peak_vs_no_msdi",
             baseline_specification_id="no_msdi",
             variant_specification_id="peak_only",
             nested=True,
-            primary=frequency == "weekly",
+            primary=frequency == "monthly",
             direction_note="positive baseline_loss_minus_variant_loss favors peak MSDI",
         ),
         PairedComparison(
@@ -2859,7 +2963,7 @@ def paired_ablation_tests(
                             row: dict[str, Any] = {
                                 "frequency": frequency,
                                 "frequency_role": (
-                                    "primary" if frequency == "weekly" else "robustness"
+                                    "primary" if frequency == "monthly" else "robustness"
                                 ),
                                 "index_construction": construction,
                                 "comparison_id": comparison.comparison_id,
@@ -2869,7 +2973,7 @@ def paired_ablation_tests(
                                 "nested_models": comparison.nested,
                                 "primary_family": bool(
                                     comparison.primary
-                                    and construction == "weekly_log_volume"
+                                    and construction == "adapted_pdf_sqrt_ema3"
                                     and sample_subset == "full_sample"
                                     and loss_name == "squared_error"
                                 ),
@@ -3781,7 +3885,7 @@ def causal_ml_sensitivity_from_manifest(
     )
     result = result.merge(placebo_summary, on=keys, how="left", validate="one_to_one")
     result["causal_claim_allowed"] = False
-    result["cohort_scope"] = "upstream_stage08b_broader_panel_not_frozen_common_6481"
+    result["cohort_scope"] = "upstream_stage08b_broader_panel_not_frozen_common_6480"
     result["evidence_role"] = "broader_cohort_causal_ml_sensitivity_only"
     result["interpretation_guardrail"] = (
         "orthogonalized_predictive_effect_not_structural_causality"
@@ -3816,7 +3920,7 @@ def causal_ml_sensitivity_from_manifest(
                     result["falsification_flag_fdr"].sum()
                 ),
                 "alpha": alpha,
-                "cohort_scope": "upstream_stage08b_broader_panel_not_frozen_common_6481",
+                "cohort_scope": "upstream_stage08b_broader_panel_not_frozen_common_6480",
                 "evidence_role": "broader_cohort_causal_ml_sensitivity_only",
             }
         ]
@@ -4084,10 +4188,10 @@ def run_future_treatment_lead_placebos(
         estimates.loc[primary, "p_value"], "holm"
     )
     estimates["falsification_flag_fdr"] = estimates["p_value_fdr_all"].lt(alpha)
-    estimates["cohort_scope"] = "frozen_6481_all_three_llm_common_articles"
-    predictions["cohort_scope"] = "frozen_6481_all_three_llm_common_articles"
+    estimates["cohort_scope"] = "frozen_6480_all_four_llm_common_articles"
+    predictions["cohort_scope"] = "frozen_6480_all_four_llm_common_articles"
     fold_audit = pd.concat(audit_frames, ignore_index=True)
-    fold_audit["cohort_scope"] = "frozen_6481_all_three_llm_common_articles"
+    fold_audit["cohort_scope"] = "frozen_6480_all_four_llm_common_articles"
     return (
         estimates,
         predictions,
@@ -4434,6 +4538,9 @@ def main() -> int:
         weekly_long = aggregate_all_weekly_variants(
             article, variants, aliases, seed, logger
         )
+        direct_monthly_long = aggregate_all_monthly_variants_direct(
+            article, variants, aliases, seed
+        )
         weekly_base = load_weekly_base_panel(args.weekly_panel)
         monthly_base = load_monthly_base_panel(args.monthly_panel)
         weekly_aligned, weekly_alignment_audit = align_weekly_variants_to_panel(
@@ -4441,7 +4548,11 @@ def main() -> int:
         )
         monthly_aligned, monthly_long, monthly_alignment_audit = (
             build_monthly_variant_panel(
-                weekly_aligned, monthly_base, variants, ema_span=3
+                weekly_aligned,
+                monthly_base,
+                variants,
+                direct_monthly_long=direct_monthly_long,
+                ema_span=3,
             )
         )
         common_analysis_panels = build_common_cohort_analysis_panels(
@@ -4603,7 +4714,7 @@ def main() -> int:
             )
         )
         upstream_selected_lag_audit["cohort_scope"] = (
-            "upstream_stage08_broader_panel_not_frozen_common_6481"
+            "upstream_stage08_broader_panel_not_frozen_common_6480"
         )
         upstream_selected_lag_audit["selection_role"] = (
             "broader_cohort_reference_only_not_used_for_common_cohort_refits"
@@ -4760,7 +4871,7 @@ def main() -> int:
                                 "dynamic_effective_sample_matched_across_lags"
                             ] = False
                         cell[key]["cohort_scope"] = (
-                            "frozen_6481_all_three_llm_common_articles"
+                            "frozen_6480_all_four_llm_common_articles"
                         )
                     var_selection_frames.append(cell["var_selection"])
                     var_diagnostic_frames.append(cell["var_diagnostics"])
@@ -4809,7 +4920,7 @@ def main() -> int:
                                 "selection_reason"
                             ),
                             "cohort_scope": (
-                                "frozen_6481_all_three_llm_common_articles"
+                                "frozen_6480_all_four_llm_common_articles"
                             ),
                             "selection_role": (
                                 "canonical_common_cohort_dynamic_lag_used_for_"
@@ -4868,7 +4979,7 @@ def main() -> int:
         }
         if not dynamic_outputs["peak_breadth_difference"].empty:
             dynamic_outputs["peak_breadth_difference"]["cohort_scope"] = (
-                "frozen_6481_all_three_llm_common_articles"
+                "frozen_6480_all_four_llm_common_articles"
             )
         selected_lag_audit = pd.concat(
             [
@@ -5192,8 +5303,8 @@ def main() -> int:
             "publication_scope_complete": full_scope,
             "publication_eligible_without_human_validation": False,
             "causal_claim_allowed": False,
-            "primary_frequency": "weekly",
-            "monthly_role": "robustness",
+            "primary_frequency": "monthly",
+            "weekly_role": "higher_frequency_robustness",
             "inputs": input_hashes,
             "upstream_manifests": upstream_audit.to_dict(orient="records"),
             "arguments": {
@@ -5213,7 +5324,7 @@ def main() -> int:
                 "frozen_common_article_cohort": expected_articles,
                 "model_aliases": aliases,
                 "score_scale": [0, 4],
-                "reference_peak": "median_over_three_llms_of_overall_disruption_max",
+                "reference_peak": "median_over_four_llms_of_overall_disruption_max",
                 "reference_breadth": "equal_mean_of_seven_dimension_medians",
                 "monthly_constructions": list(MONTHLY_CONSTRUCTIONS),
                 "matched_forecast_origins_and_targets": True,

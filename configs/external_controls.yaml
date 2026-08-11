@@ -25,7 +25,9 @@ sources:
   unctad_lsbci:
     raw_directory: data/01_raw/controls/connectivity
     file_patterns: ["*lsbci*.csv", "*lsbci*.xlsx", "*lsci*.csv", "*lsci*.xlsx"]
-    frequency: quarterly
+    # The downloaded US.LSBCI extract contains one Q01 observation per year
+    # (2006Q01--2026Q01), so its empirical cadence is annual.
+    frequency: annual
     release_lag_days: 45
     date_columns: [quarter, date, month, period, time_period, observation_date]
     value_columns: [index, lsbci, lsci, liner_shipping_bilateral_connectivity_index, liner_shipping_connectivity_index, value]

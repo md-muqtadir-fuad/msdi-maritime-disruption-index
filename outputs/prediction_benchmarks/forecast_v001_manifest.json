@@ -3,7 +3,7 @@
   "status": "provisional_pending_human_validation",
   "input": {
     "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\msdi_scfi_weekly_panel.csv",
-    "sha256": "3761cb49f7cbce5bd546a8868e4008a9800bf8cfbd91d3f91551bcd9f88f15dc",
+    "sha256": "65a55e85dc1358c10ac0b318a0f4a5a1d82bf15beceb2983f6f99fd1a0a53c17",
     "rows": 522
   },
   "design": {
@@ -19,10 +19,24 @@
       8,
       12
     ],
+    "model_families": [
+      "ridge",
+      "glm",
+      "elastic_net",
+      "hist_gradient_boosting"
+    ],
     "target": "forward SCFI log change",
     "identical_evaluation_dates_enforced": true,
     "random_train_test_split": false,
     "preprocessing_fit_inside_training_window": true,
+    "glm_specification": {
+      "family": "Gaussian (Tweedie power=0)",
+      "link": "identity",
+      "feature_preprocessing": "training-only median imputation and standardization",
+      "alpha": 0.01,
+      "max_iter": 5000,
+      "tol": 1e-08
+    },
     "hist_gradient_boosting_internal_random_early_stopping": false,
     "algorithm_matched_incremental_tests": true
   },
@@ -35,14 +49,14 @@
     {
       "horizon_weeks": 1,
       "model_id": "hist_gradient_boosting__ar_brent",
-      "rmse_log_change": 0.04850539320577962,
-      "oos_r2_vs_zero_change": 0.08510409670117636
+      "rmse_log_change": 0.04946843058098542,
+      "oos_r2_vs_zero_change": 0.048414340621053986
     },
     {
       "horizon_weeks": 2,
-      "model_id": "hist_gradient_boosting__ar_brent_peak",
-      "rmse_log_change": 0.08647200585449223,
-      "oos_r2_vs_zero_change": 0.03930321689155203
+      "model_id": "hist_gradient_boosting__ar_brent_both",
+      "rmse_log_change": 0.0858984244591436,
+      "oos_r2_vs_zero_change": 0.05200583062145503
     },
     {
       "horizon_weeks": 4,
@@ -71,6 +85,20 @@
     "feature_sets": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\prediction_benchmarks\\forecast_v001_feature_sets.json",
     "log": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\logs\\07_prediction_benchmarks_forecast_v001.log",
     "manifest": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\prediction_benchmarks\\forecast_v001_manifest.json"
+  },
+  "output_sha256": {
+    "predictions": "856b3b0a07c4ef4d943d70deecd6c6a12299fbeffc3d15edcf0d619afb32b255",
+    "metrics": "91f94ac043c9d00e260dda5b31d9654f4f70a63702fdf5926e9d9970f7b520d9",
+    "statistical_tests": "bed5f06827e895bc024d717faedb5a0443f440a68a17e54d2224baaff786a3fd",
+    "fit_audit": "c0eba1bbcec2b6c02612bf90d561bb3be97150f21073f93f4284894a49a69ac7",
+    "feature_sets": "66406b657e747c96e8fb765b8e2317baa1cd5cfd5827909a1f1036a849e1656c"
+  },
+  "output_row_counts": {
+    "predictions": 33744,
+    "metrics": 95,
+    "statistical_tests": 180,
+    "fit_audit": 1934,
+    "feature_sets": 1
   },
   "software": {
     "python": "3.11.9",

@@ -124,6 +124,7 @@ STAGES: tuple[Stage, ...] = (
         8,
         "08_filter_irrelevant_news.py",
         "Filter irrelevant news and assign canonical events",
+        "external_kaggle",
         completion_artifacts=(
             "data/03_processed/news_full_text/pre_llm_filter/pre_llm_filter_summary.json",
             "data/03_processed/news_full_text/pre_llm_filter/event_dedup/canonical_event_manifest.json",
@@ -162,9 +163,11 @@ STAGES: tuple[Stage, ...] = (
     Stage(
         13,
         "13_build_disruption_index.py",
-        "Build article and weekly disruption indices",
+        "Build article, monthly-primary, and weekly-robustness disruption indices",
         completion_artifacts=(
             "data/05_indices/disruption_index_versions/msdi_v001_manifest.json",
+            "data/05_indices/monthly/msdi_monthly.csv",
+            "data/05_indices/weekly/msdi_weekly.csv",
         ),
     ),
     Stage(
@@ -604,6 +607,14 @@ def manifest_audit(path: Path, deep_hash: bool) -> dict[str, Any]:
             if key in {"manifest", "checkpoint_directory"} or not raw_output:
                 continue
             output = resolve_project_path(str(raw_output))
+            # External Kaggle manifests retain their original absolute paths.
+            # Once the artifact bundle is copied into this project, resolve an
+            # unavailable external path to the same-named file beside the
+            # imported manifest instead of requiring the Kaggle filesystem.
+            if not output.exists():
+                imported_output = path.parent / Path(str(raw_output)).name
+                if imported_output.exists():
+                    output = imported_output.resolve()
             if not output.exists():
                 missing.append(f"{key}:{output}")
                 continue
@@ -707,12 +718,27 @@ def render_smoke_report(report: dict[str, Any]) -> None:
 
 def atomic_write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    temporary = path.with_suffix(path.suffix + ".tmp")
+    temporary = path.with_name(
+        f".{path.name}.{os.getpid()}.{time.time_ns()}.tmp"
+    )
     temporary.write_text(
         json.dumps(payload, indent=2, sort_keys=True, default=str) + "\n",
         encoding="utf-8",
     )
-    os.replace(temporary, path)
+    # On Windows, antivirus scanners and file indexers can briefly open the
+    # destination without delete sharing.  ``os.replace`` then raises WinError
+    # 5 even though the directory ACL permits writes.  Retrying preserves the
+    # atomic contract without turning a transient lock into a pipeline failure.
+    maximum_attempts = 10
+    for attempt in range(maximum_attempts):
+        try:
+            os.replace(temporary, path)
+            return
+        except PermissionError:
+            if attempt + 1 == maximum_attempts:
+                temporary.unlink(missing_ok=True)
+                raise
+            time.sleep(min(0.05 * (2**attempt), 1.0))
 
 
 def selected_stages(first: int, last: int) -> list[Stage]:
@@ -796,6 +822,8 @@ def stage_command(
         return None, "covered_by_granular_registered_stages"
     if stage.mode == "manual_scoring":
         return None, f"external_scores_present:{len(scoring_archives())}_archives"
+    if stage.mode == "external_kaggle":
+        return None, "external_kaggle_artifacts_present"
     if stage.mode == "human_validation":
         if args.annotations:
             command = [

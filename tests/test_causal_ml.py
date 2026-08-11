@@ -241,7 +241,7 @@ class CausalMLTests(unittest.TestCase):
         with self.assertRaises(AssertionError):
             MODULE.treatment_horizon_invariance_audit(broken)
 
-    def test_primary_multiplicity_family_is_weekly_peak_only(self) -> None:
+    def test_primary_multiplicity_family_is_monthly_peak_only(self) -> None:
         frame = pd.DataFrame(
             {
                 "frequency": ["weekly"] * 4 + ["monthly"],
@@ -257,7 +257,7 @@ class CausalMLTests(unittest.TestCase):
             }
         )
         result = MODULE.add_effect_multiplicity(frame, "elastic_net")
-        self.assertEqual(result["primary_family"].tolist(), [True, True, False, False, False])
+        self.assertEqual(result["primary_family"].tolist(), [False, False, False, False, True])
         self.assertTrue(result.loc[result["primary_family"], "p_value_holm_primary_family"].notna().all())
 
     def test_monthly_completeness_contract_drops_partial_edges(self) -> None:
