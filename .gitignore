@@ -57,6 +57,8 @@ secrets.json
 /checkpoints/
 /models/
 /runs/
+/eda/outputs/*
+!/eda/outputs/.gitkeep
 /docs/
 
 # Experiment trackers and distributed-training state
