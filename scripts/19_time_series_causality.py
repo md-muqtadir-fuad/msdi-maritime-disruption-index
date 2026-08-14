@@ -61,6 +61,12 @@ def exogenous_controls(frame: pd.DataFrame) -> list[str]:
     return [*SEASONAL_CONTROLS, *[f"{column}_lag_1" for column in EXTERNAL_CONTROL_COLUMNS if f"{column}_lag_1" in frame]]
 
 
+def analysis_columns(frame: pd.DataFrame) -> list[str]:
+    """Return the complete-case columns required by the dynamic models."""
+
+    return [*ENDOGENOUS_VARIABLES, *exogenous_controls(frame), "scfi_log"]
+
+
 @dataclass(frozen=True)
 class FrequencySpecification:
     frequency: str
@@ -1542,7 +1548,7 @@ def main() -> None:
             )
             analysis_frame, sample_audit = select_longest_complete_block(
                 prepared,
-                [*ENDOGENOUS_VARIABLES, *exogenous_controls(analysis_frame), "scfi_log"],
+                analysis_columns(prepared),
                 spec.frequency,
             )
             sample_audit.update(

@@ -116,7 +116,7 @@ class SignificanceAnalysisTests(unittest.TestCase):
             "prediction"
         ]
         self.assertTrue(prediction["require_manifest_output_contract"])
-        self.assertEqual(prediction["expected_rows"], 180)
+        self.assertEqual(prediction["expected_rows"], 144)
         handoff = config["registry_sources"]["stage09b_raw_handoff"]
         self.assertIsNone(handoff["expected_rows"])
         nonlinear = config["registry_sources"]["stage09_nonlinear"]
@@ -301,6 +301,18 @@ class SignificanceAnalysisTests(unittest.TestCase):
             "confirmatory_primary",
         )
         self.assertEqual(
+            MODULE.classify_monthly_llm_family(
+                "monthly_primary_llm_vs_coverage__diebold_mariano_absolute"
+            ),
+            "prespecified_secondary",
+        )
+        self.assertEqual(
+            MODULE.classify_monthly_llm_family(
+                "monthly_primary_llm_vs_coverage__clark_west_nested_squared"
+            ),
+            "prespecified_secondary",
+        )
+        self.assertEqual(
             MODULE.classify_weekly_llm_family(
                 "sensitivity_hybrid_vs_baseline__diebold_mariano_absolute"
             ),
@@ -396,6 +408,58 @@ class SignificanceAnalysisTests(unittest.TestCase):
         self.assertEqual(duplicate["duplicate_of"], "earliest_owner")
         self.assertEqual(canonical["supporting_block_bootstrap_p_value"], 0.02)
         self.assertEqual(len(audit), 1)
+
+    def test_distinct_stage09_primary_family_is_not_deduplicated(self) -> None:
+        ablation = pd.DataFrame(
+            [
+                {
+                    "frequency": "monthly",
+                    "frequency_role": "primary",
+                    "index_construction": "adapted_pdf_sqrt_ema3",
+                    "comparison_id": "peak_vs_no_msdi",
+                    "family_id": "primary_monthly_peak_vs_no_msdi",
+                    "baseline_specification_id": "no_msdi",
+                    "variant_specification_id": "peak_only",
+                    "primary_family": True,
+                    "sample_subset": "full_sample",
+                    "loss": "squared_error",
+                    "horizon": 1,
+                    "paired_n": 58,
+                    "first_origin_date": "2021-03-31",
+                    "last_origin_date": "2025-12-31",
+                    "mean_loss_difference": -0.01,
+                    "standard_error_hac": 0.002,
+                    "dm_hac_p_value": 0.01,
+                    "dm_hac_p_value_adjusted": 0.03,
+                    "multiplicity_method": "holm",
+                    "bootstrap_p_value_two_sided": 0.02,
+                    "bootstrap_ci_lower": -0.02,
+                    "bootstrap_ci_upper": -0.001,
+                    "clark_west_one_sided_p_value": 0.4,
+                    "rmse_improvement_percent": -5.0,
+                    "incremental_oos_r_squared": -0.1,
+                }
+            ]
+        )
+        registry = MODULE.build_ablation_registry(ablation, 0.95)
+        self.assertEqual(registry.at[0, "inference_role"], "confirmatory_primary")
+        config = {
+            "semantic_duplicate_contract": {
+                "numeric_effect_tolerance": 1.0e-12,
+                "mappings": [],
+                "expected_stage09_duplicate_rows": 0,
+                "expected_stage09_duplicate_rows_by_frequency": {
+                    "weekly": 0,
+                    "monthly": 0,
+                },
+                "expected_reassigned_primary_rows": 0,
+            }
+        }
+        observed, audit = MODULE.apply_forecast_semantic_deduplication(
+            registry, ablation, config
+        )
+        self.assertTrue(observed.at[0, "canonical_inference"])
+        self.assertTrue(audit.empty)
 
     def test_varx_repeats_choose_smallest_lag_ceiling(self) -> None:
         rows = []

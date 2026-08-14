@@ -138,6 +138,10 @@ MONTHLY_BRENT_FEATURES = (
     *[f"brent_monthly_mean_log_lag_{lag}m" for lag in MONTHLY_LAGS],
     *[f"brent_monthly_mean_log_change_{lag}m" for lag in (1, 3, 6, 12)],
 )
+EXTERNAL_CONTROL_COLUMNS = (
+    "cpb_world_trade_volume",
+    "unctad_china_core_lane_lsbci",
+)
 WEEKLY_EXTERNAL_CONTROL_FEATURES = (
     *[f"cpb_world_trade_volume_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
     *[f"unctad_china_core_lane_lsbci_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
@@ -521,6 +525,7 @@ def load_common_articles(
         "source_domain",
         "source_name",
         "duplicate_group_size",
+        "source_duplicate_weight",
         "event_id_weekly",
         "event_id_monthly",
     ]
@@ -537,6 +542,7 @@ def load_common_articles(
     for column in [
         *score_columns,
         "duplicate_group_size",
+        "source_duplicate_weight",
     ]:
         article[column] = pd.to_numeric(article[column], errors="coerce")
     common = article.loc[
@@ -555,6 +561,12 @@ def load_common_articles(
     common["duplicate_group_size"] = (
         common["duplicate_group_size"].fillna(1).clip(lower=1)
     )
+    if common["source_duplicate_weight"].isna().any() or common[
+        "source_duplicate_weight"
+    ].le(0).any():
+        raise ValueError(
+            "Frozen common cohort has invalid source_duplicate_weight values"
+        )
     common["source_domain"] = (
         common["source_domain"].fillna("unknown_source").astype(str).str.strip()
     )
@@ -1199,11 +1211,12 @@ def load_weekly_base_panel(path: Path) -> pd.DataFrame:
     required = {
         "observation_date",
         "scfi",
+        *EXTERNAL_CONTROL_COLUMNS,
         *WEEKLY_AR_FEATURES,
         *WEEKLY_BRENT_FEATURES,
         *WEEKLY_EXTERNAL_CONTROL_FEATURES,
-        *[f"target_scfi_log_change_h{h}w" for h in (1, 2, 4, 8, 12)],
-        *[f"target_scfi_level_h{h}w" for h in (1, 2, 4, 8, 12)],
+        *[f"target_scfi_log_change_h{h}w" for h in (1, 2, 4, 6)],
+        *[f"target_scfi_level_h{h}w" for h in (1, 2, 4, 6)],
     }
     header = pd.read_csv(resolved, nrows=0)
     missing = sorted(required.difference(header.columns))
@@ -1228,6 +1241,7 @@ def load_monthly_base_panel(path: Path) -> pd.DataFrame:
     required = {
         "month_ending",
         "scfi_monthly_mean",
+        *EXTERNAL_CONTROL_COLUMNS,
         *MONTHLY_AR_FEATURES,
         *MONTHLY_BRENT_FEATURES,
         *MONTHLY_EXTERNAL_CONTROL_FEATURES,
@@ -1498,6 +1512,10 @@ def build_common_cohort_analysis_panels(
             "breadth_score_media_corrected": weekly_aligned[
                 _variant_column("signal", breadth)
             ],
+            **{
+                column: weekly_aligned[column]
+                for column in EXTERNAL_CONTROL_COLUMNS
+            },
         }
     )
     construction = "adapted_pdf_sqrt_ema3"
@@ -1522,6 +1540,10 @@ def build_common_cohort_analysis_panels(
             ],
             "msdi_available_weeks": monthly_aligned["matched_mondays"],
             "weekly_observations_in_month": monthly_aligned["expected_mondays"],
+            **{
+                column: monthly_aligned[column]
+                for column in EXTERNAL_CONTROL_COLUMNS
+            },
         }
     )
     return {"weekly": weekly, "monthly": monthly}
@@ -1601,32 +1623,45 @@ def reference_reconstruction_audit(
     tolerance: float = 1e-10,
 ) -> pd.DataFrame:
     """Fail closed unless stage-09 references reproduce stages 07b/07c."""
-    expected_source_weight = duplicate_weights(article["duplicate_group_size"], "sqrt")
-    expected_weight = period_event_weights(
-        article, expected_source_weight, "W-FRI", "fixed"
+    # Stage 16 recomputes event-period weights only after restricting to the
+    # frozen all-four-LLM cohort. Therefore the article table's generic
+    # novelty_weight (monthly-primary provenance) is not a valid weekly
+    # reference. Audit the persistent duplicate component here; the weekly and
+    # monthly period-event weights are validated below through exact aggregate
+    # reconstruction against the Stage 16/17 panels.
+    expected_source_weight = duplicate_weights(
+        article["duplicate_group_size"], "sqrt"
     )
-    novelty_difference = (article["novelty_weight"] - expected_weight).abs()
-    novelty_maximum = float(novelty_difference.max())
+    source_weight_difference = (
+        article["source_duplicate_weight"] - expected_source_weight
+    ).abs()
+    source_weight_maximum = float(source_weight_difference.max())
     rows: list[dict[str, Any]] = [
         {
-            "audit_layer": "article_novelty_weight",
+            "audit_layer": "article_source_duplicate_weight",
             "frequency": "article",
-            "index_construction": "sqrt_duplicate_then_fixed_event_total",
+            "index_construction": "inverse_sqrt_duplicate_group_size",
             "msdi_path": "both",
             "date_column": "publication_date",
-            "reconstructed_column": "period_local_fixed_event_total_weight",
-            "reference_column": "novelty_weight",
-            "matched_nonmissing_rows": int(novelty_difference.notna().sum()),
-            "reconstructed_nonmissing_rows": int(expected_weight.notna().sum()),
-            "reference_nonmissing_rows": int(article["novelty_weight"].notna().sum()),
+            "reconstructed_column": "inverse_sqrt_duplicate_group_size",
+            "reference_column": "source_duplicate_weight",
+            "matched_nonmissing_rows": int(
+                source_weight_difference.notna().sum()
+            ),
+            "reconstructed_nonmissing_rows": int(
+                expected_source_weight.notna().sum()
+            ),
+            "reference_nonmissing_rows": int(
+                article["source_duplicate_weight"].notna().sum()
+            ),
             "reconstructed_only_dates": 0,
             "reference_only_dates": 0,
             "sample_start_date": article["publication_date"].min(),
             "sample_end_date": article["publication_date"].max(),
-            "maximum_absolute_difference": novelty_maximum,
-            "mean_absolute_difference": float(novelty_difference.mean()),
+            "maximum_absolute_difference": source_weight_maximum,
+            "mean_absolute_difference": float(source_weight_difference.mean()),
             "tolerance": tolerance,
-            "contract_passed": bool(novelty_maximum <= tolerance),
+            "contract_passed": bool(source_weight_maximum <= tolerance),
         }
     ]
 
@@ -1745,8 +1780,8 @@ def reference_reconstruction_audit(
         monthly_long["variant_id"].eq("reference_peak_median")
     ]
     for reconstructed_column, reference_column in (
-        ("article_count_sum", monthly_columns["article_count"]),
-        ("effective_article_count_sum", monthly_columns["effective_count"]),
+        ("direct_article_count", monthly_columns["article_count"]),
+        ("direct_effective_article_count", monthly_columns["effective_count"]),
     ):
         rows.append(
             _reconstruction_row(
@@ -1754,7 +1789,7 @@ def reference_reconstruction_audit(
                 monthly_reference,
                 layer="reference_monthly_coverage",
                 frequency="monthly",
-                construction="both",
+                construction="adapted_pdf_sqrt_ema3",
                 path_name="both",
                 date_column="month_ending",
                 reconstructed_column=reconstructed_column,
@@ -3261,6 +3296,7 @@ def prepare_dynamic_frames(
                 spec.brent_column,
                 spec.article_count_column,
                 *spec.msdi_columns.values(),
+                *support08.EXTERNAL_CONTROL_COLUMNS,
             }
             missing = sorted(required.difference(panel.columns))
             if missing:

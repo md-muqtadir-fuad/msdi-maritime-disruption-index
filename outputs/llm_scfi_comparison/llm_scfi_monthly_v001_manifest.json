@@ -4,12 +4,12 @@
   "inputs": {
     "weekly_common_cohort_panel": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\llm_specific_scfi_weekly_panel.csv",
-      "sha256": "bcada4e880cd3efa9a0fb27c1421fa2f9cb80a2b526aa5f449147e4fb27a4981",
+      "sha256": "e9af2578357eb12a61e04d137a4c36bee0197606a75a537a79683585747e7418",
       "rows": 522
     },
     "weekly_manifest": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_manifest.json",
-      "sha256": "fb3219eb8d1bb5744ab20ea823d4f4125c8bae5eb969dcafbb13c62336c46489",
+      "sha256": "8f07fb6ca7965316f91aedab25e979efd0287afadcaccb757098e86480b4a1e6",
       "version": "llm_scfi_v001"
     },
     "frozen_common_article_cohort": {
@@ -39,8 +39,8 @@
       "qwen_2_5_7b",
       "glm_4_9b_0414"
     ],
-    "weekly_manifest_sha256": "fb3219eb8d1bb5744ab20ea823d4f4125c8bae5eb969dcafbb13c62336c46489",
-    "weekly_panel_sha256": "bcada4e880cd3efa9a0fb27c1421fa2f9cb80a2b526aa5f449147e4fb27a4981"
+    "weekly_manifest_sha256": "8f07fb6ca7965316f91aedab25e979efd0287afadcaccb757098e86480b4a1e6",
+    "weekly_panel_sha256": "e9af2578357eb12a61e04d137a4c36bee0197606a75a537a79683585747e7418"
   },
   "weekly_input_audit": {
     "rows": 522,
@@ -54,7 +54,7 @@
     },
     "aligned_weekly_article_count_sum": 6074,
     "raw_signal_columns_selected": 54,
-    "target_columns_excluded": 10,
+    "target_columns_excluded": 8,
     "weekly_derived_signal_columns_excluded": 756,
     "broader_consensus_predictor_columns_selected": 0
   },
@@ -342,17 +342,17 @@
   "output_sha256": {
     "monthly_signal_audit": "ad99f1803225d2858ff78e279749c4375e768edad2a79c86611690b0c65c052b",
     "signal_differences": "a6d12d55e3ba9ff2fc4715949dd797de7076310609e921651f45b7e058688b9f",
-    "monthly_panel": "371a6a9ebcbd7c6bd7fce05d1c87c998b17cdd367318c4a585ee5a75969505e9",
-    "forecasts": "e7ae74a14dea9b2cc3d205b1fc3bc53a640b9dab1382a05eb4a391d8b9d5fb41",
-    "metrics": "d864100e13735464343b1fcf79ad26f4abc48dfa55a819b1031c5571384f213a",
-    "statistical_tests": "c5f110211bd33d8ed423fb42d56ea96dafeb6e88451147fa17e17fa2a674fb84",
+    "monthly_panel": "bb70386f380969def1a8a9835bb62d505b15defcf81476f7b8cdb859e769743b",
+    "forecasts": "a0cfaa120237ba80855c7ecd457ce0a4abf6754ed5b3c7f9b4e199d524ea3ade",
+    "metrics": "93916c606544e75f157c978656b3ee083f188928ffa05787aacb328d342a721f",
+    "statistical_tests": "841d27db02f3ca79afb79cea0c2d5acf6f4ac85c88c91b21283a4ea5ed86f80c",
     "fit_audit": "243b9ede16a70f8dd6d42c24d80545877274d1a419b23042856e15e4d78ec8f0",
     "origin_audit": "42032a0fb2421d3d5ab4c36131e271fdf230e51e78f7253e05dcb0161dc25099",
-    "hybrid_weights": "fd63593e6ffbf7198c0d267fb5b54483481a10d46bee641dcc2ba6553b40a99a",
+    "hybrid_weights": "175820729174580b7f8f37f77eab00ce7dd395d5edf5fcd6af93a6bdd15cc256",
     "llm_ranking": "e71ec50f4fe9d435f3c9f46f57c035a1058698921e4f73ea3e4ee89b9b6cf840",
     "llm_ranking_cells": "aa7ac59b7de77c1990dfd4e1c8da3a6b5c79b3258379617c83117cbb8ce4562c",
     "primary_predictor_ranking": "e228bb8a39c032730fa2bc97c7e57cb7fff6fe0c09ea5d37cb65ed7b30388cd7",
-    "dimension_summary": "ca825d015e042cf4462a059c9ac007d4fae3e0aa3d09a3e194989308a9bbf84c",
+    "dimension_summary": "ae2bbfff8def40cc0f49e168b41e16ac11b6f758be26c3596ef0de28f2632e51",
     "construction_summary": "dbbd13943bd69e3073c7655e6139c5242841063d1f447899b754c1f26af9d876",
     "feature_sets": "c8896a5843ba9b9acb3c456329d32d781e3d7e0f5d53901ef961071a60caf66f"
   },
@@ -375,7 +375,7 @@
   "log": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\logs\\07c_monthly_llm_scfi_comparison_llm_scfi_monthly_v001.log",
   "software": {
     "python": "3.11.9",
-    "pandas": "3.0.3",
+    "pandas": "2.3.3",
     "numpy": "2.4.6"
   }
 }

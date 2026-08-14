@@ -25,3 +25,6 @@ evaluate
 sentence-transformers
 krippendorff
 optuna
+torch
+prophet
+neuralforecast

@@ -45,7 +45,7 @@ models:
 prediction:
   primary_frequency: monthly
   weekly_frequency_role: higher_frequency_robustness
-  horizons_weeks: [1, 2, 4, 8, 12]
+  horizons_weeks: [1, 2, 4, 6]
   validation: expanding_window_with_horizon_purge
   statistical_models:
     - naive_zero_change

@@ -1,164 +1,162 @@
-2026-08-01 03:03:17,285 | INFO | Starting dynamic time-series analysis version=causality_v001
-2026-08-01 03:03:17,286 | INFO | Arguments: {'weekly_panel': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/prediction/msdi_scfi_weekly_panel.csv'), 'monthly_panel': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/causality/msdi_scfi_monthly_panel.csv'), 'output_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/time_series_causality'), 'log_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/logs'), 'version': 'causality_v001', 'weekly_maximum_lag': 12, 'monthly_maximum_lag': 6, 'weekly_lp_horizon': 12, 'monthly_lp_horizon': 6, 'weekly_irf_horizon': 12, 'monthly_irf_horizon': 6, 'minimum_observations': 80, 'alpha': 0.05, 'pcmci_pc_alpha': 0.2, 'irf_monte_carlo_repetitions': 500, 'lp_bootstrap_repetitions': 500, 'lp_block_length': 0, 'seed': 20260801, 'skip_pcmci': False}
-2026-08-01 03:03:17,286 | WARNING | Interpretation guardrail: VAR, Granger, PCMCI, and local projections are observational dynamic analyses, not automatic causal identification.
-2026-08-01 03:03:17,322 | INFO | Loaded weekly panel rows=522 range=2016-02-08 00:00:00 to 2026-02-02 00:00:00
-2026-08-01 03:03:17,572 | INFO | weekly/peak stationary-change sample rows=517 range=2016-02-15 00:00:00 to 2026-01-05 00:00:00 excluded_noncontiguous=0
-2026-08-01 03:03:17,572 | INFO | Stationarity weekly/peak variable=scfi_log transform=log_level ADF_p=0.33679082170555596 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:03:17,572 | INFO | Stationarity weekly/peak variable=scfi_return transform=first_difference_of_log ADF_p=0.0006502892015493709 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:03:17,572 | INFO | Stationarity weekly/peak variable=brent_log transform=log_level ADF_p=0.06784548257366198 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:03:17,572 | INFO | Stationarity weekly/peak variable=brent_return transform=first_difference_of_log ADF_p=8.935932584575707e-15 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:03:17,572 | INFO | Stationarity weekly/peak variable=msdi_level transform=media_corrected_level ADF_p=0.15880179922702625 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:03:17,572 | INFO | Stationarity weekly/peak variable=msdi_change transform=first_difference ADF_p=7.22716999490243e-20 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:03:17,572 | INFO | Stationarity weekly/peak variable=log_news_volume transform=log1p_level ADF_p=0.05939393668975833 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:03:17,572 | INFO | Stationarity weekly/peak variable=news_volume_change transform=first_difference_of_log1p ADF_p=3.54867675641682e-15 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:03:28,789 | INFO | PCMCI weekly/peak FDR-significant links into SCFI return=7
-2026-08-01 03:03:28,789 | INFO | PCMCI link weekly/peak scfi_return(t-1)->SCFI partial_r=0.365304 raw_p=1.00121e-16 fdr_p=6.40776e-15
-2026-08-01 03:03:28,789 | INFO | PCMCI link weekly/peak scfi_return(t-2)->SCFI partial_r=0.206800 raw_p=4.58891e-06 fdr_p=0.000110134
-2026-08-01 03:03:28,789 | INFO | PCMCI link weekly/peak scfi_return(t-3)->SCFI partial_r=-0.142806 raw_p=0.00167106 fdr_p=0.0229175
-2026-08-01 03:03:28,789 | INFO | PCMCI link weekly/peak scfi_return(t-9)->SCFI partial_r=0.221741 raw_p=8.79181e-07 fdr_p=2.41147e-05
-2026-08-01 03:03:28,789 | INFO | PCMCI link weekly/peak scfi_return(t-10)->SCFI partial_r=-0.132205 raw_p=0.00364061 fdr_p=0.0436873
-2026-08-01 03:03:28,789 | INFO | PCMCI link weekly/peak scfi_return(t-11)->SCFI partial_r=-0.178693 raw_p=8.12737e-05 fdr_p=0.00173384
-2026-08-01 03:03:28,789 | INFO | PCMCI link weekly/peak news_volume_change(t-12)->SCFI partial_r=-0.152580 raw_p=0.000787029 fdr_p=0.0137372
-2026-08-01 03:04:58,474 | INFO | VARX weekly/peak selected_lag=1 BIC=-11.621202 stable=True residual_whiteness_p=2.55232e-19 selection_reason=bic_fallback_no_candidate_passed_whiteness
-2026-08-01 03:04:58,474 | WARNING | VARX weekly/peak failed residual-whiteness diagnostics at all candidate lags; use HAC local projections and HAC Granger as primary inference, and treat VAR IRFs as exploratory.
-2026-08-01 03:04:58,474 | INFO | Conditional Granger weekly/peak model=conditional_varx msdi_change->scfi_return statistic=1.203725 distribution=F p=0.272708
-2026-08-01 03:04:58,474 | INFO | Conditional Granger weekly/peak model=conditional_varx scfi_return->msdi_change statistic=0.314613 distribution=F p=0.574925
-2026-08-01 03:04:58,474 | INFO | Conditional Granger weekly/peak model=conditional_ols_hac_prespecified_max_lag msdi_change->scfi_return statistic=21.052350 distribution=chi_square p=0.0496191
-2026-08-01 03:04:58,474 | INFO | Conditional Granger weekly/peak model=conditional_ols_hac_prespecified_max_lag scfi_return->msdi_change statistic=18.682339 distribution=chi_square p=0.0964884
-2026-08-01 03:04:58,474 | INFO | LP bootstrap weekly/peak successful=500/500 block_length=9 sup_t_critical=3.093646
-2026-08-01 03:04:58,726 | INFO | weekly/breadth stationary-change sample rows=517 range=2016-02-15 00:00:00 to 2026-01-05 00:00:00 excluded_noncontiguous=0
-2026-08-01 03:04:58,726 | INFO | Stationarity weekly/breadth variable=scfi_log transform=log_level ADF_p=0.33679082170555596 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:04:58,726 | INFO | Stationarity weekly/breadth variable=scfi_return transform=first_difference_of_log ADF_p=0.0006502892015493709 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:04:58,726 | INFO | Stationarity weekly/breadth variable=brent_log transform=log_level ADF_p=0.06784548257366198 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:04:58,726 | INFO | Stationarity weekly/breadth variable=brent_return transform=first_difference_of_log ADF_p=8.935932584575707e-15 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:04:58,726 | INFO | Stationarity weekly/breadth variable=msdi_level transform=media_corrected_level ADF_p=0.1798171245612366 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:04:58,726 | INFO | Stationarity weekly/breadth variable=msdi_change transform=first_difference ADF_p=1.2401757843620501e-19 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:04:58,726 | INFO | Stationarity weekly/breadth variable=log_news_volume transform=log1p_level ADF_p=0.05939393668975833 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:04:58,726 | INFO | Stationarity weekly/breadth variable=news_volume_change transform=first_difference_of_log1p ADF_p=3.54867675641682e-15 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:05:12,916 | INFO | PCMCI weekly/breadth FDR-significant links into SCFI return=7
-2026-08-01 03:05:12,918 | INFO | PCMCI link weekly/breadth scfi_return(t-1)->SCFI partial_r=0.365304 raw_p=1.00121e-16 fdr_p=6.40776e-15
-2026-08-01 03:05:12,918 | INFO | PCMCI link weekly/breadth scfi_return(t-2)->SCFI partial_r=0.206800 raw_p=4.58891e-06 fdr_p=0.000110134
-2026-08-01 03:05:12,919 | INFO | PCMCI link weekly/breadth scfi_return(t-3)->SCFI partial_r=-0.142806 raw_p=0.00167106 fdr_p=0.0246803
-2026-08-01 03:05:12,919 | INFO | PCMCI link weekly/breadth scfi_return(t-9)->SCFI partial_r=0.221741 raw_p=8.79181e-07 fdr_p=2.41147e-05
-2026-08-01 03:05:12,919 | INFO | PCMCI link weekly/breadth scfi_return(t-10)->SCFI partial_r=-0.132205 raw_p=0.00364061 fdr_p=0.0465998
-2026-08-01 03:05:12,920 | INFO | PCMCI link weekly/breadth scfi_return(t-11)->SCFI partial_r=-0.178693 raw_p=8.12737e-05 fdr_p=0.00173384
-2026-08-01 03:05:12,920 | INFO | PCMCI link weekly/breadth news_volume_change(t-12)->SCFI partial_r=-0.148177 raw_p=0.0011439 fdr_p=0.0199663
-2026-08-01 03:06:57,781 | INFO | VARX weekly/breadth selected_lag=2 BIC=-13.427531 stable=True residual_whiteness_p=1.0598e-18 selection_reason=bic_fallback_no_candidate_passed_whiteness
-2026-08-01 03:06:57,782 | WARNING | VARX weekly/breadth failed residual-whiteness diagnostics at all candidate lags; use HAC local projections and HAC Granger as primary inference, and treat VAR IRFs as exploratory.
-2026-08-01 03:06:57,783 | INFO | Conditional Granger weekly/breadth model=conditional_varx msdi_change->scfi_return statistic=0.634989 distribution=F p=0.530047
-2026-08-01 03:06:57,784 | INFO | Conditional Granger weekly/breadth model=conditional_varx scfi_return->msdi_change statistic=0.209736 distribution=F p=0.810816
-2026-08-01 03:06:57,784 | INFO | Conditional Granger weekly/breadth model=conditional_ols_hac_prespecified_max_lag msdi_change->scfi_return statistic=23.815445 distribution=chi_square p=0.0215489
-2026-08-01 03:06:57,784 | INFO | Conditional Granger weekly/breadth model=conditional_ols_hac_prespecified_max_lag scfi_return->msdi_change statistic=15.410481 distribution=chi_square p=0.219752
-2026-08-01 03:06:57,785 | INFO | LP bootstrap weekly/breadth successful=500/500 block_length=9 sup_t_critical=3.033383
-2026-08-01 03:06:57,791 | INFO | Loaded monthly panel rows=121 range=2016-02-29 00:00:00 to 2026-02-28 00:00:00
-2026-08-01 03:06:57,912 | INFO | monthly/peak stationary-change sample rows=119 range=2016-03-31 00:00:00 to 2026-01-31 00:00:00 excluded_noncontiguous=0
-2026-08-01 03:06:57,912 | INFO | Stationarity monthly/peak variable=scfi_log transform=log_level ADF_p=0.0373148224786974 KPSS_p=0.01 decision=mixed_test_evidence
-2026-08-01 03:06:57,912 | INFO | Stationarity monthly/peak variable=scfi_return transform=first_difference_of_log ADF_p=0.0072630675218890856 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:06:57,912 | INFO | Stationarity monthly/peak variable=brent_log transform=log_level ADF_p=0.08777647349883755 KPSS_p=0.010473038823570093 decision=nonstationary_by_both
-2026-08-01 03:06:57,912 | INFO | Stationarity monthly/peak variable=brent_return transform=first_difference_of_log ADF_p=1.163476999143284e-14 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:06:57,912 | INFO | Stationarity monthly/peak variable=msdi_level transform=media_corrected_level ADF_p=0.3795036331195735 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:06:57,912 | INFO | Stationarity monthly/peak variable=msdi_change transform=first_difference ADF_p=5.272503332814657e-17 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:06:57,912 | INFO | Stationarity monthly/peak variable=log_news_volume transform=log1p_level ADF_p=0.11943823724691777 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:06:57,912 | INFO | Stationarity monthly/peak variable=news_volume_change transform=first_difference_of_log1p ADF_p=9.999160616565546e-07 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:07:05,080 | INFO | PCMCI monthly/peak FDR-significant links into SCFI return=2
-2026-08-01 03:07:05,096 | INFO | PCMCI link monthly/peak scfi_return(t-1)->SCFI partial_r=0.542745 raw_p=3.79508e-09 fdr_p=3.64327e-07
-2026-08-01 03:07:05,096 | INFO | PCMCI link monthly/peak scfi_return(t-2)->SCFI partial_r=-0.300058 raw_p=0.00229925 fdr_p=0.0315326
-2026-08-01 03:08:09,046 | INFO | VARX monthly/peak selected_lag=2 BIC=-8.993262 stable=True residual_whiteness_p=0.40141 selection_reason=minimum_bic_among_residual_white_candidates
-2026-08-01 03:08:09,046 | INFO | Conditional Granger monthly/peak model=conditional_varx msdi_change->scfi_return statistic=1.683588 distribution=F p=0.186945
-2026-08-01 03:08:09,046 | INFO | Conditional Granger monthly/peak model=conditional_varx scfi_return->msdi_change statistic=0.037473 distribution=F p=0.963224
-2026-08-01 03:08:09,046 | INFO | Conditional Granger monthly/peak model=conditional_ols_hac_prespecified_max_lag msdi_change->scfi_return statistic=12.204678 distribution=chi_square p=0.0575554
-2026-08-01 03:08:09,046 | INFO | Conditional Granger monthly/peak model=conditional_ols_hac_prespecified_max_lag scfi_return->msdi_change statistic=16.087191 distribution=chi_square p=0.0132935
-2026-08-01 03:08:09,046 | INFO | LP bootstrap monthly/peak successful=500/500 block_length=5 sup_t_critical=4.738562
-2026-08-01 03:08:09,184 | INFO | monthly/breadth stationary-change sample rows=119 range=2016-03-31 00:00:00 to 2026-01-31 00:00:00 excluded_noncontiguous=0
-2026-08-01 03:08:09,184 | INFO | Stationarity monthly/breadth variable=scfi_log transform=log_level ADF_p=0.0373148224786974 KPSS_p=0.01 decision=mixed_test_evidence
-2026-08-01 03:08:09,184 | INFO | Stationarity monthly/breadth variable=scfi_return transform=first_difference_of_log ADF_p=0.0072630675218890856 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:08:09,184 | INFO | Stationarity monthly/breadth variable=brent_log transform=log_level ADF_p=0.08777647349883755 KPSS_p=0.010473038823570093 decision=nonstationary_by_both
-2026-08-01 03:08:09,184 | INFO | Stationarity monthly/breadth variable=brent_return transform=first_difference_of_log ADF_p=1.163476999143284e-14 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:08:09,184 | INFO | Stationarity monthly/breadth variable=msdi_level transform=media_corrected_level ADF_p=0.3921905660279736 KPSS_p=0.012826680696390673 decision=nonstationary_by_both
-2026-08-01 03:08:09,184 | INFO | Stationarity monthly/breadth variable=msdi_change transform=first_difference ADF_p=1.816188539108274e-15 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:08:09,184 | INFO | Stationarity monthly/breadth variable=log_news_volume transform=log1p_level ADF_p=0.11943823724691777 KPSS_p=0.01 decision=nonstationary_by_both
-2026-08-01 03:08:09,184 | INFO | Stationarity monthly/breadth variable=news_volume_change transform=first_difference_of_log1p ADF_p=9.999160616565546e-07 KPSS_p=0.1 decision=stationary_by_both
-2026-08-01 03:08:15,947 | INFO | PCMCI monthly/breadth FDR-significant links into SCFI return=2
-2026-08-01 03:08:15,962 | INFO | PCMCI link monthly/breadth scfi_return(t-1)->SCFI partial_r=0.537002 raw_p=5.93765e-09 fdr_p=5.70015e-07
-2026-08-01 03:08:15,962 | INFO | PCMCI link monthly/breadth scfi_return(t-2)->SCFI partial_r=-0.298152 raw_p=0.00245945 fdr_p=0.0393512
-2026-08-01 03:09:20,515 | INFO | VARX monthly/breadth selected_lag=2 BIC=-10.686256 stable=True residual_whiteness_p=0.436533 selection_reason=minimum_bic_among_residual_white_candidates
-2026-08-01 03:09:20,515 | INFO | Conditional Granger monthly/breadth model=conditional_varx msdi_change->scfi_return statistic=1.561622 distribution=F p=0.211
-2026-08-01 03:09:20,515 | INFO | Conditional Granger monthly/breadth model=conditional_varx scfi_return->msdi_change statistic=0.194760 distribution=F p=0.823106
-2026-08-01 03:09:20,515 | INFO | Conditional Granger monthly/breadth model=conditional_ols_hac_prespecified_max_lag msdi_change->scfi_return statistic=9.634910 distribution=chi_square p=0.140893
-2026-08-01 03:09:20,515 | INFO | Conditional Granger monthly/breadth model=conditional_ols_hac_prespecified_max_lag scfi_return->msdi_change statistic=15.534593 distribution=chi_square p=0.0164824
-2026-08-01 03:09:20,515 | INFO | LP bootstrap monthly/breadth successful=500/500 block_length=5 sup_t_critical=4.986985
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=0 beta_log=0.002006 effect_pct=0.2008 HAC_se=0.003244 raw_p=0.536317 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.008031,0.012043] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=1 beta_log=0.001298 effect_pct=0.1299 HAC_se=0.004131 raw_p=0.753342 Holm_p=1 FDR_p=0.849496 simultaneous=[-0.011482,0.014079] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=2 beta_log=0.003286 effect_pct=0.3291 HAC_se=0.005852 raw_p=0.574457 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.014819,0.021391] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=3 beta_log=0.003770 effect_pct=0.3777 HAC_se=0.006327 raw_p=0.551327 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.015805,0.023344] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=4 beta_log=0.003694 effect_pct=0.3701 HAC_se=0.006684 raw_p=0.580453 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.016984,0.024372] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=5 beta_log=0.004708 effect_pct=0.4719 HAC_se=0.006948 raw_p=0.498003 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.016786,0.026203] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=6 beta_log=0.005883 effect_pct=0.5900 HAC_se=0.006875 raw_p=0.392207 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.015387,0.027153] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=7 beta_log=0.003576 effect_pct=0.3583 HAC_se=0.006921 raw_p=0.605337 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.017834,0.024987] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=8 beta_log=0.003522 effect_pct=0.3528 HAC_se=0.007057 raw_p=0.617693 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.018309,0.025354] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=9 beta_log=0.006834 effect_pct=0.6858 HAC_se=0.006874 raw_p=0.320114 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.014431,0.028100] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=10 beta_log=0.008660 effect_pct=0.8697 HAC_se=0.006977 raw_p=0.214562 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.012926,0.030245] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=11 beta_log=0.009053 effect_pct=0.9094 HAC_se=0.006675 raw_p=0.175028 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.011597,0.029703] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/peak h=12 beta_log=0.008718 effect_pct=0.8756 HAC_se=0.006115 raw_p=0.153941 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.010199,0.027635] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=0 beta_log=0.000615 effect_pct=0.0615 HAC_se=0.002656 raw_p=0.816823 Holm_p=1 FDR_p=0.849496 simultaneous=[-0.007443,0.008673] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=1 beta_log=-0.000589 effect_pct=-0.0589 HAC_se=0.003531 raw_p=0.867552 Holm_p=1 FDR_p=0.867552 simultaneous=[-0.011298,0.010121] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=2 beta_log=0.001216 effect_pct=0.1217 HAC_se=0.005140 raw_p=0.813009 Holm_p=1 FDR_p=0.849496 simultaneous=[-0.014377,0.016809] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=3 beta_log=0.002907 effect_pct=0.2911 HAC_se=0.005817 raw_p=0.617274 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.014739,0.020553] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=4 beta_log=0.004917 effect_pct=0.4930 HAC_se=0.006192 raw_p=0.427085 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.013865,0.023700] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=5 beta_log=0.005935 effect_pct=0.5952 HAC_se=0.006537 raw_p=0.363981 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.013895,0.025764] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=6 beta_log=0.006003 effect_pct=0.6021 HAC_se=0.006563 raw_p=0.360332 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.013905,0.025912] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=7 beta_log=0.003447 effect_pct=0.3453 HAC_se=0.006490 raw_p=0.595254 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.016238,0.023133] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=8 beta_log=0.004241 effect_pct=0.4250 HAC_se=0.006709 raw_p=0.527246 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.016108,0.024591] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=9 beta_log=0.007644 effect_pct=0.7673 HAC_se=0.006759 raw_p=0.258075 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.012858,0.028145] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=10 beta_log=0.009976 effect_pct=1.0026 HAC_se=0.006807 raw_p=0.142768 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.010673,0.030625] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=11 beta_log=0.010904 effect_pct=1.0964 HAC_se=0.006909 raw_p=0.114506 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.010053,0.031861] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection weekly/breadth h=12 beta_log=0.011083 effect_pct=1.1144 HAC_se=0.006973 raw_p=0.11197 Holm_p=1 FDR_p=0.730001 simultaneous=[-0.010069,0.032234] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection monthly/peak h=0 beta_log=0.030431 effect_pct=3.0899 HAC_se=0.013583 raw_p=0.0250656 Holm_p=0.25816 FDR_p=0.0434003 simultaneous=[-0.033933,0.094795] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection monthly/peak h=1 beta_log=0.051164 effect_pct=5.2495 HAC_se=0.022733 raw_p=0.0244071 Holm_p=0.25816 FDR_p=0.0434003 simultaneous=[-0.056557,0.158885] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection monthly/peak h=2 beta_log=0.071587 effect_pct=7.4212 HAC_se=0.025625 raw_p=0.00521093 Holm_p=0.0677421 FDR_p=0.0364765 simultaneous=[-0.049836,0.193010] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection monthly/peak h=3 beta_log=0.062385 effect_pct=6.4372 HAC_se=0.028375 raw_p=0.0279087 Holm_p=0.25816 FDR_p=0.0434003 simultaneous=[-0.072073,0.196842] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection monthly/peak h=4 beta_log=0.065335 effect_pct=6.7517 HAC_se=0.033177 raw_p=0.0489193 Holm_p=0.25816 FDR_p=0.052546 simultaneous=[-0.091876,0.222547] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection monthly/peak h=5 beta_log=0.078482 effect_pct=8.1644 HAC_se=0.037498 raw_p=0.0363531 Holm_p=0.25816 FDR_p=0.0462676 simultaneous=[-0.099205,0.256170] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection monthly/peak h=6 beta_log=0.100525 effect_pct=10.5751 HAC_se=0.045136 raw_p=0.025937 Holm_p=0.25816 FDR_p=0.0434003 simultaneous=[-0.113355,0.314404] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection monthly/breadth h=0 beta_log=0.030247 effect_pct=3.0709 HAC_se=0.013713 raw_p=0.0274055 Holm_p=0.25816 FDR_p=0.0434003 simultaneous=[-0.038140,0.098634] joint_significant=False
-2026-08-01 03:09:20,865 | INFO | Local projection monthly/breadth h=1 beta_log=0.049981 effect_pct=5.1251 HAC_se=0.020578 raw_p=0.0151468 Holm_p=0.181762 FDR_p=0.0434003 simultaneous=[-0.052642,0.152605] joint_significant=False
-2026-08-01 03:09:20,881 | INFO | Local projection monthly/breadth h=2 beta_log=0.071563 effect_pct=7.4186 HAC_se=0.024925 raw_p=0.00409002 Holm_p=0.0572602 FDR_p=0.0364765 simultaneous=[-0.052738,0.195865] joint_significant=False
-2026-08-01 03:09:20,882 | INFO | Local projection monthly/breadth h=3 beta_log=0.067060 effect_pct=6.9360 HAC_se=0.031089 raw_p=0.0310002 Holm_p=0.25816 FDR_p=0.0434003 simultaneous=[-0.087978,0.222099] joint_significant=False
-2026-08-01 03:09:20,882 | INFO | Local projection monthly/breadth h=4 beta_log=0.075106 effect_pct=7.7999 HAC_se=0.038742 raw_p=0.052546 Holm_p=0.25816 FDR_p=0.052546 simultaneous=[-0.118099,0.268312] joint_significant=False
-2026-08-01 03:09:20,882 | INFO | Local projection monthly/breadth h=5 beta_log=0.089713 effect_pct=9.3860 HAC_se=0.044056 raw_p=0.0417138 Holm_p=0.25816 FDR_p=0.0486661 simultaneous=[-0.129991,0.309417] joint_significant=False
-2026-08-01 03:09:20,882 | INFO | Local projection monthly/breadth h=6 beta_log=0.113555 effect_pct=12.0253 HAC_se=0.050119 raw_p=0.0234691 Holm_p=0.25816 FDR_p=0.0434003 simultaneous=[-0.136387,0.363497] joint_significant=False
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=0 peak_beta=0.002006 breadth_beta=0.000615 peak_minus_breadth=0.001391
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=1 peak_beta=0.001298 breadth_beta=-0.000589 peak_minus_breadth=0.001887
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=2 peak_beta=0.003286 breadth_beta=0.001216 peak_minus_breadth=0.002070
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=3 peak_beta=0.003770 breadth_beta=0.002907 peak_minus_breadth=0.000863
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=4 peak_beta=0.003694 breadth_beta=0.004917 peak_minus_breadth=-0.001223
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=5 peak_beta=0.004708 breadth_beta=0.005935 peak_minus_breadth=-0.001226
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=6 peak_beta=0.005883 breadth_beta=0.006003 peak_minus_breadth=-0.000121
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=7 peak_beta=0.003576 breadth_beta=0.003447 peak_minus_breadth=0.000129
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=8 peak_beta=0.003522 breadth_beta=0.004241 peak_minus_breadth=-0.000719
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=9 peak_beta=0.006834 breadth_beta=0.007644 peak_minus_breadth=-0.000809
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=10 peak_beta=0.008660 breadth_beta=0.009976 peak_minus_breadth=-0.001317
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=11 peak_beta=0.009053 breadth_beta=0.010904 peak_minus_breadth=-0.001851
-2026-08-01 03:09:20,882 | INFO | Dual-path difference weekly h=12 peak_beta=0.008718 breadth_beta=0.011083 peak_minus_breadth=-0.002365
-2026-08-01 03:09:20,882 | INFO | Dual-path difference monthly h=0 peak_beta=0.030431 breadth_beta=0.030247 peak_minus_breadth=0.000184
-2026-08-01 03:09:20,882 | INFO | Dual-path difference monthly h=1 peak_beta=0.051164 breadth_beta=0.049981 peak_minus_breadth=0.001183
-2026-08-01 03:09:20,882 | INFO | Dual-path difference monthly h=2 peak_beta=0.071587 breadth_beta=0.071563 peak_minus_breadth=0.000024
-2026-08-01 03:09:20,882 | INFO | Dual-path difference monthly h=3 peak_beta=0.062385 breadth_beta=0.067060 peak_minus_breadth=-0.004675
-2026-08-01 03:09:20,882 | INFO | Dual-path difference monthly h=4 peak_beta=0.065335 breadth_beta=0.075106 peak_minus_breadth=-0.009771
-2026-08-01 03:09:20,882 | INFO | Dual-path difference monthly h=5 peak_beta=0.078482 breadth_beta=0.089713 peak_minus_breadth=-0.011231
-2026-08-01 03:09:20,882 | INFO | Dual-path difference monthly h=6 peak_beta=0.100525 breadth_beta=0.113555 peak_minus_breadth=-0.013030
-2026-08-01 03:09:20,882 | INFO | Wrote stationarity_tests rows=32 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_stationarity_tests.csv
-2026-08-01 03:09:20,898 | INFO | Wrote cointegration_tests rows=24 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_cointegration_tests.csv
-2026-08-01 03:09:20,898 | INFO | Wrote var_lag_selection rows=36 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_var_lag_selection.csv
-2026-08-01 03:09:20,898 | INFO | Wrote var_coefficients rows=160 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_var_coefficients.csv
-2026-08-01 03:09:20,898 | INFO | Wrote conditional_granger_tests rows=16 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_conditional_granger_tests.csv
-2026-08-01 03:09:20,915 | INFO | Wrote conventional_granger_tests rows=72 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_conventional_granger_tests.csv
-2026-08-01 03:09:20,915 | INFO | Wrote var_diagnostics rows=48 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_var_diagnostics.csv
-2026-08-01 03:09:20,915 | INFO | Wrote var_impulse_responses rows=80 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_var_impulse_responses.csv
-2026-08-01 03:09:20,932 | INFO | Wrote var_fevd rows=576 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_var_fevd.csv
-2026-08-01 03:09:20,948 | INFO | Wrote pcmci_links rows=576 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_pcmci_links.csv
-2026-08-01 03:09:20,965 | INFO | Wrote msdi_innovations rows=1265 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_msdi_innovations.csv
-2026-08-01 03:09:20,983 | INFO | Wrote local_projections rows=40 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_local_projections.csv
-2026-08-01 03:09:20,983 | INFO | Wrote dual_path_comparison rows=20 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_dual_path_comparison.csv
-2026-08-01 03:09:21,219 | INFO | Wrote manifest path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_manifest.json
-2026-08-01 03:09:21,219 | INFO | Dynamic time-series analysis completed
+2026-08-14 01:05:32,381 | INFO | Starting dynamic time-series analysis version=causality_v001
+2026-08-14 01:05:32,381 | INFO | Arguments: {'weekly_panel': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/prediction/msdi_scfi_weekly_panel.csv'), 'monthly_panel': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/data/06_model_ready/causality/msdi_scfi_monthly_panel.csv'), 'output_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/time_series_causality'), 'log_dir': WindowsPath('C:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/logs'), 'version': 'causality_v001', 'weekly_maximum_lag': 12, 'monthly_maximum_lag': 6, 'weekly_lp_horizon': 12, 'monthly_lp_horizon': 6, 'weekly_irf_horizon': 12, 'monthly_irf_horizon': 6, 'minimum_observations': 80, 'alpha': 0.05, 'pcmci_pc_alpha': 0.2, 'irf_monte_carlo_repetitions': 500, 'lp_bootstrap_repetitions': 500, 'lp_block_length': 0, 'seed': 20260801, 'skip_pcmci': False}
+2026-08-14 01:05:32,381 | WARNING | Interpretation guardrail: VAR, Granger, PCMCI, and local projections are observational dynamic analyses, not automatic causal identification.
+2026-08-14 01:05:32,439 | INFO | Loaded weekly panel rows=522 range=2016-02-08 00:00:00 to 2026-02-02 00:00:00
+2026-08-14 01:05:32,677 | INFO | weekly/peak stationary-change sample rows=517 range=2016-02-15 00:00:00 to 2026-01-05 00:00:00 excluded_noncontiguous=0
+2026-08-14 01:05:32,677 | INFO | Stationarity weekly/peak variable=scfi_log transform=log_level ADF_p=0.33679082170555596 KPSS_p=0.01 decision=nonstationary_by_both
+2026-08-14 01:05:32,677 | INFO | Stationarity weekly/peak variable=scfi_return transform=first_difference_of_log ADF_p=0.0006502892015493709 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:05:32,677 | INFO | Stationarity weekly/peak variable=brent_log transform=log_level ADF_p=0.06784548257366198 KPSS_p=0.01 decision=nonstationary_by_both
+2026-08-14 01:05:32,677 | INFO | Stationarity weekly/peak variable=brent_return transform=first_difference_of_log ADF_p=8.935932584575707e-15 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:05:32,677 | INFO | Stationarity weekly/peak variable=msdi_level transform=media_corrected_level ADF_p=0.15446543927402817 KPSS_p=0.01 decision=nonstationary_by_both
+2026-08-14 01:05:32,677 | INFO | Stationarity weekly/peak variable=msdi_change transform=first_difference ADF_p=5.8819200658259886e-15 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:05:32,677 | INFO | Stationarity weekly/peak variable=log_news_volume transform=log1p_level ADF_p=0.0594835519592919 KPSS_p=0.01 decision=nonstationary_by_both
+2026-08-14 01:05:32,677 | INFO | Stationarity weekly/peak variable=news_volume_change transform=first_difference_of_log1p ADF_p=3.1706645539579405e-15 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:05:42,203 | INFO | PCMCI weekly/peak FDR-significant links into SCFI return=7
+2026-08-14 01:05:42,204 | INFO | PCMCI link weekly/peak scfi_return(t-1)->SCFI partial_r=0.365353 raw_p=9.91123e-17 fdr_p=6.34319e-15
+2026-08-14 01:05:42,205 | INFO | PCMCI link weekly/peak scfi_return(t-2)->SCFI partial_r=0.206747 raw_p=4.6152e-06 fdr_p=0.000110765
+2026-08-14 01:05:42,205 | INFO | PCMCI link weekly/peak scfi_return(t-3)->SCFI partial_r=-0.142855 raw_p=0.00166484 fdr_p=0.0228321
+2026-08-14 01:05:42,205 | INFO | PCMCI link weekly/peak scfi_return(t-9)->SCFI partial_r=0.221586 raw_p=8.95173e-07 fdr_p=2.45533e-05
+2026-08-14 01:05:42,206 | INFO | PCMCI link weekly/peak scfi_return(t-10)->SCFI partial_r=-0.131947 raw_p=0.00370782 fdr_p=0.0418766
+2026-08-14 01:05:42,206 | INFO | PCMCI link weekly/peak scfi_return(t-11)->SCFI partial_r=-0.178674 raw_p=8.14219e-05 fdr_p=0.001737
+2026-08-14 01:05:42,207 | INFO | PCMCI link weekly/peak news_volume_change(t-12)->SCFI partial_r=-0.152763 raw_p=0.000775497 fdr_p=0.0114535
+2026-08-14 01:06:50,710 | INFO | VARX weekly/peak selected_lag=1 BIC=-11.468096 stable=True residual_whiteness_p=2.8009e-20 selection_reason=bic_fallback_no_candidate_passed_whiteness
+2026-08-14 01:06:50,710 | WARNING | VARX weekly/peak failed residual-whiteness diagnostics at all candidate lags; use HAC local projections and HAC Granger as primary inference, and treat VAR IRFs as exploratory.
+2026-08-14 01:06:50,711 | INFO | Conditional Granger weekly/peak model=conditional_varx msdi_change->scfi_return statistic=1.678944 distribution=F p=0.195212
+2026-08-14 01:06:50,711 | INFO | Conditional Granger weekly/peak model=conditional_varx scfi_return->msdi_change statistic=0.275327 distribution=F p=0.599838
+2026-08-14 01:06:50,712 | INFO | Conditional Granger weekly/peak model=conditional_ols_hac_prespecified_max_lag msdi_change->scfi_return statistic=20.363882 distribution=chi_square p=0.0605081
+2026-08-14 01:06:50,712 | INFO | Conditional Granger weekly/peak model=conditional_ols_hac_prespecified_max_lag scfi_return->msdi_change statistic=19.233044 distribution=chi_square p=0.0830575
+2026-08-14 01:06:50,712 | INFO | LP bootstrap weekly/peak successful=500/500 block_length=9 sup_t_critical=3.124389
+2026-08-14 01:06:50,950 | INFO | weekly/breadth stationary-change sample rows=517 range=2016-02-15 00:00:00 to 2026-01-05 00:00:00 excluded_noncontiguous=0
+2026-08-14 01:06:50,965 | INFO | Stationarity weekly/breadth variable=scfi_log transform=log_level ADF_p=0.33679082170555596 KPSS_p=0.01 decision=nonstationary_by_both
+2026-08-14 01:06:50,967 | INFO | Stationarity weekly/breadth variable=scfi_return transform=first_difference_of_log ADF_p=0.0006502892015493709 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:06:50,968 | INFO | Stationarity weekly/breadth variable=brent_log transform=log_level ADF_p=0.06784548257366198 KPSS_p=0.01 decision=nonstationary_by_both
+2026-08-14 01:06:50,968 | INFO | Stationarity weekly/breadth variable=brent_return transform=first_difference_of_log ADF_p=8.935932584575707e-15 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:06:50,968 | INFO | Stationarity weekly/breadth variable=msdi_level transform=media_corrected_level ADF_p=0.3247772348425717 KPSS_p=0.01 decision=nonstationary_by_both
+2026-08-14 01:06:50,968 | INFO | Stationarity weekly/breadth variable=msdi_change transform=first_difference ADF_p=7.0877499855860945e-15 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:06:50,968 | INFO | Stationarity weekly/breadth variable=log_news_volume transform=log1p_level ADF_p=0.0594835519592919 KPSS_p=0.01 decision=nonstationary_by_both
+2026-08-14 01:06:50,968 | INFO | Stationarity weekly/breadth variable=news_volume_change transform=first_difference_of_log1p ADF_p=3.1706645539579405e-15 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:07:01,328 | INFO | PCMCI weekly/breadth FDR-significant links into SCFI return=7
+2026-08-14 01:07:01,329 | INFO | PCMCI link weekly/breadth scfi_return(t-1)->SCFI partial_r=0.365353 raw_p=9.91123e-17 fdr_p=6.34319e-15
+2026-08-14 01:07:01,329 | INFO | PCMCI link weekly/breadth scfi_return(t-2)->SCFI partial_r=0.206747 raw_p=4.6152e-06 fdr_p=0.000110765
+2026-08-14 01:07:01,330 | INFO | PCMCI link weekly/breadth scfi_return(t-3)->SCFI partial_r=-0.142855 raw_p=0.00166484 fdr_p=0.0245885
+2026-08-14 01:07:01,330 | INFO | PCMCI link weekly/breadth scfi_return(t-9)->SCFI partial_r=0.221586 raw_p=8.95173e-07 fdr_p=2.45533e-05
+2026-08-14 01:07:01,331 | INFO | PCMCI link weekly/breadth scfi_return(t-10)->SCFI partial_r=-0.131947 raw_p=0.00370782 fdr_p=0.0470128
+2026-08-14 01:07:01,331 | INFO | PCMCI link weekly/breadth scfi_return(t-11)->SCFI partial_r=-0.178674 raw_p=8.14219e-05 fdr_p=0.001737
+2026-08-14 01:07:01,331 | INFO | PCMCI link weekly/breadth news_volume_change(t-12)->SCFI partial_r=-0.146694 raw_p=0.00126868 fdr_p=0.0202988
+2026-08-14 01:08:15,275 | INFO | VARX weekly/breadth selected_lag=1 BIC=-13.146115 stable=True residual_whiteness_p=3.0718e-20 selection_reason=bic_fallback_no_candidate_passed_whiteness
+2026-08-14 01:08:15,276 | WARNING | VARX weekly/breadth failed residual-whiteness diagnostics at all candidate lags; use HAC local projections and HAC Granger as primary inference, and treat VAR IRFs as exploratory.
+2026-08-14 01:08:15,276 | INFO | Conditional Granger weekly/breadth model=conditional_varx msdi_change->scfi_return statistic=1.323416 distribution=F p=0.250116
+2026-08-14 01:08:15,277 | INFO | Conditional Granger weekly/breadth model=conditional_varx scfi_return->msdi_change statistic=0.287957 distribution=F p=0.591592
+2026-08-14 01:08:15,277 | INFO | Conditional Granger weekly/breadth model=conditional_ols_hac_prespecified_max_lag msdi_change->scfi_return statistic=22.620413 distribution=chi_square p=0.0311269
+2026-08-14 01:08:15,278 | INFO | Conditional Granger weekly/breadth model=conditional_ols_hac_prespecified_max_lag scfi_return->msdi_change statistic=16.314373 distribution=chi_square p=0.177258
+2026-08-14 01:08:15,278 | INFO | LP bootstrap weekly/breadth successful=500/500 block_length=9 sup_t_critical=2.869664
+2026-08-14 01:08:15,289 | INFO | Loaded monthly panel rows=121 range=2016-02-29 00:00:00 to 2026-02-28 00:00:00
+2026-08-14 01:08:15,416 | INFO | monthly/peak stationary-change sample rows=119 range=2016-03-31 00:00:00 to 2026-01-31 00:00:00 excluded_noncontiguous=0
+2026-08-14 01:08:15,416 | INFO | Stationarity monthly/peak variable=scfi_log transform=log_level ADF_p=0.0373148224786974 KPSS_p=0.01 decision=mixed_test_evidence
+2026-08-14 01:08:15,417 | INFO | Stationarity monthly/peak variable=scfi_return transform=first_difference_of_log ADF_p=0.0072630675218890856 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:08:15,418 | INFO | Stationarity monthly/peak variable=brent_log transform=log_level ADF_p=0.08777647349883755 KPSS_p=0.010473038823570093 decision=nonstationary_by_both
+2026-08-14 01:08:15,418 | INFO | Stationarity monthly/peak variable=brent_return transform=first_difference_of_log ADF_p=1.163476999143284e-14 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:08:15,419 | INFO | Stationarity monthly/peak variable=msdi_level transform=media_corrected_level ADF_p=0.34065205364335793 KPSS_p=0.01 decision=nonstationary_by_both
+2026-08-14 01:08:15,419 | INFO | Stationarity monthly/peak variable=msdi_change transform=first_difference ADF_p=4.876752430855034e-14 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:08:15,420 | INFO | Stationarity monthly/peak variable=log_news_volume transform=log1p_level ADF_p=0.00048531825645717406 KPSS_p=0.01 decision=mixed_test_evidence
+2026-08-14 01:08:15,420 | INFO | Stationarity monthly/peak variable=news_volume_change transform=first_difference_of_log1p ADF_p=6.56032159191296e-06 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:08:20,192 | INFO | PCMCI monthly/peak FDR-significant links into SCFI return=1
+2026-08-14 01:08:20,192 | INFO | PCMCI link monthly/peak scfi_return(t-1)->SCFI partial_r=0.542558 raw_p=4.60669e-09 fdr_p=4.42242e-07
+2026-08-14 01:09:08,914 | INFO | VARX monthly/peak selected_lag=1 BIC=-9.232711 stable=True residual_whiteness_p=0.0522729 selection_reason=minimum_bic_among_residual_white_candidates
+2026-08-14 01:09:08,915 | INFO | Conditional Granger monthly/peak model=conditional_varx msdi_change->scfi_return statistic=0.072260 distribution=F p=0.788201
+2026-08-14 01:09:08,916 | INFO | Conditional Granger monthly/peak model=conditional_varx scfi_return->msdi_change statistic=0.142685 distribution=F p=0.70581
+2026-08-14 01:09:08,916 | INFO | Conditional Granger monthly/peak model=conditional_ols_hac_prespecified_max_lag msdi_change->scfi_return statistic=13.199326 distribution=chi_square p=0.0399776
+2026-08-14 01:09:08,917 | INFO | Conditional Granger monthly/peak model=conditional_ols_hac_prespecified_max_lag scfi_return->msdi_change statistic=9.686649 distribution=chi_square p=0.138483
+2026-08-14 01:09:08,917 | INFO | LP bootstrap monthly/peak successful=500/500 block_length=5 sup_t_critical=4.744107
+2026-08-14 01:09:09,053 | INFO | monthly/breadth stationary-change sample rows=119 range=2016-03-31 00:00:00 to 2026-01-31 00:00:00 excluded_noncontiguous=0
+2026-08-14 01:09:09,054 | INFO | Stationarity monthly/breadth variable=scfi_log transform=log_level ADF_p=0.0373148224786974 KPSS_p=0.01 decision=mixed_test_evidence
+2026-08-14 01:09:09,055 | INFO | Stationarity monthly/breadth variable=scfi_return transform=first_difference_of_log ADF_p=0.0072630675218890856 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:09:09,055 | INFO | Stationarity monthly/breadth variable=brent_log transform=log_level ADF_p=0.08777647349883755 KPSS_p=0.010473038823570093 decision=nonstationary_by_both
+2026-08-14 01:09:09,056 | INFO | Stationarity monthly/breadth variable=brent_return transform=first_difference_of_log ADF_p=1.163476999143284e-14 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:09:09,057 | INFO | Stationarity monthly/breadth variable=msdi_level transform=media_corrected_level ADF_p=0.3846694959573177 KPSS_p=0.01 decision=nonstationary_by_both
+2026-08-14 01:09:09,057 | INFO | Stationarity monthly/breadth variable=msdi_change transform=first_difference ADF_p=3.874031345745842e-18 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:09:09,058 | INFO | Stationarity monthly/breadth variable=log_news_volume transform=log1p_level ADF_p=0.00048531825645717406 KPSS_p=0.01 decision=mixed_test_evidence
+2026-08-14 01:09:09,059 | INFO | Stationarity monthly/breadth variable=news_volume_change transform=first_difference_of_log1p ADF_p=6.56032159191296e-06 KPSS_p=0.1 decision=stationary_by_both
+2026-08-14 01:09:14,693 | INFO | PCMCI monthly/breadth FDR-significant links into SCFI return=1
+2026-08-14 01:09:14,693 | INFO | PCMCI link monthly/breadth scfi_return(t-1)->SCFI partial_r=0.538556 raw_p=6.27824e-09 fdr_p=6.02711e-07
+2026-08-14 01:09:57,237 | INFO | VARX monthly/breadth selected_lag=2 BIC=-10.565459 stable=True residual_whiteness_p=0.725544 selection_reason=minimum_bic_among_residual_white_candidates
+2026-08-14 01:09:57,238 | INFO | Conditional Granger monthly/breadth model=conditional_varx msdi_change->scfi_return statistic=0.152792 distribution=F p=0.858357
+2026-08-14 01:09:57,238 | INFO | Conditional Granger monthly/breadth model=conditional_varx scfi_return->msdi_change statistic=0.835718 distribution=F p=0.43429
+2026-08-14 01:09:57,239 | INFO | Conditional Granger monthly/breadth model=conditional_ols_hac_prespecified_max_lag msdi_change->scfi_return statistic=9.984133 distribution=chi_square p=0.125322
+2026-08-14 01:09:57,239 | INFO | Conditional Granger monthly/breadth model=conditional_ols_hac_prespecified_max_lag scfi_return->msdi_change statistic=12.662796 distribution=chi_square p=0.0487145
+2026-08-14 01:09:57,239 | INFO | LP bootstrap monthly/breadth successful=500/500 block_length=5 sup_t_critical=4.863102
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=0 beta_log=0.001782 effect_pct=0.1783 HAC_se=0.003479 raw_p=0.608539 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.009087,0.012650] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=1 beta_log=0.000970 effect_pct=0.0971 HAC_se=0.004411 raw_p=0.82592 Holm_p=1 FDR_p=0.858957 simultaneous=[-0.012812,0.014752] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=2 beta_log=0.003441 effect_pct=0.3447 HAC_se=0.006099 raw_p=0.572624 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.015614,0.022496] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=3 beta_log=0.003818 effect_pct=0.3825 HAC_se=0.006616 raw_p=0.563887 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.016852,0.024488] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=4 beta_log=0.004060 effect_pct=0.4068 HAC_se=0.006834 raw_p=0.552459 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.017292,0.025412] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=5 beta_log=0.006047 effect_pct=0.6065 HAC_se=0.007155 raw_p=0.398016 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.016308,0.028402] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=6 beta_log=0.007301 effect_pct=0.7328 HAC_se=0.007017 raw_p=0.298104 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.014623,0.029225] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=7 beta_log=0.004734 effect_pct=0.4745 HAC_se=0.006987 raw_p=0.498086 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.017096,0.026563] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=8 beta_log=0.003544 effect_pct=0.3551 HAC_se=0.007149 raw_p=0.620058 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.018793,0.025882] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=9 beta_log=0.006178 effect_pct=0.6197 HAC_se=0.006976 raw_p=0.375822 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.015617,0.027973] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=10 beta_log=0.008257 effect_pct=0.8291 HAC_se=0.007016 raw_p=0.239224 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.013662,0.030176] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=11 beta_log=0.009144 effect_pct=0.9186 HAC_se=0.006607 raw_p=0.166346 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.011498,0.029787] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/peak h=12 beta_log=0.008827 effect_pct=0.8866 HAC_se=0.006076 raw_p=0.146263 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.010155,0.027809] joint_significant=False
+2026-08-14 01:09:57,537 | INFO | Local projection weekly/breadth h=0 beta_log=0.000354 effect_pct=0.0354 HAC_se=0.002665 raw_p=0.894298 Holm_p=1 FDR_p=0.894298 simultaneous=[-0.007293,0.008001] joint_significant=False
+2026-08-14 01:09:57,547 | INFO | Local projection weekly/breadth h=1 beta_log=-0.000893 effect_pct=-0.0893 HAC_se=0.003545 raw_p=0.801088 Holm_p=1 FDR_p=0.858957 simultaneous=[-0.011065,0.009279] joint_significant=False
+2026-08-14 01:09:57,547 | INFO | Local projection weekly/breadth h=2 beta_log=0.001131 effect_pct=0.1132 HAC_se=0.005114 raw_p=0.824946 Holm_p=1 FDR_p=0.858957 simultaneous=[-0.013545,0.015807] joint_significant=False
+2026-08-14 01:09:57,548 | INFO | Local projection weekly/breadth h=3 beta_log=0.001699 effect_pct=0.1701 HAC_se=0.005672 raw_p=0.76449 Holm_p=1 FDR_p=0.858957 simultaneous=[-0.014578,0.017977] joint_significant=False
+2026-08-14 01:09:57,548 | INFO | Local projection weekly/breadth h=4 beta_log=0.003301 effect_pct=0.3306 HAC_se=0.005967 raw_p=0.580143 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.013822,0.020423] joint_significant=False
+2026-08-14 01:09:57,549 | INFO | Local projection weekly/breadth h=5 beta_log=0.005156 effect_pct=0.5169 HAC_se=0.006255 raw_p=0.409813 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.012795,0.023106] joint_significant=False
+2026-08-14 01:09:57,550 | INFO | Local projection weekly/breadth h=6 beta_log=0.006341 effect_pct=0.6361 HAC_se=0.006216 raw_p=0.307654 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.011497,0.024179] joint_significant=False
+2026-08-14 01:09:57,551 | INFO | Local projection weekly/breadth h=7 beta_log=0.003597 effect_pct=0.3603 HAC_se=0.006206 raw_p=0.562231 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.014213,0.021407] joint_significant=False
+2026-08-14 01:09:57,553 | INFO | Local projection weekly/breadth h=8 beta_log=0.002760 effect_pct=0.2764 HAC_se=0.006357 raw_p=0.664156 Holm_p=1 FDR_p=0.822288 simultaneous=[-0.015481,0.021001] joint_significant=False
+2026-08-14 01:09:57,554 | INFO | Local projection weekly/breadth h=9 beta_log=0.005324 effect_pct=0.5338 HAC_se=0.006354 raw_p=0.402076 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.012910,0.023558] joint_significant=False
+2026-08-14 01:09:57,554 | INFO | Local projection weekly/breadth h=10 beta_log=0.007746 effect_pct=0.7776 HAC_se=0.006455 raw_p=0.230174 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.010779,0.026271] joint_significant=False
+2026-08-14 01:09:57,555 | INFO | Local projection weekly/breadth h=11 beta_log=0.008571 effect_pct=0.8608 HAC_se=0.006300 raw_p=0.17369 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.009509,0.026652] joint_significant=False
+2026-08-14 01:09:57,557 | INFO | Local projection weekly/breadth h=12 beta_log=0.008625 effect_pct=0.8663 HAC_se=0.006016 raw_p=0.151646 Holm_p=1 FDR_p=0.806075 simultaneous=[-0.008638,0.025889] joint_significant=False
+2026-08-14 01:09:57,558 | INFO | Local projection monthly/peak h=0 beta_log=0.027706 effect_pct=2.8093 HAC_se=0.016656 raw_p=0.0962333 Holm_p=0.386489 FDR_p=0.0962333 simultaneous=[-0.051313,0.106725] joint_significant=False
+2026-08-14 01:09:57,559 | INFO | Local projection monthly/peak h=1 beta_log=0.047104 effect_pct=4.8231 HAC_se=0.027549 raw_p=0.0872923 Holm_p=0.386489 FDR_p=0.0962333 simultaneous=[-0.083589,0.177798] joint_significant=False
+2026-08-14 01:09:57,560 | INFO | Local projection monthly/peak h=2 beta_log=0.066017 effect_pct=6.8244 HAC_se=0.030864 raw_p=0.0324393 Holm_p=0.361143 FDR_p=0.0848033 simultaneous=[-0.080405,0.212438] joint_significant=False
+2026-08-14 01:09:57,560 | INFO | Local projection monthly/peak h=3 beta_log=0.065349 effect_pct=6.7531 HAC_se=0.032283 raw_p=0.0429432 Holm_p=0.386489 FDR_p=0.0848033 simultaneous=[-0.087804,0.218501] joint_significant=False
+2026-08-14 01:09:57,561 | INFO | Local projection monthly/peak h=4 beta_log=0.066669 effect_pct=6.8942 HAC_se=0.037231 raw_p=0.0733449 Holm_p=0.386489 FDR_p=0.0933481 simultaneous=[-0.109960,0.243298] joint_significant=False
+2026-08-14 01:09:57,561 | INFO | Local projection monthly/peak h=5 beta_log=0.087780 effect_pct=9.1748 HAC_se=0.041254 raw_p=0.0333525 Holm_p=0.361143 FDR_p=0.0848033 simultaneous=[-0.107931,0.283491] joint_significant=False
+2026-08-14 01:09:57,562 | INFO | Local projection monthly/peak h=6 beta_log=0.108390 effect_pct=11.4483 HAC_se=0.048908 raw_p=0.0266769 Holm_p=0.346799 FDR_p=0.0848033 simultaneous=[-0.123634,0.340415] joint_significant=False
+2026-08-14 01:09:57,562 | INFO | Local projection monthly/breadth h=0 beta_log=0.030742 effect_pct=3.1219 HAC_se=0.016210 raw_p=0.0578992 Holm_p=0.386489 FDR_p=0.0848033 simultaneous=[-0.048089,0.109572] joint_significant=False
+2026-08-14 01:09:57,562 | INFO | Local projection monthly/breadth h=1 beta_log=0.052146 effect_pct=5.3529 HAC_se=0.026836 raw_p=0.0520036 Holm_p=0.386489 FDR_p=0.0848033 simultaneous=[-0.078362,0.182653] joint_significant=False
+2026-08-14 01:09:57,563 | INFO | Local projection monthly/breadth h=2 beta_log=0.072434 effect_pct=7.5122 HAC_se=0.033398 raw_p=0.0300952 Holm_p=0.361143 FDR_p=0.0848033 simultaneous=[-0.089982,0.234851] joint_significant=False
+2026-08-14 01:09:57,563 | INFO | Local projection monthly/breadth h=3 beta_log=0.072530 effect_pct=7.5226 HAC_se=0.038650 raw_p=0.0605738 Holm_p=0.386489 FDR_p=0.0848033 simultaneous=[-0.115429,0.260489] joint_significant=False
+2026-08-14 01:09:57,564 | INFO | Local projection monthly/breadth h=4 beta_log=0.074459 effect_pct=7.7302 HAC_se=0.044257 raw_p=0.0924856 Holm_p=0.386489 FDR_p=0.0962333 simultaneous=[-0.140767,0.289686] joint_significant=False
+2026-08-14 01:09:57,564 | INFO | Local projection monthly/breadth h=5 beta_log=0.097794 effect_pct=10.2735 HAC_se=0.048918 raw_p=0.0455917 Holm_p=0.386489 FDR_p=0.0848033 simultaneous=[-0.140097,0.335685] joint_significant=False
+2026-08-14 01:09:57,565 | INFO | Local projection monthly/breadth h=6 beta_log=0.123929 effect_pct=13.1936 HAC_se=0.054336 raw_p=0.0225611 Holm_p=0.315855 FDR_p=0.0848033 simultaneous=[-0.140313,0.388171] joint_significant=False
+2026-08-14 01:09:57,566 | INFO | Dual-path difference weekly h=0 peak_beta=0.001782 breadth_beta=0.000354 peak_minus_breadth=0.001428
+2026-08-14 01:09:57,567 | INFO | Dual-path difference weekly h=1 peak_beta=0.000970 breadth_beta=-0.000893 peak_minus_breadth=0.001863
+2026-08-14 01:09:57,567 | INFO | Dual-path difference weekly h=2 peak_beta=0.003441 breadth_beta=0.001131 peak_minus_breadth=0.002310
+2026-08-14 01:09:57,568 | INFO | Dual-path difference weekly h=3 peak_beta=0.003818 breadth_beta=0.001699 peak_minus_breadth=0.002118
+2026-08-14 01:09:57,568 | INFO | Dual-path difference weekly h=4 peak_beta=0.004060 breadth_beta=0.003301 peak_minus_breadth=0.000759
+2026-08-14 01:09:57,569 | INFO | Dual-path difference weekly h=5 peak_beta=0.006047 breadth_beta=0.005156 peak_minus_breadth=0.000891
+2026-08-14 01:09:57,570 | INFO | Dual-path difference weekly h=6 peak_beta=0.007301 breadth_beta=0.006341 peak_minus_breadth=0.000960
+2026-08-14 01:09:57,571 | INFO | Dual-path difference weekly h=7 peak_beta=0.004734 breadth_beta=0.003597 peak_minus_breadth=0.001137
+2026-08-14 01:09:57,571 | INFO | Dual-path difference weekly h=8 peak_beta=0.003544 breadth_beta=0.002760 peak_minus_breadth=0.000785
+2026-08-14 01:09:57,573 | INFO | Dual-path difference weekly h=9 peak_beta=0.006178 breadth_beta=0.005324 peak_minus_breadth=0.000854
+2026-08-14 01:09:57,573 | INFO | Dual-path difference weekly h=10 peak_beta=0.008257 breadth_beta=0.007746 peak_minus_breadth=0.000511
+2026-08-14 01:09:57,573 | INFO | Dual-path difference weekly h=11 peak_beta=0.009144 breadth_beta=0.008571 peak_minus_breadth=0.000573
+2026-08-14 01:09:57,573 | INFO | Dual-path difference weekly h=12 peak_beta=0.008827 breadth_beta=0.008625 peak_minus_breadth=0.000202
+2026-08-14 01:09:57,573 | INFO | Dual-path difference monthly h=0 peak_beta=0.027706 breadth_beta=0.030742 peak_minus_breadth=-0.003036
+2026-08-14 01:09:57,578 | INFO | Dual-path difference monthly h=1 peak_beta=0.047104 breadth_beta=0.052146 peak_minus_breadth=-0.005041
+2026-08-14 01:09:57,578 | INFO | Dual-path difference monthly h=2 peak_beta=0.066017 breadth_beta=0.072434 peak_minus_breadth=-0.006418
+2026-08-14 01:09:57,578 | INFO | Dual-path difference monthly h=3 peak_beta=0.065349 breadth_beta=0.072530 peak_minus_breadth=-0.007182
+2026-08-14 01:09:57,579 | INFO | Dual-path difference monthly h=4 peak_beta=0.066669 breadth_beta=0.074459 peak_minus_breadth=-0.007790
+2026-08-14 01:09:57,579 | INFO | Dual-path difference monthly h=5 peak_beta=0.087780 breadth_beta=0.097794 peak_minus_breadth=-0.010014
+2026-08-14 01:09:57,580 | INFO | Dual-path difference monthly h=6 peak_beta=0.108390 breadth_beta=0.123929 peak_minus_breadth=-0.015539
+2026-08-14 01:09:57,607 | INFO | Wrote stationarity_tests rows=32 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_stationarity_tests.csv
+2026-08-14 01:09:57,607 | INFO | Wrote cointegration_tests rows=24 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_cointegration_tests.csv
+2026-08-14 01:09:57,607 | INFO | Wrote var_lag_selection rows=36 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_var_lag_selection.csv
+2026-08-14 01:09:57,623 | INFO | Wrote var_coefficients rows=160 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_var_coefficients.csv
+2026-08-14 01:09:57,624 | INFO | Wrote conditional_granger_tests rows=16 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_conditional_granger_tests.csv
+2026-08-14 01:09:57,624 | INFO | Wrote conventional_granger_tests rows=72 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_conventional_granger_tests.csv
+2026-08-14 01:09:57,635 | INFO | Wrote var_diagnostics rows=48 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_var_diagnostics.csv
+2026-08-14 01:09:57,640 | INFO | Wrote var_impulse_responses rows=80 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_var_impulse_responses.csv
+2026-08-14 01:09:57,657 | INFO | Wrote var_fevd rows=576 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_var_fevd.csv
+2026-08-14 01:09:57,683 | INFO | Wrote pcmci_links rows=576 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_pcmci_links.csv
+2026-08-14 01:09:57,707 | INFO | Wrote msdi_innovations rows=1267 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_msdi_innovations.csv
+2026-08-14 01:09:57,713 | INFO | Wrote local_projections rows=40 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_local_projections.csv
+2026-08-14 01:09:57,717 | INFO | Wrote dual_path_comparison rows=20 path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_dual_path_comparison.csv
+2026-08-14 01:09:58,068 | INFO | Wrote manifest path=C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\time_series_causality\causality_v001_manifest.json
+2026-08-14 01:09:58,068 | INFO | Dynamic time-series analysis completed

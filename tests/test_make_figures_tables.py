@@ -34,7 +34,8 @@ class PublicationOutputUnitTests(unittest.TestCase):
         self.assertEqual(MODULE.read_sha256_lock(lock), MODULE.sha256_file(SCRIPT))
 
     def test_guardrails_are_fail_closed(self) -> None:
-        guardrails = MODULE.load_yaml(MODULE.DEFAULT_CONFIG)["guardrails"]
+        config = MODULE.load_yaml(MODULE.DEFAULT_CONFIG)
+        guardrails = config["guardrails"]
         self.assertEqual(guardrails["primary_frequency"], "monthly")
         self.assertEqual(
             guardrails["weekly_role"], "higher_frequency_robustness"
@@ -43,6 +44,10 @@ class PublicationOutputUnitTests(unittest.TestCase):
         self.assertFalse(guardrails["publication_eligible_without_human_validation"])
         self.assertFalse(guardrails["causal_claim_allowed"])
         self.assertFalse(guardrails["economic_importance_claim_allowed"])
+        self.assertIn(
+            "monthly_panel",
+            config["source_manifests"]["monthly_llm"]["required_outputs"],
+        )
 
     def test_safe_zscore_and_boolean_parser(self) -> None:
         observed = MODULE.safe_zscore(pd.Series([1.0, 2.0, 3.0]))
@@ -244,7 +249,13 @@ class PublicationOutputIntegrationTests(unittest.TestCase):
 
     def test_all_frozen_source_contracts_pass(self) -> None:
         self.assertEqual(len(self.audited), 8)
-        self.assertEqual(len(self.source_audit), 37)
+        self.assertEqual(
+            len(self.source_audit),
+            sum(
+                len(contract["required_outputs"])
+                for contract in self.config["source_manifests"].values()
+            ),
+        )
         self.assertTrue(self.source_audit["contract_passed"].all())
 
     def test_publication_tables_preserve_registered_counts(self) -> None:
@@ -305,6 +316,24 @@ class PublicationOutputIntegrationTests(unittest.TestCase):
         self.assertFalse(status["causal_claim_allowed"].any())
         heterogeneity = self.main["T10_guarded_heterogeneity"]
         self.assertFalse(heterogeneity["causal_forest_estimate"].any())
+
+    def test_primary_effect_figure_uses_registered_monthly_family(self) -> None:
+        colors = {
+            "primary": "#1f4e79",
+            "secondary": "#c55a11",
+            "robustness": "#6b7280",
+            "warning": "#b91c1c",
+        }
+        figure = MODULE.plot_primary_effects(
+            self.main["T04_primary_forecast_inference"], colors
+        )
+        try:
+            self.assertEqual(len(figure.axes), 2)
+            self.assertTrue(
+                all(axis.get_xlabel() == "Forecast horizon (months)" for axis in figure.axes)
+            )
+        finally:
+            MODULE.plt.close(figure)
 
 
 if __name__ == "__main__":

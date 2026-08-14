@@ -67,7 +67,7 @@ DEFAULT_MONTHLY_PANEL = (
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs/diagnostics"
 DEFAULT_LOG_DIR = PROJECT_ROOT / "outputs/logs"
 CANONICAL_CONFIG_SHA256 = (
-    "47da8fef774e794b7bca7633e6b1a0ff8b572af357627f5a6a10163ac58d3230"
+    "2f4d3390c8413461ff2ef46c151ffcc46bcfed5190db354ed4d0c396190db83c"
 )
 
 FROZEN_MODEL_ALIASES = (
@@ -546,6 +546,17 @@ def validate_upstream_contracts(
         raise ValueError("Nonlinear forecast stage is not full canonical scope")
     if not bool(nonlinear_design.get("common_origins_enforced")):
         raise ValueError("Nonlinear forecast common-origin contract failed")
+    if not bool(nonlinear_design.get("tuning_enabled")):
+        raise ValueError("Nonlinear full run did not enable frozen initial tuning")
+    tuning_protocol = str(nonlinear_design.get("tuning_protocol", ""))
+    if "one initial purged expanding-window calibration" not in tuning_protocol:
+        raise ValueError(
+            "Nonlinear tuning must occur once before rolling evaluation"
+        )
+    if nonlinear_design.get("tuning_reuses_outer_test_outcomes") is not False:
+        raise ValueError("Nonlinear tuning may not reuse outer test outcomes")
+    if nonlinear_design.get("retuning_during_outer_evaluation") is not False:
+        raise ValueError("Nonlinear parameters must remain frozen during evaluation")
     if causal_ml_manifest.get("causal_claim_allowed") is not False:
         raise ValueError("Causal-ML upstream causal-claim guardrail is not false")
     if not bool(causal_ml_manifest.get("publication_scope_complete")):
@@ -1031,22 +1042,43 @@ def build_monthly_context(
                 for dimension in DIMENSION_COLUMNS
             },
         }
-    )
-    raw = raw.merge(direct, on="origin_date", how="left", validate="one_to_one")
+    ).sort_values("origin_date").reset_index(drop=True)
+    # Build the causal EMA on the complete frozen article history before
+    # restricting it to the SCFI panel's date domain. Stage 21 starts the
+    # direct monthly construction at the first article month (2015-01); doing
+    # this after the left merge would discard that legitimate pre-panel
+    # history and change the EMA initialization in the diagnostic context.
     direct_denominator = np.sqrt(
-        raw["direct_effective_article_count"].where(
-            raw["direct_effective_article_count"].gt(0)
+        direct["direct_effective_article_count"].where(
+            direct["direct_effective_article_count"].gt(0)
         )
     )
-    raw["adapted_peak_base"] = raw["direct_peak_weighted_sum"].div(direct_denominator)
-    raw["adapted_breadth_base"] = raw["direct_breadth_weighted_sum"].div(
-        direct_denominator
+    direct["direct_adapted_peak_base"] = direct[
+        "direct_peak_weighted_sum"
+    ].div(direct_denominator)
+    direct["direct_adapted_breadth_base"] = direct[
+        "direct_breadth_weighted_sum"
+    ].div(direct_denominator)
+    direct["direct_adapted_peak_ema3"] = ema_after_gaps(
+        direct["direct_adapted_peak_base"]
     )
-    raw["adapted_peak_ema3"] = ema_after_gaps(raw["adapted_peak_base"])
-    raw["adapted_breadth_ema3"] = ema_after_gaps(raw["adapted_breadth_base"])
+    direct["direct_adapted_breadth_ema3"] = ema_after_gaps(
+        direct["direct_adapted_breadth_base"]
+    )
     for dimension in DIMENSION_COLUMNS:
-        base = raw[f"direct__{dimension}__weighted_sum"].div(direct_denominator)
-        raw[f"adapted_ema3__{dimension}"] = ema_after_gaps(base)
+        base = direct[f"direct__{dimension}__weighted_sum"].div(
+            direct_denominator
+        )
+        direct[f"direct_adapted_ema3__{dimension}"] = ema_after_gaps(base)
+    raw = raw.merge(direct, on="origin_date", how="left", validate="one_to_one")
+    raw["adapted_peak_base"] = raw["direct_adapted_peak_base"]
+    raw["adapted_breadth_base"] = raw["direct_adapted_breadth_base"]
+    raw["adapted_peak_ema3"] = raw["direct_adapted_peak_ema3"]
+    raw["adapted_breadth_ema3"] = raw["direct_adapted_breadth_ema3"]
+    for dimension in DIMENSION_COLUMNS:
+        raw[f"adapted_ema3__{dimension}"] = raw[
+            f"direct_adapted_ema3__{dimension}"
+        ]
     pieces: list[pd.DataFrame] = []
     for construction in MONTHLY_CONSTRUCTIONS:
         columns = [

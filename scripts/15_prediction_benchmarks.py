@@ -43,7 +43,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_PANEL = PROJECT_ROOT / "data/06_model_ready/prediction/msdi_scfi_weekly_panel.csv"
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs/prediction_benchmarks"
 DEFAULT_LOG_DIR = PROJECT_ROOT / "outputs/logs"
-HORIZONS = (1, 2, 4, 8, 12)
+HORIZONS = (1, 2, 4, 6)
 
 
 @dataclass(frozen=True)

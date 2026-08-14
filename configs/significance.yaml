@@ -50,7 +50,7 @@ inputs:
       manifest_version: forecast_v001
       manifest_status: provisional_pending_human_validation
       output_key: statistical_tests
-      expected_rows: 180
+      expected_rows: 144
       require_manifest_output_contract: true
     weekly_llm:
       manifest_version: llm_scfi_v001
@@ -77,9 +77,13 @@ upstream_contracts:
   require_causal_claim_allowed_false: true
   fail_closed: true
 
-# Earliest frozen family ownership is retained. Stage 09's three-row direct
-# monthly peak-only family is a semantic subset of the Stage 07c hybrid family and may not
-# be used to shrink the multiplicity burden after results are known.
+# Earliest frozen family ownership is retained for exact aliases. Stage 21
+# uses separately fitted feature-augmented Ridge models and a longer
+# evaluation sample than the Stage 07b/07c score-hybrid forecasts. Runtime
+# verification showed that their paired sample sizes, fitted predictions, and
+# loss effects differ, so they are distinct hypotheses rather than semantic
+# aliases. The three prespecified primary direct-monthly ablations retain their
+# own frozen Holm family. Only exact numerical aliases may be deduplicated.
 confirmatory_primary_families:
   source_table: stage07c_monthly_llm_statistical_tests
   family_ids:
@@ -101,17 +105,7 @@ confirmatory_primary_families:
 
 semantic_duplicate_contract:
   earliest_frozen_family_owns_hypothesis: true
-  mappings:
-    - comparison_id: peak_vs_no_msdi
-      baseline_specification_id: no_msdi
-      variant_specification_id: peak_only
-      earlier_score_source: score_median
-      earlier_signal_name: overall_disruption_max
-    - comparison_id: breadth_vs_no_msdi
-      baseline_specification_id: no_msdi
-      variant_specification_id: breadth_only
-      earlier_score_source: score_median
-      earlier_signal_name: dimension_mean7
+  mappings: []
   semantic_match_fields:
     - frequency
     - index_construction
@@ -124,11 +118,11 @@ semantic_duplicate_contract:
     - mean_loss_improvement
   numeric_effect_tolerance: 1.0e-12
   require_unique_earlier_match: true
-  expected_stage09_duplicate_rows: 44
+  expected_stage09_duplicate_rows: 0
   expected_stage09_duplicate_rows_by_frequency:
-    weekly: 20
-    monthly: 24
-  expected_reassigned_primary_rows: 3
+    weekly: 0
+    monthly: 0
+  expected_reassigned_primary_rows: 0
   stage09_reassigned_family_id: primary_monthly_peak_vs_no_msdi
   retain_stage09_bootstrap_and_clark_west_as_sensitivity: true
   duplicate_rows_excluded_from_canonical_discoveries: true
@@ -141,9 +135,9 @@ semantic_duplicate_contract:
       - equation
       - term
     canonical_owner: smallest_maximum_lag_specification
-    expected_input_rows: 728
-    expected_unique_hypotheses: 500
-    expected_duplicate_rows: 228
+    expected_input_rows: 584
+    expected_unique_hypotheses: 212
+    expected_duplicate_rows: 372
     require_identical_effect_standard_error_and_p_value: true
   varx_diagnostics:
     semantic_key:
@@ -155,8 +149,8 @@ semantic_duplicate_contract:
       - details
     canonical_owner: smallest_maximum_lag_specification
     expected_input_p_value_rows: 140
-    expected_unique_hypotheses: 77
-    expected_duplicate_rows: 63
+    expected_unique_hypotheses: 59
+    expected_duplicate_rows: 81
     require_identical_statistic_and_p_value: true
 
 corrections:
@@ -207,7 +201,8 @@ registry_sources:
     exploratory_prefix: exploratory_
     preserve_upstream_family_and_method: true
   stage07c_monthly_llm:
-    monthly_primary_role: confirmatory_primary_for_direct_monthly_construction
+    monthly_primary_role: confirmatory_primary_for_direct_monthly_construction_dm_squared_main_test
+    other_monthly_primary_prefixed_tests: prespecified_secondary_sensitivity
     monthly_exploratory_role: exploratory
     preserve_upstream_family_and_method: true
   stage09b_raw_handoff:
@@ -265,9 +260,9 @@ registry_sources:
     standard_error: standard_error
     role: exploratory
     family_key: [frequency, msdi_path, selected_lag]
-    expected_rows: 728
-    expected_canonical_rows: 500
-    expected_family_count: 7
+    expected_rows: 584
+    expected_canonical_rows: 212
+    expected_family_count: 5
   stage09_dynamic_handoff_enrichment:
     source_tables:
       - varx_diagnostics_sensitivity

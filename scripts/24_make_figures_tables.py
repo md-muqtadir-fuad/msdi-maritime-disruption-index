@@ -34,7 +34,7 @@ import yaml
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = PROJECT_ROOT / "configs/publication_outputs.yaml"
 CANONICAL_CONFIG_SHA256 = (
-    "6472a2726c0c5c683a59268fdf1b482a2b0c6232e8fd9afdd766350d6c746276"
+    "c97afd869ba4d6553a1c2532d79cd430bc2d6ec1c78e8a0dfdb1dd73c4b24a27"
 )
 
 PUBLICATION_LABELS = {
@@ -1135,11 +1135,12 @@ def plot_llm_ranking(ranking: pd.DataFrame, colors: Mapping[str, str]) -> plt.Fi
 def plot_primary_effects(primary: pd.DataFrame, colors: Mapping[str, str]) -> plt.Figure:
     family = primary.loc[
         primary["correction_family_id"].astype(str).str.contains(
-            "primary_hybrid_vs_baseline", regex=False
+            "monthly_primary_hybrid_vs_coverage__diebold_mariano_squared",
+            regex=False,
         )
     ].copy()
     if family.empty:
-        raise ValueError("Primary hybrid-versus-baseline family is unavailable")
+        raise ValueError("Primary monthly hybrid-versus-coverage family is unavailable")
     fig, axes = plt.subplots(1, 2, figsize=(12.2, 4.8), sharey=True)
     palette = [colors["primary"], colors["secondary"], "#2f855a", "#805ad5"]
     for ax, signal in zip(axes, ["overall_disruption_max", "dimension_mean7"]):
@@ -1167,7 +1168,7 @@ def plot_primary_effects(primary: pd.DataFrame, colors: Mapping[str, str]) -> pl
             )
         ax.axhline(0.0, color="#111827", lw=0.8)
         ax.set_title("Peak path" if signal == "overall_disruption_max" else "Breadth path")
-        ax.set_xlabel("Forecast horizon (weeks)")
+        ax.set_xlabel("Forecast horizon (months)")
     axes[0].set_ylabel("Baseline loss − challenger loss (×1,000)")
     axes[1].legend(loc="best")
     fig.tight_layout()

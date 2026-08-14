@@ -81,9 +81,9 @@ forecast:
   loss_functions: [absolute_error, squared_error]
   weekly:
     role: higher_frequency_robustness
-    horizons: [1, 2, 4, 8, 12]
+    horizons: [1, 2, 4, 6]
     lag_sets:
-      primary: [1, 2, 4, 8, 12]
+      primary: [1, 2, 4, 6]
       short: [1, 2, 4]
       long: [1, 2, 4, 8, 12, 16]
     rolling_window_sets:

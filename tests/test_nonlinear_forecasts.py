@@ -34,7 +34,7 @@ class NonlinearForecastTests(unittest.TestCase):
         monthly = self.specs["monthly"]
         self.assertEqual(weekly.date_column, "observation_date")
         self.assertEqual(weekly.complete_column, "llm_comparison_complete_case")
-        self.assertEqual(weekly.horizons, (1, 2, 4, 8, 12))
+        self.assertEqual(weekly.horizons, (1, 2, 4, 6))
         self.assertEqual(weekly.minimum_training_rows, 156)
         self.assertFalse(weekly.primary)
         self.assertEqual(monthly.date_column, "month_ending")
@@ -46,6 +46,14 @@ class NonlinearForecastTests(unittest.TestCase):
         self.assertTrue(monthly.primary)
         for spec in (weekly, monthly):
             columns = set(pd.read_csv(spec.panel_path, nrows=0).columns)
+            missing = [
+                column
+                for horizon in spec.horizons
+                for column in (spec.target_column(horizon), spec.level_column(horizon))
+                if column not in columns
+            ]
+            if missing:
+                self.skipTest("requires Stages 14-17 to regenerate horizon columns")
             for horizon in spec.horizons:
                 self.assertIn(spec.target_column(horizon), columns)
                 self.assertIn(spec.level_column(horizon), columns)
@@ -139,6 +147,127 @@ class NonlinearForecastTests(unittest.TestCase):
         self.assertEqual(fixed, [self.config["models"]["random_forest"]["fixed"]])
         self.assertEqual(tuned, self.config["models"]["random_forest"]["candidates"])
         self.assertGreater(len(tuned), 1)
+
+    def test_expensive_model_grids_are_compute_bounded(self) -> None:
+        expected_counts = {
+            "glm": 4,
+            "random_forest": 2,
+            "xgboost": 2,
+            "lstm": 2,
+            "prophet": 2,
+        }
+        for algorithm, expected in expected_counts.items():
+            candidates = MODULE.resolve_parameter_candidates(
+                self.config, algorithm, tune=True
+            )
+            self.assertEqual(len(candidates), expected)
+        self.assertLessEqual(
+            max(item["n_estimators"] for item in self.config["models"]["random_forest"]["candidates"]),
+            250,
+        )
+        self.assertLessEqual(
+            max(item["n_estimators"] for item in self.config["models"]["xgboost"]["candidates"]),
+            250,
+        )
+        self.assertLessEqual(
+            max(item["epochs"] for item in self.config["models"]["lstm"]["candidates"]),
+            30,
+        )
+
+    def test_frozen_tuning_is_pretest_purged_and_shared_across_horizons(self) -> None:
+        rows = 100
+        panel = pd.DataFrame(
+            {
+                "date": pd.date_range("2020-01-03", periods=rows, freq="W-FRI"),
+                "complete": True,
+                "level": np.linspace(800.0, 1200.0, rows),
+                "x": np.linspace(-2.0, 2.0, rows),
+            }
+        )
+        for horizon in (1, 2, 4, 6):
+            panel[f"target_h{horizon}"] = (
+                0.02 * panel["x"] + 0.001 * horizon
+            )
+            panel[f"level_h{horizon}"] = panel["level"] * np.exp(
+                panel[f"target_h{horizon}"]
+            )
+        spec = MODULE.FrequencySpec(
+            name="weekly",
+            panel_path=Path("unused.csv"),
+            upstream_manifest_path=Path("unused.json"),
+            upstream_feature_sets_path=Path("unused.json"),
+            date_column="date",
+            complete_column="complete",
+            horizons=(1, 2, 4, 6),
+            target_template="target_h{horizon}",
+            level_template="level_h{horizon}",
+            current_level_column="level",
+            horizon_unit="weeks",
+            minimum_training_rows=40,
+            minimum_tuning_rows=20,
+            refit_every=4,
+            sequence_length=4,
+            primary=False,
+        )
+        first_origins = {
+            horizon: MODULE.eligible_origins(panel, spec, horizon)[0]
+            for horizon in spec.horizons
+        }
+        # Leave enough pre-test history for all three purged calibration folds.
+        cutoff = max(first_origins.values()) + 12
+        candidates = [
+            {"power": 0, "link": "identity", "alpha": alpha,
+             "fit_intercept": True, "solver": "lbfgs", "max_iter": 1000,
+             "tol": 1.0e-8}
+            for alpha in (0.001, 0.1)
+        ]
+        parameters, candidate_id, audit = MODULE.select_frozen_parameters(
+            algorithm="glm",
+            candidates=candidates,
+            panel=panel,
+            spec=spec,
+            calibration_position=cutoff,
+            features=["x"],
+            seed=123,
+            n_splits=3,
+            smoke_test=False,
+        )
+        frame = pd.DataFrame(audit)
+        self.assertIn(parameters, candidates)
+        self.assertRegex(candidate_id, r"candidate_0[01]")
+        self.assertEqual(len(frame), len(candidates) * len(spec.horizons) * 3)
+        self.assertEqual(frame["fit_id"].nunique(), 1)
+        self.assertEqual(frame["tuning_scope"].unique().tolist(), [
+            "once_per_algorithm_frequency"
+        ])
+        self.assertTrue(frame["purge_check_passed"].all())
+        self.assertFalse(frame["evaluation_period_used"].any())
+        self.assertTrue(
+            (
+                frame["validation_last_position"] + frame["horizon_steps"]
+                <= cutoff
+            ).all()
+        )
+        self.assertEqual(frame.loc[frame["selected"], "candidate_id"].nunique(), 1)
+        configuration = MODULE.baseline_configuration(spec, MODULE.WEEKLY_CONSTRUCTION)
+        logger = logging.getLogger("frozen_tuning_guard_test")
+        logger.addHandler(logging.NullHandler())
+        with self.assertRaisesRegex(AssertionError, "overlaps the calibration"):
+            MODULE.rolling_forecasts(
+                panel=panel,
+                spec=spec,
+                horizon=1,
+                origins=[cutoff - 1],
+                algorithm="glm",
+                configuration=configuration,
+                features=["x"],
+                parameters=parameters,
+                candidate_id=candidate_id,
+                tuning_enabled=True,
+                tuning_calibration_position=cutoff,
+                seed=123,
+                logger=logger,
+            )
 
     def test_glm_is_canonical_deterministic_and_leakage_safe(self) -> None:
         self.assertEqual(MODULE.ALGORITHMS[0], "glm")
@@ -339,6 +468,9 @@ class NonlinearForecastTests(unittest.TestCase):
         )
         for frequency in ("weekly", "monthly"):
             spec = self.specs[frequency]
+            header = set(pd.read_csv(spec.panel_path, nrows=0).columns)
+            if any(spec.target_column(horizon) not in header for horizon in spec.horizons):
+                self.skipTest("requires Stages 14-17 to regenerate horizon columns")
             panel = MODULE.load_panel(spec)
             feature_sets = MODULE.load_feature_sets(spec)
             challengers = MODULE.limited_configurations(
@@ -367,11 +499,13 @@ class NonlinearForecastTests(unittest.TestCase):
                     algorithm="random_forest",
                     configuration=configuration,
                     features=selected_features["random_forest"][model_id],
-                    candidates=candidates,
-                    tune=False,
-                    inner_splits=3,
+                    parameters=MODULE.smoke_parameters(
+                        "random_forest", candidates[0]
+                    ),
+                    candidate_id="fixed",
+                    tuning_enabled=False,
+                    tuning_calibration_position=None,
                     seed=20260712,
-                    smoke_test=True,
                     logger=logger,
                 )
                 rows.extend(forecasts)

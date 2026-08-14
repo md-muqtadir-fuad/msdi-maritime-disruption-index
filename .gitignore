@@ -57,6 +57,7 @@ secrets.json
 /checkpoints/
 /models/
 /runs/
+/docs/
 
 # Experiment trackers and distributed-training state
 /wandb/

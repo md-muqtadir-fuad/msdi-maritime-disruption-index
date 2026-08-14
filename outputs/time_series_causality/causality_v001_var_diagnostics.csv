@@ -1,49 +1,49 @@
 frequency,msdi_path,diagnostic,variable,statistic,p_value,passes_at_alpha,details,degrees_freedom,secondary_statistic,secondary_p_value
-weekly,peak,var_stability,system,1.993298884861859,,True,statistic is minimum inverse-root modulus; stable when > 1,,,
-weekly,peak,var_max_inverse_root_modulus,system,4.680304118299759,,True,reported for root audit,,,
-weekly,peak,multivariate_portmanteau_whiteness,system,534.8158655710873,2.5523189599097387e-19,False,adjusted test through lag 18,272.0,,
-weekly,peak,multivariate_jarque_bera,system,8096.4154642629,0.0,False,"normality is diagnostic, not required for HAC inference",8.0,,
-weekly,peak,ljung_box_autocorrelation,scfi_return,115.13520198582343,1.7192351742845852e-19,False,lag=12; model_df=1,,,
-weekly,peak,arch_lm_heteroskedasticity,scfi_return,98.38334297174778,1.1537125917810011e-15,False,lag=12,,9.92444067613071,1.709306876743738e-17
-weekly,peak,ljung_box_autocorrelation,msdi_change,65.07316484396159,1.0440171053294242e-09,False,lag=12; model_df=1,,,
-weekly,peak,arch_lm_heteroskedasticity,msdi_change,133.44157713233867,1.2558370109257123e-22,False,lag=12,,14.734476924703799,1.754734241886012e-26
-weekly,peak,ljung_box_autocorrelation,brent_return,46.586263190542596,2.5463452449619587e-06,False,lag=12; model_df=1,,,
-weekly,peak,arch_lm_heteroskedasticity,brent_return,208.34310549526325,6.159986083042758e-38,False,lag=12,,28.833102012140902,1.3290044655187894e-49
-weekly,peak,ljung_box_autocorrelation,news_volume_change,51.35972948303971,3.5599195116401976e-07,False,lag=12; model_df=1,,,
-weekly,peak,arch_lm_heteroskedasticity,news_volume_change,14.858032138223386,0.24929227697829606,True,lag=12,,1.2428725978673336,0.2502286108324769
-weekly,breadth,var_stability,system,1.85569336812734,,True,statistic is minimum inverse-root modulus; stable when > 1,,,
-weekly,breadth,var_max_inverse_root_modulus,system,18.78865765162452,,True,reported for root audit,,,
-weekly,breadth,multivariate_portmanteau_whiteness,system,507.05433208659264,1.059798835087747e-18,False,adjusted test through lag 18,256.0,,
-weekly,breadth,multivariate_jarque_bera,system,7329.11887764005,0.0,False,"normality is diagnostic, not required for HAC inference",8.0,,
-weekly,breadth,ljung_box_autocorrelation,scfi_return,119.66605475679128,5.914419301905409e-21,False,lag=12; model_df=2,,,
-weekly,breadth,arch_lm_heteroskedasticity,scfi_return,113.39236303238172,1.273693377332395e-18,False,lag=12,,11.884233566860031,3.225904408647889e-21
-weekly,breadth,ljung_box_autocorrelation,msdi_change,55.342324394555405,2.7255072598480808e-08,False,lag=12; model_df=2,,,
-weekly,breadth,arch_lm_heteroskedasticity,msdi_change,80.2416033170955,3.7117250315198254e-12,False,lag=12,,7.750365601622033,2.908234986550473e-13
-weekly,breadth,ljung_box_autocorrelation,brent_return,47.18523691903747,8.737615217081996e-07,False,lag=12; model_df=2,,,
-weekly,breadth,arch_lm_heteroskedasticity,brent_return,206.8322034792184,1.2647938541343144e-37,False,lag=12,,28.51643023971424,4.155801472932905e-49
-weekly,breadth,ljung_box_autocorrelation,news_volume_change,28.632351004497863,0.0014286746030062745,False,lag=12; model_df=2,,,
-weekly,breadth,arch_lm_heteroskedasticity,news_volume_change,8.812923353881612,0.7188207775285718,True,lag=12,,0.728187874503762,0.7241816986245352
-monthly,peak,var_stability,system,1.3763589020179965,,True,statistic is minimum inverse-root modulus; stable when > 1,,,
-monthly,peak,var_max_inverse_root_modulus,system,2.072735874643178,,True,reported for root audit,,,
-monthly,peak,multivariate_portmanteau_whiteness,system,163.83135353405746,0.4014103296855289,True,adjusted test through lag 12,160.0,,
-monthly,peak,multivariate_jarque_bera,system,2787.9833392172386,0.0,False,"normality is diagnostic, not required for HAC inference",8.0,,
-monthly,peak,ljung_box_autocorrelation,scfi_return,19.52968561015886,0.0340283424376519,False,lag=12; model_df=2,,,
-monthly,peak,arch_lm_heteroskedasticity,scfi_return,14.591543287444608,0.20197008430490226,True,lag=11,,1.3641119694537336,0.20292116509432268
-monthly,peak,ljung_box_autocorrelation,msdi_change,25.426224425049394,0.0045935580813917225,False,lag=12; model_df=2,,,
-monthly,peak,arch_lm_heteroskedasticity,msdi_change,9.404115819075415,0.5846438767978362,True,lag=11,,0.8319448075197462,0.6086849710940412
-monthly,peak,ljung_box_autocorrelation,brent_return,10.195973413638855,0.42347148834453036,True,lag=12; model_df=2,,,
-monthly,peak,arch_lm_heteroskedasticity,brent_return,53.1833583314691,1.6625695703232162e-07,False,lag=11,,8.60478737077627,2.457280774687857e-10
-monthly,peak,ljung_box_autocorrelation,news_volume_change,7.896258643350278,0.63896960100814,True,lag=12; model_df=2,,,
-monthly,peak,arch_lm_heteroskedasticity,news_volume_change,8.77985868448347,0.6422041437608115,True,lag=11,,0.7717318889742573,0.667080904360474
-monthly,breadth,var_stability,system,1.4177286590755653,,True,statistic is minimum inverse-root modulus; stable when > 1,,,
-monthly,breadth,var_max_inverse_root_modulus,system,2.347474479953497,,True,reported for root audit,,,
-monthly,breadth,multivariate_portmanteau_whiteness,system,162.20186932014295,0.43653327814210363,True,adjusted test through lag 12,160.0,,
-monthly,breadth,multivariate_jarque_bera,system,4023.6112947647634,0.0,False,"normality is diagnostic, not required for HAC inference",8.0,,
-monthly,breadth,ljung_box_autocorrelation,scfi_return,19.611118499080906,0.03315297973979031,False,lag=12; model_df=2,,,
-monthly,breadth,arch_lm_heteroskedasticity,scfi_return,14.210664999627788,0.2215549604807451,True,lag=11,,1.3229923913765,0.22407872585908617
-monthly,breadth,ljung_box_autocorrelation,msdi_change,17.61381971602611,0.061838002328856015,True,lag=12; model_df=2,,,
-monthly,breadth,arch_lm_heteroskedasticity,msdi_change,13.356796991687837,0.27064626752961857,True,lag=11,,1.2320375144530737,0.2771207621959943
-monthly,breadth,ljung_box_autocorrelation,brent_return,11.252142643463626,0.3382142261540117,True,lag=12; model_df=2,,,
-monthly,breadth,arch_lm_heteroskedasticity,brent_return,53.611013086328725,1.3897225227103048e-07,False,lag=11,,8.744785926475679,1.7357292128067197e-10
-monthly,breadth,ljung_box_autocorrelation,news_volume_change,7.761249658359209,0.6521448314837541,True,lag=12; model_df=2,,,
-monthly,breadth,arch_lm_heteroskedasticity,news_volume_change,9.950494325940463,0.5348456680361169,True,lag=11,,0.8852882310053617,0.5574526504139394
+weekly,peak,var_stability,system,2.018995625768792,,True,statistic is minimum inverse-root modulus; stable when > 1,,,
+weekly,peak,var_max_inverse_root_modulus,system,4.768881134849166,,True,reported for root audit,,,
+weekly,peak,multivariate_portmanteau_whiteness,system,543.6039725766011,2.8008980926190344e-20,False,adjusted test through lag 18,272.0,,
+weekly,peak,multivariate_jarque_bera,system,7113.5621658688315,0.0,False,"normality is diagnostic, not required for HAC inference",8.0,,
+weekly,peak,ljung_box_autocorrelation,scfi_return,116.54141660144369,8.980018659547882e-20,False,lag=12; model_df=1,,,
+weekly,peak,arch_lm_heteroskedasticity,scfi_return,88.63457449032687,9.069684013313864e-14,False,lag=12,,8.731182512633286,3.496875764424179e-15
+weekly,peak,ljung_box_autocorrelation,msdi_change,66.6082457954906,5.363505614534125e-10,False,lag=12; model_df=1,,,
+weekly,peak,arch_lm_heteroskedasticity,msdi_change,114.3826317072962,8.101455889574721e-19,False,lag=12,,12.01218527431643,1.8310242429439944e-21
+weekly,peak,ljung_box_autocorrelation,brent_return,47.33135820622134,1.8779091465916536e-06,False,lag=12; model_df=1,,,
+weekly,peak,arch_lm_heteroskedasticity,brent_return,207.61824977453085,8.699353785647521e-38,False,lag=12,,28.662516209175187,2.382925310925881e-49
+weekly,peak,ljung_box_autocorrelation,news_volume_change,50.1378049459504,5.912240776027023e-07,False,lag=12; model_df=1,,,
+weekly,peak,arch_lm_heteroskedasticity,news_volume_change,14.456078278171653,0.2725365101596746,True,lag=12,,1.208256317706447,0.27386000656507725
+weekly,breadth,var_stability,system,2.0395246257855346,,True,statistic is minimum inverse-root modulus; stable when > 1,,,
+weekly,breadth,var_max_inverse_root_modulus,system,4.627430969235591,,True,reported for root audit,,,
+weekly,breadth,multivariate_portmanteau_whiteness,system,543.2395487284072,3.071800073561817e-20,False,adjusted test through lag 18,272.0,,
+weekly,breadth,multivariate_jarque_bera,system,7500.158659324191,0.0,False,"normality is diagnostic, not required for HAC inference",8.0,,
+weekly,breadth,ljung_box_autocorrelation,scfi_return,114.93240627104736,1.887943427826372e-19,False,lag=12; model_df=1,,,
+weekly,breadth,arch_lm_heteroskedasticity,scfi_return,90.57823535650638,3.8151622477577975e-14,False,lag=12,,8.964596884571346,1.2290330415366e-15
+weekly,breadth,ljung_box_autocorrelation,msdi_change,61.78370088610062,4.3159374542713286e-09,False,lag=12; model_df=1,,,
+weekly,breadth,arch_lm_heteroskedasticity,msdi_change,132.92849138250264,1.5926277492193142e-22,False,lag=12,,14.657527312363067,2.418269175261385e-26
+weekly,breadth,ljung_box_autocorrelation,brent_return,47.19927781264011,1.9822071349206953e-06,False,lag=12; model_df=1,,,
+weekly,breadth,arch_lm_heteroskedasticity,brent_return,203.5276829835477,6.094875178774255e-37,False,lag=12,,27.71527987924706,6.248861949384028e-48
+weekly,breadth,ljung_box_autocorrelation,news_volume_change,51.40959923535025,3.4867995740144764e-07,False,lag=12; model_df=1,,,
+weekly,breadth,arch_lm_heteroskedasticity,news_volume_change,14.586750410762434,0.26481714743015616,True,lag=12,,1.2195035684218947,0.2660124613722151
+monthly,peak,var_stability,system,2.4357065526123947,,True,statistic is minimum inverse-root modulus; stable when > 1,,,
+monthly,peak,var_max_inverse_root_modulus,system,3.9185159088748605,,True,reported for root audit,,,
+monthly,peak,multivariate_portmanteau_whiteness,system,207.501282727036,0.052272885392614356,True,adjusted test through lag 12,176.0,,
+monthly,peak,multivariate_jarque_bera,system,3486.605963910746,0.0,False,"normality is diagnostic, not required for HAC inference",8.0,,
+monthly,peak,ljung_box_autocorrelation,scfi_return,47.00687126926842,2.1444722993960073e-06,False,lag=12; model_df=1,,,
+monthly,peak,arch_lm_heteroskedasticity,scfi_return,16.206047547866824,0.13365218198084983,True,lag=11,,1.5415268963576088,0.12954533466144735
+monthly,peak,ljung_box_autocorrelation,msdi_change,7.5014222117610325,0.7571462939999208,True,lag=12; model_df=1,,,
+monthly,peak,arch_lm_heteroskedasticity,msdi_change,9.998282207178182,0.5305416747629668,True,lag=11,,0.8901780591618041,0.5527736270436088
+monthly,peak,ljung_box_autocorrelation,brent_return,18.179558270598307,0.07750665581009544,True,lag=12; model_df=1,,,
+monthly,peak,arch_lm_heteroskedasticity,brent_return,62.55119250983102,3.1024623564203083e-09,False,lag=11,,12.153640894023283,6.211820768619461e-14
+monthly,peak,ljung_box_autocorrelation,news_volume_change,6.583930476020121,0.8317080461144443,True,lag=12; model_df=1,,,
+monthly,peak,arch_lm_heteroskedasticity,news_volume_change,2.519202387400187,0.9956789180877352,True,lag=11,,0.20823680894794075,0.9967205406426682
+monthly,breadth,var_stability,system,1.7024360305866506,,True,statistic is minimum inverse-root modulus; stable when > 1,,,
+monthly,breadth,var_max_inverse_root_modulus,system,2.6209794814391607,,True,reported for root audit,,,
+monthly,breadth,multivariate_portmanteau_whiteness,system,148.87574249301983,0.7255442179623127,True,adjusted test through lag 12,160.0,,
+monthly,breadth,multivariate_jarque_bera,system,8581.392834619755,0.0,False,"normality is diagnostic, not required for HAC inference",8.0,,
+monthly,breadth,ljung_box_autocorrelation,scfi_return,17.98248553959794,0.05525980519562316,True,lag=12; model_df=2,,,
+monthly,breadth,arch_lm_heteroskedasticity,scfi_return,16.168439981553384,0.1349919113185345,True,lag=11,,1.538063781870228,0.13092617891780503
+monthly,breadth,ljung_box_autocorrelation,msdi_change,2.99787827853218,0.9814739506666739,True,lag=12; model_df=2,,,
+monthly,breadth,arch_lm_heteroskedasticity,msdi_change,14.315467835455076,0.21602621991866322,True,lag=11,,1.3342728243980138,0.2181043737347769
+monthly,breadth,ljung_box_autocorrelation,brent_return,14.213631732253562,0.16346832955852983,True,lag=12; model_df=2,,,
+monthly,breadth,arch_lm_heteroskedasticity,brent_return,56.91678507447121,3.4468166627814807e-08,False,lag=11,,9.909289773810787,1.0498028820304882e-11
+monthly,breadth,ljung_box_autocorrelation,news_volume_change,4.2993129507988215,0.9328359330323754,True,lag=12; model_df=2,,,
+monthly,breadth,arch_lm_heteroskedasticity,news_volume_change,2.6358816012650452,0.9947164043631598,True,lag=11,,0.21791707567145485,0.9959798983917151

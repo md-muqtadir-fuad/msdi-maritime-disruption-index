@@ -6,8 +6,9 @@ and audits existing manifests/artifacts.  It never invokes a stage-local
 ``--smoke-test`` option because those options write partial research outputs.
 
 ``full`` performs a fail-fast, sequential run with the publication settings.
-The forecasting-model stage enables the complete nested, horizon-purged tuning
-grid.  Manual LLM scoring and human annotation remain explicit gates rather
+The forecasting-model stage enables one initial, horizon-purged calibration per
+algorithm and frequency, then freezes parameters for rolling evaluation.
+Manual LLM scoring and human annotation remain explicit gates rather
 than being represented as completed automated work.
 """
 
@@ -203,7 +204,7 @@ STAGES: tuple[Stage, ...] = (
     Stage(
         18,
         "18_forecasting_models.py",
-        "Tune GLM, RF, XGBoost, LSTM, and Prophet forecasts",
+        "Calibrate and evaluate GLM, RF, XGBoost, LSTM, and Prophet forecasts",
         arguments=(
             "--frequency",
             "both",
@@ -936,7 +937,7 @@ def run_full(args: argparse.Namespace) -> int:
             "updated_at_utc": utc_now(),
             "project_root": str(PROJECT_ROOT),
             "python": str(python),
-            "full_nested_tuning": True,
+            "frozen_initial_tuning": True,
             "forecast_algorithms": list(EXPECTED_FORECAST_ALGORITHMS),
             "preflight": preflight,
             "arguments": {

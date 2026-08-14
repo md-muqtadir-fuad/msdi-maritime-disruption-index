@@ -26,6 +26,8 @@ class CausalityAnalysisTests(unittest.TestCase):
                 "scfi": [100.0, 110.0, 121.0, 133.1],
                 "brent_price": [50.0, 55.0, 60.5, 66.55],
                 "article_count": [1.0, 3.0, 7.0, 15.0],
+                "cpb_world_trade_volume": [100.0, 100.5, 101.0, 101.5],
+                "unctad_china_core_lane_lsbci": [95.0, 95.5, 96.0, 96.5],
                 "peak_score_media_corrected": [0.0, 1.0, 3.0, 2.0],
                 "breadth_score_media_corrected": [0.0, 0.5, 1.0, 1.5],
             }
@@ -50,6 +52,21 @@ class CausalityAnalysisTests(unittest.TestCase):
         self.assertAlmostEqual(
             result.loc[1, "news_volume_change"], np.log1p(3) - np.log1p(1)
         )
+
+    def test_analysis_columns_are_resolved_from_prepared_frame(self) -> None:
+        frame = pd.DataFrame(
+            columns=[
+                *MODULE.ENDOGENOUS_VARIABLES,
+                *MODULE.SEASONAL_CONTROLS,
+                "cpb_world_trade_volume_lag_1",
+                "scfi_log",
+            ]
+        )
+        columns = MODULE.analysis_columns(frame)
+        self.assertEqual(columns[:4], list(MODULE.ENDOGENOUS_VARIABLES))
+        self.assertIn("cpb_world_trade_volume_lag_1", columns)
+        self.assertNotIn("unctad_china_core_lane_lsbci_lag_1", columns)
+        self.assertEqual(columns[-1], "scfi_log")
 
     def test_longest_complete_block_does_not_bridge_time_gaps(self) -> None:
         frame = pd.DataFrame(

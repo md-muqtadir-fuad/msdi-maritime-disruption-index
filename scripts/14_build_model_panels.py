@@ -47,7 +47,7 @@ DEFAULT_MONTHLY_OUTPUT = (
 DEFAULT_AUDIT_DIR = PROJECT_ROOT / "outputs/model_panel_audit"
 DEFAULT_LOG_DIR = PROJECT_ROOT / "outputs/logs"
 
-FORECAST_HORIZONS_WEEKS = (1, 2, 4, 8, 12)
+FORECAST_HORIZONS_WEEKS = (1, 2, 4, 6)
 FORECAST_HORIZONS_MONTHS = (1, 3, 6)
 PREDICTOR_LAGS_WEEKS = (1, 2, 4, 8, 12)
 ROLLING_WINDOWS_WEEKS = (4, 13, 26, 52)
@@ -654,11 +654,12 @@ def build_monthly_panel(
         # Remove all MSDI values constructed by averaging weekly indices. The
         # monthly-primary series is constructed directly from article rows by
         # Stage 13 with event_id_monthly, sqrt effective volume, and EMA(3).
+        # Retain msdi_available_weeks: it is the within-month weekly coverage
+        # count used by the downstream completeness contract, not an index.
         legacy_msdi_columns = [
             column
             for column in monthly.columns
-            if column == "msdi_available_weeks"
-            or any(column.startswith(f"{source}_") for source in MSDI_BASE_COLUMNS)
+            if any(column.startswith(f"{source}_") for source in MSDI_BASE_COLUMNS)
         ]
         monthly = monthly.drop(columns=legacy_msdi_columns, errors="ignore")
         direct = monthly_msdi.copy()
@@ -679,7 +680,7 @@ def build_monthly_panel(
             }:
                 direct_rename[column] = f"{column}_mean"
         direct = direct.rename(columns=direct_rename)
-        direct["msdi_available_weeks"] = direct[
+        direct["direct_monthly_msdi_available"] = direct[
             ["peak_score_media_corrected_mean", "breadth_score_media_corrected_mean"]
         ].notna().all(axis=1).astype(int)
         monthly = monthly.merge(direct, on="month_ending", how="left", validate="one_to_one")

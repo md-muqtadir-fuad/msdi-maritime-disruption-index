@@ -52,7 +52,7 @@ DEFAULT_MODEL_CONFIG = PROJECT_ROOT / "configs/model_registry.yaml"
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs/llm_scfi_comparison"
 DEFAULT_LOG_DIR = PROJECT_ROOT / "outputs/logs"
 
-HORIZONS = (1, 2, 4, 8, 12)
+HORIZONS = (1, 2, 4, 6)
 LAGS = (1, 2, 4, 8, 12)
 ROLLING_WINDOWS = (4, 13, 26, 52)
 DIMENSION_COLUMNS = (
@@ -1581,7 +1581,7 @@ def build_llm_rankings(
     ).reset_index(drop=True)
     ranking["predictive_point_rank"] = np.arange(1, len(ranking) + 1)
     ranking["ranking_scope"] = (
-        "equal-weight overall-max and dimension-mean7 RMSE ranks across five horizons"
+        "equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons"
     )
     return ranking, cells.sort_values(
         ["horizon_weeks", "signal_name", "rmse_rank_within_horizon_signal"]

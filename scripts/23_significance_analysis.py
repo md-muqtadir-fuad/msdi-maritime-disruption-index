@@ -51,7 +51,7 @@ DEFAULT_LOG_DIR = PROJECT_ROOT / "outputs/logs"
 
 # Updated only after configs/significance.yaml is frozen.
 CANONICAL_CONFIG_SHA256 = (
-    "748aa9277123d2e55fe1ad2088bfcd0f9f82d871eac16349c9f05ab85f1e390e"
+    "fef8d706cefc45e52bae360a6fdecc72df46d0e553fcc123bef7027e23257e17"
 )
 
 DYNAMIC_IDENTITY_FIELDS = (
@@ -790,7 +790,11 @@ def classify_weekly_llm_family(family_id: str) -> str:
 
 def classify_monthly_llm_family(family_id: str) -> str:
     if family_id.startswith("monthly_primary_"):
-        return "confirmatory_primary"
+        return (
+            "confirmatory_primary"
+            if family_id.endswith("__diebold_mariano_squared")
+            else "prespecified_secondary"
+        )
     if family_id.startswith("monthly_exploratory_"):
         return "exploratory"
     raise ValueError(f"Unregistered Stage 07c family: {family_id}")
@@ -933,7 +937,11 @@ def build_ablation_registry(
     rows: list[dict[str, Any]] = []
     for row_number, record in enumerate(frame.to_dict("records")):
         is_primary = normalize_bool(record.get("primary_family"))
-        role = "noncanonical_reassigned_primary" if is_primary else "exploratory"
+        # Stage 21's primary direct-monthly ablations are a separately fitted,
+        # prespecified forecast family. They are confirmatory unless an exact
+        # semantic duplicate (same paired sample and numerical effect) is
+        # validated below.
+        role = "confirmatory_primary" if is_primary else "exploratory"
         method = normalize_method(record["multiplicity_method"])
         expected = "holm" if is_primary else "benjamini_hochberg"
         if method != expected:
@@ -2476,15 +2484,35 @@ def apply_forecast_semantic_deduplication(
                 "validation_passed": True,
             }
         )
-    audit = pd.DataFrame(audits)
+    audit_columns = [
+        "duplicate_type",
+        "duplicate_hypothesis_id",
+        "canonical_owner_hypothesis_id",
+        "frequency",
+        "index_construction",
+        "comparison_id",
+        "horizon",
+        "loss",
+        "paired_sample_size",
+        "effect_absolute_difference",
+        "raw_p_value_absolute_difference",
+        "reassigned_primary_family",
+        "canonical_owner_family_id",
+        "duplicate_family_id",
+        "canonical_owner_rule",
+        "validation_passed",
+    ]
+    audit = pd.DataFrame(audits, columns=audit_columns)
     expected = int(contract["expected_stage09_duplicate_rows"])
     if len(audit) != expected:
         raise ValueError(f"Stage 09 forecast duplicate count changed: {len(audit)} != {expected}")
-    frequency_counts = audit.groupby("frequency").size().to_dict()
+    frequency_counts = (
+        audit.groupby("frequency").size().to_dict() if not audit.empty else {}
+    )
     for frequency, count in contract["expected_stage09_duplicate_rows_by_frequency"].items():
         if int(frequency_counts.get(frequency, 0)) != int(count):
             raise ValueError(f"Stage 09 {frequency} duplicate count changed")
-    primary_count = int(audit["reassigned_primary_family"].sum())
+    primary_count = int(audit["reassigned_primary_family"].sum()) if not audit.empty else 0
     if primary_count != int(contract["expected_reassigned_primary_rows"]):
         raise ValueError("Stage 09 reassigned primary duplicate count changed")
     return result, audit
@@ -2682,6 +2710,7 @@ def validate_family_contracts(
         observed = canonical.loc[
             canonical["source_table"].eq(source_table)
             & canonical["upstream_family_id"].eq(family)
+            & canonical["inference_role"].eq("confirmatory_primary")
         ]
         if len(observed) != int(expected):
             raise ValueError(f"Confirmatory family size changed: {family}")

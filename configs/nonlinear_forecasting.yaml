@@ -1,21 +1,34 @@
 design:
   seed: 20260712
   inner_splits: 3
+  tuning:
+    strategy: frozen_initial_purged_expanding_window
+    selection_feature_set: ridge__ar_brent_coverage
+    horizon_aggregation: equal_weight_mean_rmse
+    reuse_across_score_paths: true
+    retune_during_outer_evaluation: false
   frequency:
     weekly:
       role: higher_frequency_robustness
+      horizons: [1, 2, 4, 6]
       minimum_training_rows: 156
+      minimum_tuning_rows: 52
       refit_every: 13
       sequence_length: 12
     monthly:
       role: primary
+      horizons: [1, 3, 6]
       minimum_training_rows: 60
+      minimum_tuning_rows: 24
       refit_every: 3
       sequence_length: 6
 
 # Fixed values are the publication pre-specification used when --tune is absent.
-# The candidate lists are intentionally compact.  --tune evaluates them only
-# with nested, horizon-purged expanding-window validation inside each outer fit.
+# The candidate lists are intentionally compact. The cheap GLM retains four
+# regularization values; each expensive learner has only two bounded candidates.
+# With --tune, one candidate is
+# selected per algorithm and frequency on an initial, horizon-purged expanding
+# calibration window. That choice is frozen before rolling-origin evaluation.
 models:
   glm:
     fixed:
@@ -34,23 +47,21 @@ models:
 
   random_forest:
     fixed:
-      n_estimators: 500
+      n_estimators: 200
       max_depth: 6
       min_samples_leaf: 5
       max_features: 0.7
       bootstrap: true
       n_jobs: -1
     candidates:
-      - {n_estimators: 300, max_depth: 4, min_samples_leaf: 3, max_features: 0.5, bootstrap: true, n_jobs: -1}
-      - {n_estimators: 300, max_depth: 8, min_samples_leaf: 8, max_features: 0.7, bootstrap: true, n_jobs: -1}
-      - {n_estimators: 500, max_depth: 6, min_samples_leaf: 5, max_features: 0.7, bootstrap: true, n_jobs: -1}
-      - {n_estimators: 500, max_depth: 8, min_samples_leaf: 3, max_features: 1.0, bootstrap: true, n_jobs: -1}
+      - {n_estimators: 150, max_depth: 4, min_samples_leaf: 3, max_features: 0.5, bootstrap: true, n_jobs: -1}
+      - {n_estimators: 250, max_depth: 6, min_samples_leaf: 7, max_features: 0.7, bootstrap: true, n_jobs: -1}
 
   xgboost:
     fixed:
       objective: reg:squarederror
-      n_estimators: 300
-      learning_rate: 0.03
+      n_estimators: 200
+      learning_rate: 0.04
       max_depth: 2
       min_child_weight: 5
       subsample: 0.8
@@ -60,10 +71,8 @@ models:
       tree_method: hist
       n_jobs: 1
     candidates:
-      - {objective: reg:squarederror, n_estimators: 200, learning_rate: 0.02, max_depth: 2, min_child_weight: 8, subsample: 0.8, colsample_bytree: 0.8, reg_alpha: 0.1, reg_lambda: 5.0, tree_method: hist, n_jobs: 1}
-      - {objective: reg:squarederror, n_estimators: 300, learning_rate: 0.03, max_depth: 2, min_child_weight: 5, subsample: 0.8, colsample_bytree: 0.8, reg_alpha: 0.1, reg_lambda: 5.0, tree_method: hist, n_jobs: 1}
-      - {objective: reg:squarederror, n_estimators: 400, learning_rate: 0.02, max_depth: 3, min_child_weight: 8, subsample: 0.8, colsample_bytree: 0.8, reg_alpha: 0.1, reg_lambda: 5.0, tree_method: hist, n_jobs: 1}
-      - {objective: reg:squarederror, n_estimators: 200, learning_rate: 0.05, max_depth: 3, min_child_weight: 3, subsample: 0.8, colsample_bytree: 0.8, reg_alpha: 0.1, reg_lambda: 1.0, tree_method: hist, n_jobs: 1}
+      - {objective: reg:squarederror, n_estimators: 150, learning_rate: 0.04, max_depth: 2, min_child_weight: 8, subsample: 0.8, colsample_bytree: 0.8, reg_alpha: 0.1, reg_lambda: 5.0, tree_method: hist, n_jobs: 1}
+      - {objective: reg:squarederror, n_estimators: 250, learning_rate: 0.03, max_depth: 3, min_child_weight: 5, subsample: 0.8, colsample_bytree: 0.8, reg_alpha: 0.1, reg_lambda: 5.0, tree_method: hist, n_jobs: 1}
 
   lstm:
     fixed:
@@ -73,11 +82,10 @@ models:
       learning_rate: 0.001
       weight_decay: 0.0001
       batch_size: 16
-      epochs: 40
+      epochs: 30
     candidates:
-      - {hidden_size: 8, num_layers: 1, dropout: 0.0, learning_rate: 0.001, weight_decay: 0.0001, batch_size: 16, epochs: 40}
-      - {hidden_size: 16, num_layers: 1, dropout: 0.0, learning_rate: 0.001, weight_decay: 0.0001, batch_size: 16, epochs: 40}
-      - {hidden_size: 32, num_layers: 1, dropout: 0.0, learning_rate: 0.0005, weight_decay: 0.0001, batch_size: 16, epochs: 60}
+      - {hidden_size: 8, num_layers: 1, dropout: 0.0, learning_rate: 0.001, weight_decay: 0.0001, batch_size: 16, epochs: 20}
+      - {hidden_size: 16, num_layers: 1, dropout: 0.0, learning_rate: 0.001, weight_decay: 0.0001, batch_size: 16, epochs: 30}
 
   prophet:
     fixed:
@@ -93,5 +101,3 @@ models:
     candidates:
       - {growth: linear, seasonality_mode: additive, changepoint_prior_scale: 0.01, seasonality_prior_scale: 1.0, yearly_seasonality: true, weekly_seasonality: false, daily_seasonality: false, uncertainty_samples: 0, regressor_prior_scale: 0.1}
       - {growth: linear, seasonality_mode: additive, changepoint_prior_scale: 0.05, seasonality_prior_scale: 1.0, yearly_seasonality: true, weekly_seasonality: false, daily_seasonality: false, uncertainty_samples: 0, regressor_prior_scale: 0.1}
-      - {growth: linear, seasonality_mode: additive, changepoint_prior_scale: 0.05, seasonality_prior_scale: 10.0, yearly_seasonality: true, weekly_seasonality: false, daily_seasonality: false, uncertainty_samples: 0, regressor_prior_scale: 0.1}
-      - {growth: linear, seasonality_mode: additive, changepoint_prior_scale: 0.1, seasonality_prior_scale: 10.0, yearly_seasonality: true, weekly_seasonality: false, daily_seasonality: false, uncertainty_samples: 0, regressor_prior_scale: 0.1}

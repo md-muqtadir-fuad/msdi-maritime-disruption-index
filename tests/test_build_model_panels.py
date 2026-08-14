@@ -156,6 +156,9 @@ class BuildModelPanelsTests(unittest.TestCase):
         self.assertEqual(monthly.loc[0, "peak_score_media_corrected_mean"], 2.5)
         self.assertEqual(monthly.loc[0, "breadth_score_media_corrected_mean"], 1.5)
         self.assertEqual(monthly.loc[0, "article_count_sum"], 10)
+        self.assertEqual(monthly.loc[0, "msdi_available_weeks"], 2)
+        self.assertEqual(monthly.loc[0, "weekly_observations_in_month"], 2)
+        self.assertEqual(monthly.loc[0, "direct_monthly_msdi_available"], 1)
 
 
 if __name__ == "__main__":

@@ -7,11 +7,13 @@ known only after the forecast origin. Monthly results are primary; weekly
 results are higher-frequency robustness evidence.
 
 The normal run uses the fixed, pre-specified parameters in
-``configs/nonlinear_forecasting.yaml``.  ``--tune`` is deliberately opt-in and
-uses nested expanding-window validation.  At every outer or inner fit, an
-endpoint s is admissible only when s + horizon <= fit origin.  Preprocessors
-are refit inside that admissible training window.  Nothing in this script is a
-structural causal estimate.
+``configs/nonlinear_forecasting.yaml``. ``--tune`` is deliberately opt-in. It
+selects one candidate per algorithm and frequency on an initial purged
+expanding-window calibration sample, pools validation RMSE equally across the
+pre-specified horizons, and freezes the selection before outer evaluation.
+At every outer or calibration fit, an endpoint s is admissible only when
+s + horizon <= fit origin. Preprocessors are refit inside that admissible
+training window. Nothing in this script is a structural causal estimate.
 """
 
 from __future__ import annotations
@@ -117,6 +119,7 @@ class FrequencySpec:
     current_level_column: str
     horizon_unit: str
     minimum_training_rows: int
+    minimum_tuning_rows: int
     refit_every: int
     sequence_length: int
     primary: bool
@@ -254,8 +257,9 @@ def parse_args() -> argparse.Namespace:
         "--tune",
         action="store_true",
         help=(
-            "Enable expensive nested purged expanding-window tuning. Off by "
-            "default; the fixed pre-specified parameters are otherwise used."
+            "Tune once per algorithm/frequency on an initial horizon-purged "
+            "expanding window, then freeze parameters for outer evaluation. "
+            "Off by default; fixed pre-specified parameters are otherwise used."
         ),
     )
     parser.add_argument(
@@ -394,12 +398,13 @@ def frequency_specs(
             upstream_feature_sets_path=weekly_feature_sets,
             date_column="observation_date",
             complete_column="llm_comparison_complete_case",
-            horizons=(1, 2, 4, 8, 12),
+            horizons=tuple(int(value) for value in weekly["horizons"]),
             target_template="target_scfi_log_change_h{horizon}w",
             level_template="target_scfi_level_h{horizon}w",
             current_level_column="scfi",
             horizon_unit="weeks",
             minimum_training_rows=int(weekly["minimum_training_rows"]),
+            minimum_tuning_rows=int(weekly["minimum_tuning_rows"]),
             refit_every=int(weekly["refit_every"]),
             sequence_length=int(weekly["sequence_length"]),
             primary=str(weekly.get("role", "")).lower() == "primary",
@@ -411,12 +416,13 @@ def frequency_specs(
             upstream_feature_sets_path=monthly_feature_sets,
             date_column="month_ending",
             complete_column="llm_monthly_comparison_complete_case",
-            horizons=(1, 3, 6),
+            horizons=tuple(int(value) for value in monthly["horizons"]),
             target_template="target_scfi_monthly_log_change_h{horizon}m",
             level_template="target_scfi_monthly_mean_h{horizon}m",
             current_level_column="scfi_monthly_mean",
             horizon_unit="months",
             minimum_training_rows=int(monthly["minimum_training_rows"]),
+            minimum_tuning_rows=int(monthly["minimum_tuning_rows"]),
             refit_every=int(monthly["refit_every"]),
             sequence_length=int(monthly["sequence_length"]),
             primary=str(monthly.get("role", "")).lower() == "primary",
@@ -1189,117 +1195,164 @@ def fit_predictor(
     return artifact, metadata
 
 
-def select_parameters_nested(
+def select_frozen_parameters(
     *,
     algorithm: str,
     candidates: Sequence[dict[str, Any]],
     panel: pd.DataFrame,
     spec: FrequencySpec,
-    horizon: int,
-    outer_training: np.ndarray,
-    outer_fit_position: int,
+    calibration_position: int,
     features: Sequence[str],
-    target_column: str,
     seed: int,
     n_splits: int,
     smoke_test: bool,
-    fit_id: str,
 ) -> tuple[dict[str, Any], str, list[dict[str, Any]]]:
-    minimum_inner = 52 if spec.name == "weekly" else 24
-    folds = build_inner_folds(
-        outer_training,
-        outer_fit_position,
-        horizon,
-        minimum_inner,
-        n_splits,
-    )
-    if len(folds) < n_splits:
-        raise ValueError(
-            f"Cannot form {n_splits} purged inner folds for {fit_id}; "
-            f"formed {len(folds)}. Increase the outer training history."
-        )
+    """Choose one algorithm/frequency parameter set before OOS evaluation.
+
+    The calibration position is the first common evaluation origin across all
+    configured horizons. Candidate validation is confined to labels observable
+    by that position. A candidate receives one RMSE per horizon and the
+    arithmetic mean of those horizon RMSEs determines selection, so horizons
+    with more validation rows cannot dominate mechanically.
+    """
+
+    if not candidates:
+        raise ValueError(f"No tuning candidates supplied for {algorithm}")
+    fit_id = f"frozen_initial__{spec.name}__{algorithm}__origin{calibration_position}"
     audit_rows: list[dict[str, Any]] = []
     candidate_scores: list[float] = []
+    candidate_pooled_scores: list[float] = []
     for candidate_index, original_parameters in enumerate(candidates):
         parameters = (
             smoke_parameters(algorithm, original_parameters)
             if smoke_test
             else dict(original_parameters)
         )
-        fold_squared_errors: list[np.ndarray] = []
-        for fold_index, (inner_training, validation) in enumerate(folds):
-            inner_seed = stable_seed(
-                seed,
-                spec.name,
-                algorithm,
-                horizon,
-                outer_fit_position,
-                "candidate",
-                candidate_index,
-                "fold",
-                fold_index,
-            )
-            artifact, fit_metadata = fit_predictor(
-                algorithm,
+        all_squared_errors: list[np.ndarray] = []
+        horizon_scores: list[float] = []
+        candidate_row_indexes: list[int] = []
+        for horizon in spec.horizons:
+            target_column = spec.target_column(horizon)
+            calibration_training = training_positions(
                 panel,
-                inner_training,
-                features,
+                calibration_position,
+                horizon,
                 target_column,
-                spec.sequence_length,
-                parameters,
-                inner_seed,
+                spec.complete_column,
             )
-            predictions = artifact.predict(
-                panel, validation, features, spec.sequence_length
+            folds = build_inner_folds(
+                calibration_training,
+                calibration_position,
+                horizon,
+                spec.minimum_tuning_rows,
+                n_splits,
             )
-            actual = panel.loc[validation, target_column].to_numpy(dtype=float)
-            squared_errors = (actual - predictions) ** 2
-            fold_squared_errors.append(squared_errors)
-            training_label_end_position = int(inner_training[-1]) + horizon
-            audit_rows.append(
-                {
-                    "fit_id": fit_id,
-                    "frequency": spec.name,
-                    "algorithm": algorithm,
-                    "horizon_steps": horizon,
-                    "outer_fit_position": outer_fit_position,
-                    "outer_fit_origin_date": panel.at[
-                        outer_fit_position, spec.date_column
-                    ],
-                    "candidate_id": f"candidate_{candidate_index:02d}",
-                    "candidate_index": candidate_index,
-                    "parameters_json": parameter_json(parameters),
-                    "parameters_hash": parameter_hash(parameters),
-                    "fold": fold_index + 1,
-                    "inner_training_rows": len(inner_training),
-                    "inner_train_first_position": int(inner_training[0]),
-                    "inner_train_last_position": int(inner_training[-1]),
-                    "inner_train_first_date": panel.at[
-                        int(inner_training[0]), spec.date_column
-                    ],
-                    "inner_train_last_feature_date": panel.at[
-                        int(inner_training[-1]), spec.date_column
-                    ],
-                    "inner_train_last_label_date": panel.at[
-                        training_label_end_position, spec.date_column
-                    ],
-                    "validation_rows": len(validation),
-                    "validation_first_position": int(validation[0]),
-                    "validation_last_position": int(validation[-1]),
-                    "validation_first_date": panel.at[int(validation[0]), spec.date_column],
-                    "validation_last_date": panel.at[int(validation[-1]), spec.date_column],
-                    "purge_check_passed": bool(
-                        int(inner_training[-1]) + horizon <= int(validation[0])
-                    ),
-                    "fold_rmse": float(np.sqrt(np.mean(squared_errors))),
-                    "fit_runtime_seconds": fit_metadata["fit_runtime_seconds"],
-                    "selected": False,
-                }
+            if len(folds) < n_splits:
+                raise ValueError(
+                    f"Cannot form {n_splits} purged calibration folds for "
+                    f"{fit_id}, h={horizon}; formed {len(folds)}. Increase the "
+                    "initial training history."
+                )
+            horizon_squared_errors: list[np.ndarray] = []
+            for fold_index, (inner_training, validation) in enumerate(folds):
+                inner_seed = stable_seed(
+                    seed,
+                    spec.name,
+                    algorithm,
+                    "frozen_initial",
+                    horizon,
+                    calibration_position,
+                    "candidate",
+                    candidate_index,
+                    "fold",
+                    fold_index,
+                )
+                artifact, fit_metadata = fit_predictor(
+                    algorithm,
+                    panel,
+                    inner_training,
+                    features,
+                    target_column,
+                    spec.sequence_length,
+                    parameters,
+                    inner_seed,
+                )
+                predictions = artifact.predict(
+                    panel, validation, features, spec.sequence_length
+                )
+                actual = panel.loc[validation, target_column].to_numpy(dtype=float)
+                squared_errors = (actual - predictions) ** 2
+                if not np.isfinite(squared_errors).all():
+                    raise ValueError(f"Non-finite calibration error for {fit_id}")
+                horizon_squared_errors.append(squared_errors)
+                all_squared_errors.append(squared_errors)
+                training_label_end_position = int(inner_training[-1]) + horizon
+                audit_rows.append(
+                    {
+                        "fit_id": fit_id,
+                        "frequency": spec.name,
+                        "algorithm": algorithm,
+                        "tuning_scope": "once_per_algorithm_frequency",
+                        "selection_feature_set": "ridge__ar_brent_coverage",
+                        "horizon_aggregation": "equal_weight_mean_rmse",
+                        "horizon_steps": horizon,
+                        "outer_fit_position": calibration_position,
+                        "outer_fit_origin_date": panel.at[
+                            calibration_position, spec.date_column
+                        ],
+                        "candidate_id": f"candidate_{candidate_index:02d}",
+                        "candidate_index": candidate_index,
+                        "parameters_json": parameter_json(parameters),
+                        "parameters_hash": parameter_hash(parameters),
+                        "fold": fold_index + 1,
+                        "inner_training_rows": len(inner_training),
+                        "inner_train_first_position": int(inner_training[0]),
+                        "inner_train_last_position": int(inner_training[-1]),
+                        "inner_train_first_date": panel.at[
+                            int(inner_training[0]), spec.date_column
+                        ],
+                        "inner_train_last_feature_date": panel.at[
+                            int(inner_training[-1]), spec.date_column
+                        ],
+                        "inner_train_last_label_date": panel.at[
+                            training_label_end_position, spec.date_column
+                        ],
+                        "validation_rows": len(validation),
+                        "validation_first_position": int(validation[0]),
+                        "validation_last_position": int(validation[-1]),
+                        "validation_first_date": panel.at[
+                            int(validation[0]), spec.date_column
+                        ],
+                        "validation_last_date": panel.at[
+                            int(validation[-1]), spec.date_column
+                        ],
+                        "purge_check_passed": bool(
+                            int(inner_training[-1]) + horizon <= int(validation[0])
+                            and int(validation[-1]) + horizon
+                            <= calibration_position
+                        ),
+                        "evaluation_period_used": False,
+                        "fold_rmse": float(np.sqrt(np.mean(squared_errors))),
+                        "fit_runtime_seconds": fit_metadata["fit_runtime_seconds"],
+                        "selected": False,
+                    }
+                )
+                candidate_row_indexes.append(len(audit_rows) - 1)
+            horizon_rmse = float(
+                np.sqrt(np.mean(np.concatenate(horizon_squared_errors)))
             )
-        candidate_scores.append(
-            float(np.sqrt(np.mean(np.concatenate(fold_squared_errors))))
+            horizon_scores.append(horizon_rmse)
+            for row_index in candidate_row_indexes:
+                if audit_rows[row_index]["horizon_steps"] == horizon:
+                    audit_rows[row_index]["candidate_horizon_rmse"] = horizon_rmse
+        candidate_scores.append(float(np.mean(horizon_scores)))
+        candidate_pooled_scores.append(
+            float(np.sqrt(np.mean(np.concatenate(all_squared_errors))))
         )
-    selected_index = min(range(len(candidate_scores)), key=lambda index: (candidate_scores[index], index))
+    selected_index = min(
+        range(len(candidate_scores)),
+        key=lambda index: (candidate_scores[index], index),
+    )
     selected_parameters = (
         smoke_parameters(algorithm, candidates[selected_index])
         if smoke_test
@@ -1307,7 +1360,9 @@ def select_parameters_nested(
     )
     selected_id = f"candidate_{selected_index:02d}"
     for row in audit_rows:
-        row["candidate_pooled_rmse"] = candidate_scores[int(row["candidate_index"])]
+        index = int(row["candidate_index"])
+        row["candidate_pooled_rmse"] = candidate_pooled_scores[index]
+        row["candidate_equal_horizon_rmse"] = candidate_scores[index]
         row["selected"] = row["candidate_index"] == selected_index
     return selected_parameters, selected_id, audit_rows
 
@@ -1415,18 +1470,22 @@ def rolling_forecasts(
     algorithm: str,
     configuration: ForecastConfiguration,
     features: Sequence[str],
-    candidates: Sequence[dict[str, Any]],
-    tune: bool,
-    inner_splits: int,
+    parameters: dict[str, Any],
+    candidate_id: str,
+    tuning_enabled: bool,
+    tuning_calibration_position: int | None,
     seed: int,
-    smoke_test: bool,
     logger: logging.Logger,
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]], list[dict[str, Any]]]:
     target_column = spec.target_column(horizon)
     forecast_rows: list[dict[str, Any]] = []
     fit_rows: list[dict[str, Any]] = []
-    tuning_rows: list[dict[str, Any]] = []
     model_id = configuration.model_id(algorithm)
+    if tuning_enabled:
+        if tuning_calibration_position is None:
+            raise AssertionError("Tuned forecasts require a calibration cutoff")
+        if origins and min(origins) < tuning_calibration_position:
+            raise AssertionError("Outer evaluation overlaps the calibration period")
     for block_start in range(0, len(origins), spec.refit_every):
         block = list(origins[block_start : block_start + spec.refit_every])
         fit_position = int(block[0])
@@ -1443,30 +1502,6 @@ def rolling_forecasts(
             f"{model_id}__h{horizon}__origin{fit_position}__"
             f"{pd.Timestamp(panel.at[fit_position, spec.date_column]).date()}"
         )
-        if tune:
-            parameters, candidate_id, nested_rows = select_parameters_nested(
-                algorithm=algorithm,
-                candidates=candidates,
-                panel=panel,
-                spec=spec,
-                horizon=horizon,
-                outer_training=training,
-                outer_fit_position=fit_position,
-                features=features,
-                target_column=target_column,
-                seed=seed,
-                n_splits=inner_splits,
-                smoke_test=smoke_test,
-                fit_id=fit_id,
-            )
-            tuning_rows.extend(nested_rows)
-        else:
-            parameters = (
-                smoke_parameters(algorithm, candidates[0])
-                if smoke_test
-                else dict(candidates[0])
-            )
-            candidate_id = "fixed"
         # Every score path in a matched comparison receives the same stochastic
         # seed.  The model/source/construction ID is intentionally excluded.
         fit_seed = stable_seed(
@@ -1541,10 +1576,20 @@ def rolling_forecasts(
                 "training_label_observable_at_fit": bool(label_end <= fit_origin),
                 "preprocessing_scope": "outer_training_only",
                 "random_train_test_split": False,
-                "tuning_enabled": tune,
+                "tuning_enabled": tuning_enabled,
                 "tuning_protocol": (
-                    "nested_purged_expanding_window" if tune else "fixed_prespecified"
+                    "frozen_initial_purged_expanding_window"
+                    if tuning_enabled
+                    else "fixed_prespecified"
                 ),
+                "tuning_calibration_position": tuning_calibration_position,
+                "tuning_calibration_date": (
+                    panel.at[tuning_calibration_position, spec.date_column]
+                    if tuning_calibration_position is not None
+                    else pd.NaT
+                ),
+                "parameters_selected_before_outer_evaluation": True,
+                "outer_test_outcome_used_for_tuning": False,
                 "candidate_id": candidate_id,
                 "parameters_json": parameter_json(parameters),
                 "parameters_hash": parameter_hash(parameters),
@@ -1578,7 +1623,7 @@ def rolling_forecasts(
                     parameters=parameters,
                     candidate_id=candidate_id,
                     fit_seed=fit_seed,
-                    tuning_enabled=tune,
+                    tuning_enabled=tuning_enabled,
                 )
             )
         logger.info(
@@ -1590,7 +1635,7 @@ def rolling_forecasts(
             parameter_hash(parameters),
             metadata["fit_runtime_seconds"],
         )
-    return forecast_rows, fit_rows, tuning_rows
+    return forecast_rows, fit_rows, []
 
 
 def derived_hybrid_row(
@@ -2197,6 +2242,9 @@ TUNING_AUDIT_COLUMNS = [
     "fit_id",
     "frequency",
     "algorithm",
+    "tuning_scope",
+    "selection_feature_set",
+    "horizon_aggregation",
     "horizon_steps",
     "outer_fit_position",
     "outer_fit_origin_date",
@@ -2217,9 +2265,12 @@ TUNING_AUDIT_COLUMNS = [
     "validation_first_date",
     "validation_last_date",
     "purge_check_passed",
+    "evaluation_period_used",
     "fold_rmse",
     "fit_runtime_seconds",
+    "candidate_horizon_rmse",
     "candidate_pooled_rmse",
+    "candidate_equal_horizon_rmse",
     "selected",
 ]
 
@@ -2287,6 +2338,61 @@ def load_cell_checkpoint(
     if not forecasts or not fits:
         raise ValueError(f"Checkpoint cell is empty or corrupt: {paths}")
     return forecasts, fits, tuning
+
+
+def frozen_tuning_checkpoint_paths(
+    root: Path, frequency: str, algorithm: str
+) -> dict[str, Path]:
+    stem = f"frozen_tuning_{frequency}_{algorithm}"
+    return {
+        "selection": root / f"{stem}_selection.json",
+        "audit": root / f"{stem}_audit.csv",
+    }
+
+
+def save_frozen_tuning_checkpoint(
+    paths: dict[str, Path],
+    parameters: dict[str, Any],
+    candidate_id: str,
+    calibration_position: int,
+    audit_rows: Sequence[dict[str, Any]],
+) -> None:
+    atomic_write_text(
+        paths["selection"],
+        json.dumps(
+            {
+                "parameters": parameters,
+                "candidate_id": candidate_id,
+                "calibration_position": int(calibration_position),
+            },
+            indent=2,
+            sort_keys=True,
+            default=json_default,
+        ),
+    )
+    atomic_write_csv(
+        pd.DataFrame(audit_rows, columns=TUNING_AUDIT_COLUMNS), paths["audit"]
+    )
+
+
+def load_frozen_tuning_checkpoint(
+    paths: dict[str, Path], expected_calibration_position: int
+) -> tuple[dict[str, Any], str, list[dict[str, Any]]] | None:
+    if not all(path.is_file() for path in paths.values()):
+        return None
+    selection = json.loads(paths["selection"].read_text(encoding="utf-8"))
+    if int(selection.get("calibration_position", -1)) != int(
+        expected_calibration_position
+    ):
+        raise ValueError(f"Frozen tuning checkpoint has wrong cutoff: {paths}")
+    parameters = selection.get("parameters")
+    candidate_id = selection.get("candidate_id")
+    if not isinstance(parameters, dict) or not str(candidate_id or ""):
+        raise ValueError(f"Frozen tuning checkpoint is corrupt: {paths}")
+    audit = pd.read_csv(paths["audit"], low_memory=False).to_dict(orient="records")
+    if not audit:
+        raise ValueError(f"Frozen tuning checkpoint audit is empty: {paths}")
+    return dict(parameters), str(candidate_id), audit
 
 
 def limited_configurations(
@@ -2593,21 +2699,130 @@ def main() -> None:
             list(spec.constructions),
         )
 
-        for horizon in spec.horizons:
-            origins = eligible_origins(panel, spec, horizon, maximum_origins)
+        eligible_by_horizon = {
+            horizon: eligible_origins(panel, spec, horizon)
+            for horizon in spec.horizons
+        }
+        if any(not origins for origins in eligible_by_horizon.values()):
+            absent = [
+                horizon
+                for horizon, origins in eligible_by_horizon.items()
+                if not origins
+            ]
+            raise ValueError(f"No eligible {frequency} origins for horizons={absent}")
+
+        calibration_position: int | None = None
+        if args.tune:
+            # Use a single cutoff at which every horizon has enough history.
+            # Short-horizon rows before this cutoff become calibration data and
+            # are never counted as outer evaluation observations.
+            calibration_position = max(
+                origins[0] for origins in eligible_by_horizon.values()
+            )
+
+        origins_by_horizon: dict[int, list[int]] = {}
+        for horizon, eligible in eligible_by_horizon.items():
+            origins = (
+                [position for position in eligible if position >= calibration_position]
+                if calibration_position is not None
+                else list(eligible)
+            )
+            if maximum_origins is not None:
+                origins = origins[:maximum_origins]
             if not origins:
                 raise ValueError(f"No eligible {frequency} origins for h={horizon}")
+            origins_by_horizon[horizon] = origins
             origin_design.append(
                 {
                     "frequency": frequency,
                     "horizon_steps": horizon,
                     "eligible_origins": len(origins),
+                    "eligible_before_calibration": len(eligible),
+                    "excluded_for_initial_calibration": len(eligible) - len(
+                        [position for position in eligible if position >= (calibration_position or 0)]
+                    ),
+                    "calibration_position": calibration_position,
+                    "calibration_date": (
+                        panel.at[calibration_position, spec.date_column]
+                        if calibration_position is not None
+                        else pd.NaT
+                    ),
                     "first_origin_date": panel.at[origins[0], spec.date_column],
                     "last_origin_date": panel.at[origins[-1], spec.date_column],
                     "minimum_training_rows": spec.minimum_training_rows,
                     "refit_every": spec.refit_every,
                 }
             )
+
+        frozen_selections: dict[str, tuple[dict[str, Any], str]] = {}
+        for algorithm in selected_algorithms:
+            candidates = resolve_parameter_candidates(config, algorithm, args.tune)
+            if args.tune:
+                assert calibration_position is not None
+                tuning_paths = frozen_tuning_checkpoint_paths(
+                    checkpoint_root, frequency, algorithm
+                )
+                cached_selection = (
+                    load_frozen_tuning_checkpoint(
+                        tuning_paths, calibration_position
+                    )
+                    if args.resume
+                    else None
+                )
+                if cached_selection is None:
+                    baseline = baseline_configuration(spec, spec.constructions[0])
+                    tuning_features = selected_features[algorithm][
+                        baseline.model_id(algorithm)
+                    ]
+                    parameters, candidate_id, tuning_rows = select_frozen_parameters(
+                        algorithm=algorithm,
+                        candidates=candidates,
+                        panel=panel,
+                        spec=spec,
+                        calibration_position=calibration_position,
+                        features=tuning_features,
+                        seed=seed,
+                        n_splits=inner_splits,
+                        smoke_test=args.smoke_test,
+                    )
+                    save_frozen_tuning_checkpoint(
+                        tuning_paths,
+                        parameters,
+                        candidate_id,
+                        calibration_position,
+                        tuning_rows,
+                    )
+                else:
+                    parameters, candidate_id, tuning_rows = cached_selection
+                    logger.info(
+                        "Resumed frozen tuning frequency=%s algorithm=%s "
+                        "candidate=%s cutoff=%s",
+                        frequency,
+                        algorithm,
+                        candidate_id,
+                        panel.at[calibration_position, spec.date_column],
+                    )
+                all_tuning_rows.extend(tuning_rows)
+                logger.info(
+                    "Frozen tuning frequency=%s algorithm=%s candidate=%s "
+                    "cutoff=%s params=%s",
+                    frequency,
+                    algorithm,
+                    candidate_id,
+                    panel.at[calibration_position, spec.date_column],
+                    parameter_hash(parameters),
+                )
+            else:
+                parameters = (
+                    smoke_parameters(algorithm, candidates[0])
+                    if args.smoke_test
+                    else dict(candidates[0])
+                )
+                candidate_id = "fixed"
+            frozen_selections[algorithm] = (parameters, candidate_id)
+
+        for horizon in spec.horizons:
+            origins = origins_by_horizon[horizon]
             logger.info(
                 "Running %s horizon=%s%s common_origins=%s first=%s last=%s",
                 frequency,
@@ -2618,7 +2833,7 @@ def main() -> None:
                 panel.at[origins[-1], spec.date_column],
             )
             for algorithm in selected_algorithms:
-                candidates = resolve_parameter_candidates(config, algorithm, args.tune)
+                parameters, candidate_id = frozen_selections[algorithm]
                 for configuration in configurations:
                     model_id = configuration.model_id(algorithm)
                     features = selected_features[algorithm][model_id]
@@ -2641,11 +2856,11 @@ def main() -> None:
                             algorithm=algorithm,
                             configuration=configuration,
                             features=features,
-                            candidates=candidates,
-                            tune=args.tune,
-                            inner_splits=inner_splits,
+                            parameters=parameters,
+                            candidate_id=candidate_id,
+                            tuning_enabled=args.tune,
+                            tuning_calibration_position=calibration_position,
                             seed=seed,
-                            smoke_test=args.smoke_test,
                             logger=logger,
                         )
                         save_cell_checkpoint(cell_paths, rows, cell_fits, tuning)
@@ -2844,10 +3059,16 @@ def main() -> None:
             "common_origins_enforced": True,
             "tuning_enabled": args.tune,
             "tuning_protocol": (
-                "nested purged expanding-window validation at every outer refit"
+                "one initial purged expanding-window calibration per algorithm "
+                "and frequency; equal-weight horizon RMSE; parameters frozen "
+                "before outer evaluation"
                 if args.tune
                 else "fixed pre-specified parameters; no search"
             ),
+            "tuning_reuses_outer_test_outcomes": False,
+            "retuning_during_outer_evaluation": False,
+            "tuning_selection_feature_set": "ridge__ar_brent_coverage",
+            "tuning_horizon_aggregation": "equal_weight_mean_rmse",
             "predefined_parameter_source": str(config_path),
             "inner_splits": inner_splits,
             "forecast_hybrids": {
@@ -2872,7 +3093,7 @@ def main() -> None:
             "forecast_hybrids": len(hybrids),
             "total_forecasts": len(forecasts),
             "outer_fits": len(fits),
-            "nested_tuning_rows": len(tuning_audit),
+            "initial_tuning_audit_rows": len(tuning_audit),
             "statistical_tests": len(tests),
             "confirmatory_tests": 0,
             "adjusted_significant_positive_monthly_primary_tests": len(

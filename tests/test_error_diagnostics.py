@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 import sys
+import tempfile
 import unittest
 
 import numpy as np
@@ -35,11 +36,11 @@ class ErrorDiagnosticsTests(unittest.TestCase):
             ["glm", "lstm", "prophet", "random_forest", "xgboost"],
         )
         self.assertEqual(
-            config["analysis"]["nonlinear_selected_algorithm_cells"], 55
+            config["analysis"]["nonlinear_selected_algorithm_cells"], 50
         )
         self.assertEqual(config["analysis"]["nonlinear_models_per_cell"], 3)
         self.assertEqual(
-            config["analysis"]["nonlinear_selected_prediction_rows"], 31440
+            config["analysis"]["nonlinear_selected_prediction_rows"], 25050
         )
         self.assertEqual(config["output_contract"]["expected_full_row_counts"], {})
 
@@ -142,6 +143,75 @@ class ErrorDiagnosticsTests(unittest.TestCase):
         )
         # Row 20 may use values only through row 19, so it is invariant too.
         pd.testing.assert_frame_equal(original.loc[:20], mutated.loc[:20])
+
+    def test_direct_monthly_ema_uses_article_history_before_panel_start(self) -> None:
+        panel = pd.DataFrame(
+            {
+                "month_ending": pd.to_datetime(["2020-01-31", "2020-02-29"]),
+                "expected_mondays": [4, 4],
+                "observed_mondays": [4, 4],
+                "dates_complete": [True, True],
+                "scfi_monthly_mean_log_change_1m": [0.01, 0.02],
+                "brent_monthly_mean_log_change_1m": [0.01, 0.01],
+                "llm_common_article_count": [4.0, 4.0],
+                "llm_common_effective_article_count": [4.0, 4.0],
+            }
+        )
+        weekly = pd.DataFrame(
+            {
+                "origin_date": pd.to_datetime(
+                    [
+                        "2020-01-06", "2020-01-13", "2020-01-20", "2020-01-27",
+                        "2020-02-03", "2020-02-10", "2020-02-17", "2020-02-24",
+                    ]
+                ),
+                "peak_signal": 1.0,
+                "breadth_signal": 0.5,
+                "article_count": 1.0,
+                "effective_article_count": 1.0,
+                "source_count": 1.0,
+                "peak_weighted_sum": 1.0,
+                "breadth_weighted_sum": 0.5,
+                **{
+                    f"{dimension}__weighted_sum": 0.25
+                    for dimension in MODULE.DIMENSION_COLUMNS
+                },
+                **{
+                    f"{dimension}__signal": 0.25
+                    for dimension in MODULE.DIMENSION_COLUMNS
+                },
+            }
+        )
+        article_context = pd.DataFrame(
+            {
+                "origin_date": pd.to_datetime(
+                    ["2019-12-31", "2020-01-31", "2020-02-29"]
+                ),
+                "article_context_count": [1, 1, 1],
+                "article_context_source_count": [1, 1, 1],
+                "article_context_effective_count": [1.0, 1.0, 1.0],
+                "peak_model_disagreement": [0.0, 0.0, 0.0],
+                "dimension_model_disagreement": [0.0, 0.0, 0.0],
+                "peak_weighted_sum": [10.0, 0.0, 0.0],
+                "breadth_weighted_sum": [2.0, 0.0, 0.0],
+                **{
+                    f"{dimension}__weighted_sum": [1.0, 0.0, 0.0]
+                    for dimension in MODULE.DIMENSION_COLUMNS
+                },
+            }
+        )
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "monthly.csv"
+            panel.to_csv(path, index=False)
+            observed = MODULE.build_monthly_context(
+                path, weekly, article_context, MODULE.load_yaml(MODULE.DEFAULT_CONFIG)
+            )
+        direct = observed.loc[
+            observed["index_construction"].eq("adapted_pdf_sqrt_ema3")
+        ].sort_values("origin_date")
+        # EMA(3) has alpha=0.5: 10 -> 5 -> 2.5. The December value is
+        # legitimate past information even though the SCFI panel starts later.
+        np.testing.assert_allclose(direct["peak_signal"], [5.0, 2.5])
 
     def test_normalized_loss_is_squared_scaled_error_and_rejects_bad_scale(self) -> None:
         error = pd.Series([2.0, -4.0, np.nan])

@@ -29,9 +29,9 @@ it does not fit models or write partial smoke outputs.
 .venv\Scripts\python.exe scripts\99_run_full_pipeline.py smoke
 ```
 
-The full run executes stages `00`–`24` sequentially and enables complete
-nested, horizon-purged tuning for the monthly-primary/weekly-robustness
-forecasting stage:
+The full run executes stages `00`–`24` sequentially. In Stage 18, each
+algorithm is tuned once per frequency with horizon-purged expanding validation;
+the selected parameters are frozen before rolling evaluation:
 
 ```powershell
 .venv\Scripts\python.exe scripts\99_run_full_pipeline.py full --allow-pending-human-validation

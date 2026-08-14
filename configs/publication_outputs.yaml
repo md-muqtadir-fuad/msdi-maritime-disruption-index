@@ -37,7 +37,11 @@ source_manifests:
     sha256: null
     version: llm_scfi_monthly_v001
     status: provisional_pending_human_validation
-    required_outputs: [llm_ranking, primary_predictor_ranking, construction_summary]
+    required_outputs:
+      - llm_ranking
+      - primary_predictor_ranking
+      - construction_summary
+      - monthly_panel
     legacy_outputs:
       llm_ranking:
         rows: 9
@@ -166,7 +170,9 @@ expected:
   significance_claim_gates_all_pass: true
   significance_source_contracts_all_pass: true
   significance_uncertainty_groups_all_pass: true
-  primary_forecast_hypotheses: 84
+  # 84 frozen Stage-17 direct-monthly squared-error DM tests plus the three
+  # distinct Stage-21 primary direct-monthly ablations.
+  primary_forecast_hypotheses: 87
   # Result counts are recorded, not prefilled from the obsolete weekly-primary run.
   adjusted_primary_improvements: null
   adjusted_primary_worsenings: null

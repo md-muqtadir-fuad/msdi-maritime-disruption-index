@@ -76,7 +76,7 @@ class RobustnessChecksTests(unittest.TestCase):
         self.assertEqual(config["forecast"]["monthly"]["role"], "primary")
         self.assertEqual(
             config["forecast"]["weekly"]["lag_sets"]["primary"],
-            [1, 2, 4, 8, 12],
+            [1, 2, 4, 6],
         )
         self.assertEqual(
             config["forecast"]["monthly"]["lag_sets"]["primary"],
@@ -286,6 +286,58 @@ class RobustnessChecksTests(unittest.TestCase):
         self.assertEqual(MODULE.determine_run_status(False, None, 5, True), partial)
         self.assertEqual(MODULE.determine_run_status(False, None, None, False), subset)
         self.assertEqual(MODULE.determine_run_status(False, None, None, True), complete)
+
+    def test_common_dynamic_panels_preserve_released_external_controls(self) -> None:
+        peak = "reference_peak_median"
+        breadth = "reference_breadth_median7"
+        controls = {
+            "cpb_world_trade_volume": [101.0, 102.0],
+            "unctad_china_core_lane_lsbci": [0.71, 0.72],
+        }
+        weekly = pd.DataFrame(
+            {
+                "observation_date": pd.to_datetime(["2024-01-01", "2024-01-08"]),
+                "scfi": [1000.0, 1010.0],
+                "brent_log": np.log([80.0, 81.0]),
+                MODULE._variant_column("article_count", peak): [3.0, 4.0],
+                MODULE._variant_column("source_count", peak): [2.0, 3.0],
+                MODULE._variant_column("signal", peak): [0.1, 0.2],
+                MODULE._variant_column("signal", breadth): [0.3, 0.4],
+                **controls,
+            }
+        )
+        construction = "adapted_pdf_sqrt_ema3"
+        monthly = pd.DataFrame(
+            {
+                "month_ending": pd.to_datetime(["2024-01-31", "2024-02-29"]),
+                "scfi_monthly_mean": [1005.0, 1015.0],
+                "brent_monthly_mean_log": np.log([80.5, 81.5]),
+                MODULE._variant_column("article_count", peak, construction): [12.0, 15.0],
+                MODULE._variant_column("source_count", peak, construction): [5.0, 6.0],
+                MODULE._variant_column("signal", peak, construction): [0.15, 0.25],
+                MODULE._variant_column("signal", breadth, construction): [0.35, 0.45],
+                "matched_mondays": [4, 4],
+                "expected_mondays": [4, 4],
+                **controls,
+            }
+        )
+        panels = MODULE.build_common_cohort_analysis_panels(weekly, monthly)
+        for frequency in ("weekly", "monthly"):
+            for column, expected in controls.items():
+                np.testing.assert_allclose(panels[frequency][column], expected)
+        support = MODULE.import_support(
+            MODULE.SCRIPT_08, "causality_support_for_control_regression_test"
+        )
+        frames = MODULE.prepare_dynamic_frames(
+            support,
+            Path("unused-weekly.csv"),
+            Path("unused-monthly.csv"),
+            ("weekly", "monthly"),
+            panel_overrides=panels,
+        )
+        for frame in frames.values():
+            self.assertIn("cpb_world_trade_volume_lag_1", frame.columns)
+            self.assertIn("unctad_china_core_lane_lsbci_lag_1", frame.columns)
 
     def test_adapted_pdf_skips_only_algebraically_redundant_variants(self) -> None:
         media = MODULE.IndexVariant(

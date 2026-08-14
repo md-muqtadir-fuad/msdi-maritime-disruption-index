@@ -1,7 +1,0 @@
-# Optional extended forecasting layer (scripts/18_forecasting_models.py).
-# Install into this repository's .venv only:
-#   .venv\Scripts\python.exe -m pip install -r requirements-forecasting.txt
-torch
-prophet
-neuralforecast
-optuna
