@@ -4,12 +4,12 @@
   "inputs": {
     "article_scores": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\05_indices\\article_level\\article_consensus_scores.csv",
-      "sha256": "373a61590390bd461b9baa10d1c3ae53c3654ce4e6e0e9e5000dacce985382ee",
+      "sha256": "94ba306fbbcc262d6bca43663ab68e45c6a281e3f1df8986c6eb1972d3affd6e",
       "rows": 6542
     },
     "scfi_panel_non_msdi_fields_only": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\msdi_scfi_weekly_panel.csv",
-      "sha256": "47ec6151b30beff8518ffcdcb68429bb10a429bce9d68dd05549db5313cb38fc",
+      "sha256": "8d63280039a7443a4e900d84a986c37dacfc91e3861b106ec63699c682fe9ccf",
       "rows": 522
     },
     "model_registry": {
@@ -18,7 +18,7 @@
     },
     "code": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\scripts\\16_llm_scfi_comparison_weekly.py",
-      "sha256": "6ceb353cd63f7ac0cc3a08ad4d9123f4f292b8b28b6a2014d9ffd34584a3cdcc"
+      "sha256": "57caa1b217164eab54dddad5f368fd224e90ba947c89dc2b3e71f912ea7633bd"
     }
   },
   "common_article_cohort": {
@@ -130,8 +130,8 @@
     "age_days_counts": {
       "3.0": 518
     },
-    "comparison_complete_rows": 506,
-    "first_complete_date": "2016-05-02T00:00:00",
+    "comparison_complete_rows": 479,
+    "first_complete_date": "2016-11-07T00:00:00",
     "last_complete_date": "2026-01-05T00:00:00",
     "raw_signal_columns": 54
   },
@@ -139,48 +139,48 @@
     {
       "horizon_weeks": 1,
       "models_checked": 58,
-      "common_forecast_origins": 350,
-      "first_origin_date": "2019-04-29T00:00:00",
+      "common_forecast_origins": 323,
+      "first_origin_date": "2019-11-04T00:00:00",
       "last_origin_date": "2026-01-05T00:00:00",
       "origin_sets_identical": true
     },
     {
       "horizon_weeks": 2,
       "models_checked": 58,
-      "common_forecast_origins": 349,
-      "first_origin_date": "2019-05-06T00:00:00",
+      "common_forecast_origins": 322,
+      "first_origin_date": "2019-11-11T00:00:00",
       "last_origin_date": "2026-01-05T00:00:00",
       "origin_sets_identical": true
     },
     {
       "horizon_weeks": 4,
       "models_checked": 58,
-      "common_forecast_origins": 347,
-      "first_origin_date": "2019-05-20T00:00:00",
+      "common_forecast_origins": 320,
+      "first_origin_date": "2019-11-25T00:00:00",
       "last_origin_date": "2026-01-05T00:00:00",
       "origin_sets_identical": true
     },
     {
       "horizon_weeks": 6,
       "models_checked": 58,
-      "common_forecast_origins": 343,
-      "first_origin_date": "2019-06-03T00:00:00",
+      "common_forecast_origins": 316,
+      "first_origin_date": "2019-12-09T00:00:00",
       "last_origin_date": "2025-12-22T00:00:00",
       "origin_sets_identical": true
     }
   ],
   "best_llm_point_rank": {
-    "score_source": "qwen_3_8b",
+    "score_source": "gemma_2_9b_it",
     "primary_comparison_cells": 8,
-    "mean_rmse_rank": 1.25,
-    "mean_mae_rank": 1.375,
-    "mean_skill_rank": 1.25,
-    "mean_rmse_log_change": 0.175765992760759,
-    "mean_relative_rmse_vs_coverage": 1.0511348063271553,
-    "mean_oos_r2_vs_coverage": -0.10768755121566351,
-    "mean_directional_accuracy": 0.5748992134469347,
-    "rmse_cell_wins": 7,
-    "adjusted_dm_squared_pairwise_wins": 2,
+    "mean_rmse_rank": 1.0,
+    "mean_mae_rank": 1.125,
+    "mean_skill_rank": 1.0,
+    "mean_rmse_log_change": 0.19171649216358028,
+    "mean_relative_rmse_vs_coverage": 0.9237855461001847,
+    "mean_oos_r2_vs_coverage": 0.1408206397767779,
+    "mean_directional_accuracy": 0.5753039174331349,
+    "rmse_cell_wins": 8,
+    "adjusted_dm_squared_pairwise_wins": 0,
     "adjusted_dm_squared_pairwise_losses": 0,
     "predictive_point_rank": 1,
     "ranking_scope": "equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons"
@@ -221,18 +221,18 @@
     "weekly_common_signals": "3d1ffda554c586e3fd61b9a4a5324d6b5f533fa3b0aa0b851d262ae669b84155",
     "weekly_common_coverage": "fec8d1a66b241d1da0eb8269a26e3ac45b77f05f034b3dbe1cfee5635a6bb72c",
     "signal_differences": "996bda789a81cbf0f35557b59869f22197ed11241caf41d86ce00dcf047d63e8",
-    "aligned_panel": "e9af2578357eb12a61e04d137a4c36bee0197606a75a537a79683585747e7418",
-    "forecasts": "44f913bdc3fec6a0985de309e4be13ceaf1f9111b4f5348ec236d2703db966be",
-    "metrics": "a5f78a813f9c1a29cfa4878ebc2dc021f49ee9e255620ec610fd1ce6362179a0",
-    "statistical_tests": "1aa3e35893fae82da02f5630f4e973ff1d22dfbc1fc43d8fc036eed88d52bd70",
-    "fit_audit": "74ff0f58025f5dbb219e38d39f1fee193c5e897ca00a17714d830e888f627313",
-    "origin_audit": "b1c0090c04a3a357916282f4fc998359c106ca44127e5dfb9a1604018eafcb40",
-    "hybrid_weights": "2dac6db92b27b75140821a698d94c16ecc05ede7a0467ddea4ab6e83c7a39012",
-    "llm_ranking": "6fe5cbd2b7ac47726a20858f05b0f2bbb1e92ed3d3e8700b90c704b1f685e97e",
-    "llm_ranking_cells": "9d4e62d7931da948cef631040f944700b98fd1d47fa1acb8aaf0ae331b6e2189",
-    "primary_predictor_ranking": "8621f785f15df7032701b1ee319b3d9988422750d9aa95b2e201882810a0e595",
-    "dimension_summary": "2eaa64f46ea84d14612d3f897289b78789724098f150af1ee6f4e569f09840cf",
-    "feature_sets": "3620d1ed3b4e1abac9e57d4f651c73d7d31b117133cbb8a032671406e175a6c2"
+    "aligned_panel": "947b2ad488c2f30458dd83ef3dda515557242a0be04a90374706d1bea0fc9f0e",
+    "forecasts": "75695bc091aff14cfe0b3c82571c9373790ee22ddd4c227c196274f05f26e386",
+    "metrics": "8771a294596a17e63f9bf5648f7a3b401c38e0d045e81d780eac5a342d3b48e3",
+    "statistical_tests": "5d9351ca97b349705b603f74ccada264aa52645597397ebf0ab5a2edc075dcf6",
+    "fit_audit": "d8f3f80d075767033a07e0f62959b0efba8e05fdf6f71723928d212518ca66dc",
+    "origin_audit": "4585d70af132d0481296d67be2ffb257b7a655a349d08556c523b5ae1ca56d25",
+    "hybrid_weights": "88fce6a04951901278f09d3da714832a345fd9d5a9b63626ec3dbd8d6a28d2a8",
+    "llm_ranking": "749633efc77df9ad131f183c9dc1d52e87caacc8e7bdd77920da6bb5f2590602",
+    "llm_ranking_cells": "b76533214316e6b4801a23907c47ab30d5908e35bf00266cec43acefaac8a491",
+    "primary_predictor_ranking": "a30e9a20794f7f369024c4a53b925cc6afe88ea558bef5d52f30d6090d247c08",
+    "dimension_summary": "bedaa103b76d69d9941b8a3a254f6055414cafe8f3caff7485c5a93744519e4a",
+    "feature_sets": "1b7cc46bbb78ad291ec2ff7b468376cca91af0bbc02760e4e6737b4fa7833f8a"
   },
   "output_row_counts": {
     "common_article_cohort": 6480,
@@ -241,12 +241,12 @@
     "weekly_common_coverage": 575,
     "signal_differences": 108,
     "aligned_panel": 522,
-    "forecasts": 103611,
+    "forecasts": 95403,
     "metrics": 304,
     "statistical_tests": 1224,
-    "fit_audit": 6048,
+    "fit_audit": 5600,
     "origin_audit": 4,
-    "hybrid_weights": 42192,
+    "hybrid_weights": 38304,
     "llm_ranking": 4,
     "llm_ranking_cells": 32,
     "primary_predictor_ranking": 7,

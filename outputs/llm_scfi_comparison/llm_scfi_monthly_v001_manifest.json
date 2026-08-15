@@ -4,12 +4,12 @@
   "inputs": {
     "weekly_common_cohort_panel": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\llm_specific_scfi_weekly_panel.csv",
-      "sha256": "e9af2578357eb12a61e04d137a4c36bee0197606a75a537a79683585747e7418",
+      "sha256": "947b2ad488c2f30458dd83ef3dda515557242a0be04a90374706d1bea0fc9f0e",
       "rows": 522
     },
     "weekly_manifest": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_manifest.json",
-      "sha256": "8f07fb6ca7965316f91aedab25e979efd0287afadcaccb757098e86480b4a1e6",
+      "sha256": "61170e65dfa56e2412bc0157162059a9e526b70454566c90fc8c0e8a13d1e148",
       "version": "llm_scfi_v001"
     },
     "frozen_common_article_cohort": {
@@ -23,7 +23,7 @@
     },
     "code": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\scripts\\17_llm_scfi_comparison_monthly.py",
-      "sha256": "5db87f92d25dbe4610859151a94222468632e6c189de18072b1d1f3fe163d7a3"
+      "sha256": "6c54ac6ea2592d41551663b6e2a96c5e8bf5f51c6e55d511c40a1586c3a1b171"
     }
   },
   "provenance_audit": {
@@ -39,14 +39,14 @@
       "qwen_2_5_7b",
       "glm_4_9b_0414"
     ],
-    "weekly_manifest_sha256": "8f07fb6ca7965316f91aedab25e979efd0287afadcaccb757098e86480b4a1e6",
-    "weekly_panel_sha256": "e9af2578357eb12a61e04d137a4c36bee0197606a75a537a79683585747e7418"
+    "weekly_manifest_sha256": "61170e65dfa56e2412bc0157162059a9e526b70454566c90fc8c0e8a13d1e148",
+    "weekly_panel_sha256": "947b2ad488c2f30458dd83ef3dda515557242a0be04a90374706d1bea0fc9f0e"
   },
   "weekly_input_audit": {
     "rows": 522,
     "first_monday": "2016-02-08T00:00:00",
     "last_monday": "2026-02-02T00:00:00",
-    "complete_weekly_rows": 506,
+    "complete_weekly_rows": 479,
     "future_signal_matches": 0,
     "unsafe_signal_ages": 0,
     "signal_age_counts": {
@@ -74,8 +74,8 @@
     "last_month": "2026-02-28T00:00:00",
     "scfi_complete_months": 119,
     "brent_complete_months": 119,
-    "llm_complete_months": 116,
-    "analysis_complete_months": 116,
+    "llm_complete_months": 110,
+    "analysis_complete_months": 110,
     "index_constructions": [
       "mean_safe_weekly",
       "adapted_pdf_sqrt_ema3"
@@ -111,6 +111,54 @@
         "monthly_llm_complete": false
       },
       {
+        "month_ending": "2016-05-31T00:00:00",
+        "expected_mondays": 5,
+        "observed_mondays": 5,
+        "monthly_scfi_complete": true,
+        "monthly_brent_complete": true,
+        "monthly_llm_complete": false
+      },
+      {
+        "month_ending": "2016-06-30T00:00:00",
+        "expected_mondays": 4,
+        "observed_mondays": 4,
+        "monthly_scfi_complete": true,
+        "monthly_brent_complete": true,
+        "monthly_llm_complete": false
+      },
+      {
+        "month_ending": "2016-07-31T00:00:00",
+        "expected_mondays": 4,
+        "observed_mondays": 4,
+        "monthly_scfi_complete": true,
+        "monthly_brent_complete": true,
+        "monthly_llm_complete": false
+      },
+      {
+        "month_ending": "2016-08-31T00:00:00",
+        "expected_mondays": 5,
+        "observed_mondays": 5,
+        "monthly_scfi_complete": true,
+        "monthly_brent_complete": true,
+        "monthly_llm_complete": false
+      },
+      {
+        "month_ending": "2016-09-30T00:00:00",
+        "expected_mondays": 4,
+        "observed_mondays": 4,
+        "monthly_scfi_complete": true,
+        "monthly_brent_complete": true,
+        "monthly_llm_complete": false
+      },
+      {
+        "month_ending": "2016-10-31T00:00:00",
+        "expected_mondays": 5,
+        "observed_mondays": 5,
+        "monthly_scfi_complete": true,
+        "monthly_brent_complete": true,
+        "monthly_llm_complete": false
+      },
+      {
         "month_ending": "2026-01-31T00:00:00",
         "expected_mondays": 4,
         "observed_mondays": 4,
@@ -130,8 +178,8 @@
   },
   "monthly_panel_audit": {
     "rows": 121,
-    "complete_model_origins": 116,
-    "first_complete_month": "2016-05-31T00:00:00",
+    "complete_model_origins": 110,
+    "first_complete_month": "2016-11-30T00:00:00",
     "last_complete_month": "2025-12-31T00:00:00",
     "target_nonmissing": {
       "1": 118,
@@ -158,7 +206,7 @@
     "common_cohort_is_only_score_input": true,
     "frozen_common_articles": 6480,
     "safe_weekly_overlap_articles": 6074,
-    "complete_month_articles": 5997,
+    "complete_month_articles": 5801,
     "score_scale": [
       0,
       4
@@ -234,24 +282,24 @@
     {
       "horizon_months": 1,
       "models_checked": 112,
-      "common_forecast_origins": 56,
-      "first_origin_date": "2021-05-31T00:00:00",
+      "common_forecast_origins": 50,
+      "first_origin_date": "2021-11-30T00:00:00",
       "last_origin_date": "2025-12-31T00:00:00",
       "origin_sets_identical": true
     },
     {
       "horizon_months": 3,
       "models_checked": 112,
-      "common_forecast_origins": 52,
-      "first_origin_date": "2021-07-31T00:00:00",
+      "common_forecast_origins": 46,
+      "first_origin_date": "2022-01-31T00:00:00",
       "last_origin_date": "2025-10-31T00:00:00",
       "origin_sets_identical": true
     },
     {
       "horizon_months": 6,
       "models_checked": 112,
-      "common_forecast_origins": 46,
-      "first_origin_date": "2021-10-31T00:00:00",
+      "common_forecast_origins": 40,
+      "first_origin_date": "2022-04-30T00:00:00",
       "last_origin_date": "2025-07-31T00:00:00",
       "origin_sets_identical": true
     }
@@ -259,18 +307,18 @@
   "best_llm_point_rank_by_construction": [
     {
       "index_construction": "adapted_pdf_sqrt_ema3",
-      "score_source": "qwen_3_8b",
+      "score_source": "gemma_2_9b_it",
       "primary_comparison_cells": 6,
-      "mean_rmse_rank": 1.3333333333333333,
-      "mean_mae_rank": 1.6666666666666667,
-      "mean_skill_rank": 1.3333333333333333,
-      "mean_rmse_log_change": 0.5225170733284008,
-      "mean_relative_rmse_vs_coverage": 0.9571633077695733,
-      "mean_oos_r2_vs_coverage": 0.07400677645739996,
-      "mean_directional_accuracy": 0.6222627010670488,
-      "rmse_cell_wins": 4,
+      "mean_rmse_rank": 2.0,
+      "mean_mae_rank": 2.1666666666666665,
+      "mean_skill_rank": 2.0,
+      "mean_rmse_log_change": 0.36080956411191595,
+      "mean_relative_rmse_vs_coverage": 0.7363183503751628,
+      "mean_oos_r2_vs_coverage": 0.4518996535527707,
+      "mean_directional_accuracy": 0.6632608695652173,
+      "rmse_cell_wins": 1,
       "adjusted_dm_squared_pairwise_wins": 0,
-      "adjusted_dm_squared_pairwise_losses": 0,
+      "adjusted_dm_squared_pairwise_losses": 1,
       "predictive_point_rank": 1,
       "ranking_scope": "equal-weight ranks over overall-max and dimension-mean7 at 1, 3, and 6 months; reported separately by construction plus a pooled robustness summary"
     },
@@ -278,14 +326,14 @@
       "index_construction": "mean_safe_weekly",
       "score_source": "gemma_2_9b_it",
       "primary_comparison_cells": 6,
-      "mean_rmse_rank": 1.8333333333333333,
+      "mean_rmse_rank": 1.5,
       "mean_mae_rank": 1.8333333333333333,
-      "mean_skill_rank": 1.8333333333333333,
-      "mean_rmse_log_change": 0.5215882732964204,
-      "mean_relative_rmse_vs_coverage": 0.9745242857770466,
-      "mean_oos_r2_vs_coverage": 0.04514990593179822,
-      "mean_directional_accuracy": 0.6092530657748049,
-      "rmse_cell_wins": 2,
+      "mean_skill_rank": 1.5,
+      "mean_rmse_log_change": 0.4157024439325388,
+      "mean_relative_rmse_vs_coverage": 0.8337251335719706,
+      "mean_oos_r2_vs_coverage": 0.3018788765224974,
+      "mean_directional_accuracy": 0.621231884057971,
+      "rmse_cell_wins": 3,
       "adjusted_dm_squared_pairwise_wins": 0,
       "adjusted_dm_squared_pairwise_losses": 0,
       "predictive_point_rank": 1,
@@ -293,24 +341,24 @@
     },
     {
       "index_construction": "pooled_monthly_robustness",
-      "score_source": "qwen_3_8b",
+      "score_source": "gemma_2_9b_it",
       "primary_comparison_cells": 12,
-      "mean_rmse_rank": 1.5833333333333333,
-      "mean_mae_rank": 1.9166666666666667,
-      "mean_skill_rank": 1.5833333333333333,
-      "mean_rmse_log_change": 0.538691188924033,
-      "mean_relative_rmse_vs_coverage": 0.9814959620149558,
-      "mean_oos_r2_vs_coverage": 0.02280748439503689,
-      "mean_directional_accuracy": 0.6155289456919891,
-      "rmse_cell_wins": 7,
+      "mean_rmse_rank": 1.75,
+      "mean_mae_rank": 2.0,
+      "mean_skill_rank": 1.75,
+      "mean_rmse_log_change": 0.3882560040222274,
+      "mean_relative_rmse_vs_coverage": 0.7850217419735667,
+      "mean_oos_r2_vs_coverage": 0.37688926503763404,
+      "mean_directional_accuracy": 0.6422463768115942,
+      "rmse_cell_wins": 4,
       "adjusted_dm_squared_pairwise_wins": 0,
-      "adjusted_dm_squared_pairwise_losses": 0,
+      "adjusted_dm_squared_pairwise_losses": 1,
       "predictive_point_rank": 1,
       "ranking_scope": "equal-weight ranks over overall-max and dimension-mean7 at 1, 3, and 6 months; reported separately by construction plus a pooled robustness summary"
     }
   ],
-  "adjusted_significant_positive_primary_confirmatory_dm_squared_tests": 0,
-  "adjusted_significant_positive_primary_sensitivity_tests": 7,
+  "adjusted_significant_positive_primary_confirmatory_dm_squared_tests": 26,
+  "adjusted_significant_positive_primary_sensitivity_tests": 102,
   "primary_construction_pairwise_tests": 72,
   "interpretation_limits": {
     "causal_claim": false,
@@ -340,32 +388,32 @@
     "manifest": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_monthly_v001_manifest.json"
   },
   "output_sha256": {
-    "monthly_signal_audit": "ad99f1803225d2858ff78e279749c4375e768edad2a79c86611690b0c65c052b",
-    "signal_differences": "a6d12d55e3ba9ff2fc4715949dd797de7076310609e921651f45b7e058688b9f",
-    "monthly_panel": "bb70386f380969def1a8a9835bb62d505b15defcf81476f7b8cdb859e769743b",
-    "forecasts": "a0cfaa120237ba80855c7ecd457ce0a4abf6754ed5b3c7f9b4e199d524ea3ade",
-    "metrics": "93916c606544e75f157c978656b3ee083f188928ffa05787aacb328d342a721f",
-    "statistical_tests": "841d27db02f3ca79afb79cea0c2d5acf6f4ac85c88c91b21283a4ea5ed86f80c",
-    "fit_audit": "243b9ede16a70f8dd6d42c24d80545877274d1a419b23042856e15e4d78ec8f0",
-    "origin_audit": "42032a0fb2421d3d5ab4c36131e271fdf230e51e78f7253e05dcb0161dc25099",
-    "hybrid_weights": "175820729174580b7f8f37f77eab00ce7dd395d5edf5fcd6af93a6bdd15cc256",
-    "llm_ranking": "e71ec50f4fe9d435f3c9f46f57c035a1058698921e4f73ea3e4ee89b9b6cf840",
-    "llm_ranking_cells": "aa7ac59b7de77c1990dfd4e1c8da3a6b5c79b3258379617c83117cbb8ce4562c",
-    "primary_predictor_ranking": "e228bb8a39c032730fa2bc97c7e57cb7fff6fe0c09ea5d37cb65ed7b30388cd7",
-    "dimension_summary": "ae2bbfff8def40cc0f49e168b41e16ac11b6f758be26c3596ef0de28f2632e51",
-    "construction_summary": "dbbd13943bd69e3073c7655e6139c5242841063d1f447899b754c1f26af9d876",
-    "feature_sets": "c8896a5843ba9b9acb3c456329d32d781e3d7e0f5d53901ef961071a60caf66f"
+    "monthly_signal_audit": "308c05153fdd2cae565faf52f6292c28b99d28b8724b42460176bc8b3fb4ff42",
+    "signal_differences": "661f2e04fc10cae478469a32b82af967a5a299882ee8c9104c5a3f332c6f06e9",
+    "monthly_panel": "79654dec044cfbdb98b6c78ae287e4176624663d235e23e86d11f2a6b0d4ebeb",
+    "forecasts": "f09b3e98392a341cf5018c87ac6e7a7db7d6808b91813b081a2ba29d4945e7b3",
+    "metrics": "8268c86057d4c35a4cd36336b79c6bb3469c20b5cf7f30ed5a3d7a6d6b5271b3",
+    "statistical_tests": "0272741cdec6f2491bed9bce40d589fecef94af448878ff6b93c9f433c66e137",
+    "fit_audit": "15b99e8abd0039e50ad78d1cf8851ffdf2bcf91290fc8458eeee7d8c831cc239",
+    "origin_audit": "cca0ae22d7ff8e7018a6f40e0b28be70a325375bb90f276840d336b887f12d53",
+    "hybrid_weights": "fd33583b5384b9dfb10d81563682ee04ee3e90ab6d14108ca83b7749cf991584",
+    "llm_ranking": "ffe7b506bfa41c0db1cc9970481b2f365bf330dffa9a0c1e359b672fba82f783",
+    "llm_ranking_cells": "aaf2e516bcda432a76b6096d5ee59e704ebcf74548ffe10efa6a50018fd561f7",
+    "primary_predictor_ranking": "8c0398f50f213786b49d89d6c83a53434fbe99e264021c39059f1b8783400b0a",
+    "dimension_summary": "5de8a0ccedd3eda55feece8291fd0f89d63897ffa76b9c055da34f25e981a76e",
+    "construction_summary": "2a0fe230098b8e53bfd67a72c82e75aeb024695b16682b58b889a4842c9e6ecc",
+    "feature_sets": "60426a55c2c65ad5b7fa3e2d2faa5f054bfc348fd6ff525c080bcebce70d8d6f"
   },
   "output_row_counts": {
     "monthly_signal_audit": 13068,
     "signal_differences": 108,
     "monthly_panel": 121,
-    "forecasts": 21370,
+    "forecasts": 18706,
     "metrics": 444,
     "statistical_tests": 2160,
-    "fit_audit": 5830,
+    "fit_audit": 5170,
     "origin_audit": 3,
-    "hybrid_weights": 5400,
+    "hybrid_weights": 4104,
     "llm_ranking": 12,
     "llm_ranking_cells": 48,
     "primary_predictor_ranking": 14,

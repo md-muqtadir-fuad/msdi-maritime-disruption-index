@@ -1,5 +1,5 @@
 score_source,primary_comparison_cells,mean_rmse_rank,mean_mae_rank,mean_skill_rank,mean_rmse_log_change,mean_relative_rmse_vs_coverage,mean_oos_r2_vs_coverage,mean_directional_accuracy,rmse_cell_wins,adjusted_dm_squared_pairwise_wins,adjusted_dm_squared_pairwise_losses,predictive_point_rank,ranking_scope
-qwen_3_8b,8,1.25,1.375,1.25,0.175765992760759,1.0511348063271553,-0.10768755121566351,0.5748992134469347,7,2,0,1,equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons
-gemma_2_9b_it,8,1.875,1.75,1.875,0.18273607740281278,1.0806343865847499,-0.17022640813947004,0.5929135830788956,1,1,0,2,equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons
-glm_4_9b_0414,8,2.875,2.875,2.875,0.19807918279058478,1.1583662602383997,-0.3461256982156949,0.564738776263725,0,0,0,3,equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons
-qwen_2_5_7b,8,4.0,4.0,4.0,0.24345112549519146,1.4539878004801485,-1.1288622231871355,0.4933856972797341,0,0,3,4,equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons
+gemma_2_9b_it,8,1.0,1.125,1.0,0.19171649216358028,0.9237855461001847,0.1408206397767779,0.5753039174331349,8,0,0,1,equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons
+glm_4_9b_0414,8,2.5,2.375,2.5,0.20639977253683706,0.991993120403377,0.008369199015288473,0.580303481323771,0,0,0,2,equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons
+qwen_3_8b,8,2.5,2.5,2.5,0.20850882449684843,0.9968867224433073,0.0014700433292371418,0.5173028214794448,0,0,0,3,equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons
+qwen_2_5_7b,8,4.0,4.0,4.0,0.24619919251746264,1.1389816825931625,-0.30228180938276056,0.563948718775992,0,0,0,4,equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons
