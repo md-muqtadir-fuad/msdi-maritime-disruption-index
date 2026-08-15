@@ -140,13 +140,20 @@ MONTHLY_BRENT_FEATURES = (
 )
 EXTERNAL_CONTROL_COLUMNS = (
     "cpb_world_trade_volume",
+    "rwi_isl_container_throughput_index",
+    "wto_china_merchandise_exports",
+    "cny_usd_exchange_rate",
     "unctad_china_core_lane_lsbci",
 )
-WEEKLY_EXTERNAL_CONTROL_FEATURES = (
-    *[f"cpb_world_trade_volume_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
-    *[f"unctad_china_core_lane_lsbci_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
+WEEKLY_EXTERNAL_CONTROL_FEATURES = tuple(
+    f"{column}_lag_{lag}w"
+    for column in EXTERNAL_CONTROL_COLUMNS
+    for lag in (1, 2, 4, 8, 12)
 )
-MONTHLY_EXTERNAL_CONTROL_FEATURES = ("cpb_world_trade_volume_lag_1m", "unctad_china_core_lane_lsbci_lag_1m")
+MONTHLY_EXTERNAL_CONTROL_FEATURES = tuple(
+    f"{column}_lag_1m"
+    for column in EXTERNAL_CONTROL_COLUMNS
+)
 
 PREDICTION_KEY_COLUMNS = (
     "frequency",
@@ -3311,7 +3318,7 @@ def prepare_dynamic_frames(
             prepared = support08.prepare_analysis_frame(panel, spec, path_name)
             frame, _ = support08.select_longest_complete_block(
                 prepared,
-                [*support08.ENDOGENOUS_VARIABLES, *support08.SEASONAL_CONTROLS],
+                support08.analysis_columns(prepared),
                 frequency,
             )
             result[(frequency, path_name)] = frame

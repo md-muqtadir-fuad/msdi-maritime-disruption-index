@@ -1,13 +1,12 @@
 # SC-Disrupt
 
-Reproducible research pipeline for building a human-validated, LLM-derived
-maritime supply-chain disruption index; forecasting SCFI; and running dynamic
-time-series, causal-ML, significance, ablation, sensitivity, and diagnostic
-analyses.
+Reproducible research pipeline for building an LLM-derived, human-validated Maritime Supply Chain Disruption Index (MSDI), forecasting container freight rates (SCFI), and conducting econometric time-series causality, causal machine learning (Double/Debiased ML), statistical significance audits, and sensitivity analyses.
 
-## Environment
+---
 
-All project commands must use the repository virtual environment.
+## 1. Environment & Setup
+
+All commands must be executed using the project virtual environment.
 
 ```powershell
 python -m venv .venv
@@ -15,139 +14,88 @@ python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements-forecasting.txt
 ```
 
-The forecasting requirements add PyTorch and Prophet. The Gaussian GLM,
-Random Forest, and preprocessing components use scikit-learn from the base
-environment.
+> **Requirements note**: `requirements-forecasting.txt` provides PyTorch, Prophet, and specialized time-series dependencies. Scikit-learn, statsmodels, linearmodels, and core scientific libraries are included in `requirements.txt`.
 
-## Pipeline entry point
+---
 
-Run the read-only pipeline check first. It compiles every numbered script,
-checks dependencies/configurations/the stage DAG, and inventories artifacts;
-it does not fit models or write partial smoke outputs.
+## 2. Pipeline Execution
+
+### Smoke Verification (Fast Architecture & DAG Check)
+Run the read-only verification check first. It compiles every script, checks dependencies, validates configuration hashes, and verifies artifact contracts without executing long fits:
 
 ```powershell
 .venv\Scripts\python.exe scripts\99_run_full_pipeline.py smoke
 ```
 
-The full run executes stages `00`–`24` sequentially. In Stage 18, each
-algorithm is tuned once per frequency with horizon-purged expanding validation;
-the selected parameters are frozen before rolling evaluation:
+### Full End-to-End Pipeline
+To run the full sequential pipeline across Stages `00` through `24`:
 
 ```powershell
 .venv\Scripts\python.exe scripts\99_run_full_pipeline.py full --allow-pending-human-validation
 ```
 
-For a publication-eligible run, omit the pending-validation flag and supply
-completed annotation files with `--annotations`. External LLM score ZIPs must
-already be present under `data/03_processed/model_scores/scores_zips`.
+For publication-ready runs requiring completed dual-human annotations:
+```powershell
+.venv\Scripts\python.exe scripts\99_run_full_pipeline.py full --annotations data/04_validation/human_annotations/
+```
 
-Stage 18 evaluates a penalized Gaussian identity-link GLM, Random Forest,
-XGBoost, LSTM, and Prophet at both frequencies. Direct monthly evidence is
-primary; weekly evidence is higher-frequency robustness. Fixed parameters live in
-`configs/nonlinear_forecasting.yaml`; `99` uses the predefined full tuning grid
-and resumable per-cell checkpoints.
+---
 
-The weekly and monthly LLM-comparison stages remain Ridge-only by design so the
-algorithm is held constant while comparing labels. The extended forecasting
-stage then compares the five end-to-end algorithm pipelines. Granger, PCMCI,
-local projections, and observational causal-ML outputs do not by themselves
-support structural causal claims.
+## 3. Pipeline Stages & Architecture
 
-Stage 08 also creates canonical pre-LLM event IDs with the configurable
-`BAAI/bge-m3` encoder (`configs/event_clustering.yaml`). One frozen embedding is
-reused for a weekly five-week event window and a monthly three-calendar-month
-event window. Articles are retained, while Stage 13 gives each event a fixed
-total weight within the current aggregation period. Human reviewers compare
-candidate cosine thresholds 0.85, 0.88, 0.90, and 0.92 before freezing the
-publication-final threshold; 0.88 is provisional only.
+| Stage | Script | Description |
+| :--- | :--- | :--- |
+| **00–04** | `scripts/00_...` to `04_...` | Ingestion, news normalization, deduplication, full-text enrichment. |
+| **05–08** | `scripts/05_...` to `08_...` | Embedding generation, BGE-M3 event clustering, text-quality filtering. |
+| **09–13** | `scripts/09_...` to `13_...` | LLM scoring prompts, dual-prompt evaluation, MSDI index aggregation (Peak & Breadth). |
+| **14–15** | `scripts/14_...` to `15_...` | Multi-horizon panel construction (weekly/monthly) and EDA. |
+| **16–17** | `scripts/16_...` & `17_...` | Out-of-sample LLM comparison benchmarks (Weekly & Monthly). |
+| **18** | `scripts/18_nonlinear_forecasting.py` | Multi-model forecasting benchmarks (GLM, Random Forest, XGBoost, LSTM, Prophet). |
+| **19** | `scripts/19_time_series_causality.py` | Econometric time-series causality (VARX, Granger causality, PCMCI+ graphical discovery, Jordà local projections). |
+| **20** | `scripts/20_causal_ml.py` | Double/Debiased Machine Learning (Partially Linear DML, Causal Forest GATE/BLP heterogeneity, placebo falsifications). |
+| **21** | `scripts/21_ablation_sensitivity_checks.py` | Comprehensive ablation matrix (69 index variants, media controls, prompt architectures). |
+| **22** | `scripts/22_error_diagnostics.py` | Forecast error diagnostics, Mincer–Zarnowitz calibration, extreme-case article traces. |
+| **23** | `scripts/23_significance_analysis.py` | Multiplicity-aware statistical audit (Holm FWER & Benjamini–Hochberg FDR adjustments across 14,000+ hypotheses). |
+| **24** | `scripts/24_make_figures_tables.py` | Publication package generator (26 publication tables, 30 vector/raster figures, summary reports). |
+| **25–27** | `scripts/25_...` to `27_...` | External control data ingestion, cleaning, EDA, and statistical association tests. |
+| **28–30** | `scripts/28_...` to `30_...` | Synthetic validation plumbing, inter-annotator agreement, and PortWatch event studies. |
 
-See [the full runner guide](docs/reproducibility/full_pipeline_runner.md) and
-[the forecasting method](docs/methodology/nonlinear_forecasting.md).
+---
 
-## External control data (planned extension)
+## 4. Integrated External Controls
 
-Keep downloaded source files in the folders below, preserving the original
-download alongside its retrieval date and source metadata. These controls are
-not automatically used until the panel-building stage is extended; when added,
-use only publication-available lagged values and retain the current
-Brent-only run as the baseline.
+The core model panels integrate five macroeconomic and maritime trade controls merged strictly by backward availability date:
 
-| Source | Role in this study | Raw-data location |
-|---|---|---|
-| [IMF PortWatch daily ports data](https://portwatch.imf.org/datasets/daily-ports-data/explore) | **2019+ robustness-only** port-activity / physical-shipping evidence; never a primary 2016–2026 control. | `data/01_raw/controls/portwatch/` |
-| [CPB World Trade Monitor](https://www.cpb.nl/en/world-trade-monitor/cpb-wereldhandelsmonitor-may-2026) | Global import-demand control. | `data/01_raw/controls/macro/` |
-| [UNCTAD Liner Shipping Bilateral Connectivity Index](https://unctadstat.unctad.org/datacentre/dataviewer/US.LSBCI) | Shipping-network supply and route-connectivity control. | `data/01_raw/controls/connectivity/` |
-| [New York Fed GSCPI](https://www.newyorkfed.org/research/policy/gscpi#/interactive) | External validity benchmark and optional lagged forecasting sensitivity feature; not a primary causal control because it includes transport-cost indicators. | `data/01_raw/controls/macro/` |
+1. **CPB World Trade Volume** (`cpb_world_trade_volume`): Global import/export merchandise demand.
+2. **RWI/ISL Container Throughput Index** (`rwi_isl_container_throughput_index`): Global physical container throughput across 90+ international ports.
+3. **WTO China Merchandise Exports** (`wto_china_merchandise_exports`): Export origin volume benchmark.
+4. **CNY/USD Exchange Rate** (`cny_usd_exchange_rate`): Bilateral monetary control.
+5. **UNCTAD Liner Shipping Bilateral Connectivity Index** (`unctad_china_core_lane_lsbci`): Bilateral container network connectivity for China-origin core trade lanes.
 
-Do not use a contemporaneous external series when forecasting or causal
-analysis. Record each release date and apply an availability lag before merging
-it into the weekly or monthly panel.
+For complete details on data sources, portal URLs, and ingestion protocols, see [DATA_SOURCES.md](DATA_SOURCES.md).
 
-The current UNCTAD control is the unweighted mean of pre-specified China-origin
-core lanes (United States, Germany, Netherlands, United Kingdom, Japan,
-Republic of Korea, and Singapore), not an all-pairs mean. Correlation and
-lagged-association outputs report HAC/FDR inference; ordinary IID correlation
-p-values are descriptive only. The current download provides one Q01 value per
-year, so the cleaned control is explicitly treated as annual rather than as a
-complete quarterly series.
-
-The integrated primary-control set is deliberately limited to released, lagged
-CPB global trade demand and China-core-lane UNCTAD connectivity. Stage 14
-attaches every external source by its `availability_date` using a backward-only
-join, records source age, and downstream model sets use only lags. GSCPI is
-retained for benchmark/convergent-validity analysis, never as a primary model
-control. PortWatch is retained only for the separate 2019+ event-study and
-robustness module.
-
-After placing the four downloads in those folders, run the optional control
-extension in order:
-
+To clean and analyze external control series:
 ```powershell
 .venv\Scripts\python.exe scripts\25_clean_external_controls.py
 .venv\Scripts\python.exe scripts\26_external_controls_eda.py
 .venv\Scripts\python.exe scripts\27_external_controls_statistical_analysis.py
-.venv\Scripts\python.exe scripts\30_portwatch_event_study.py
 ```
 
-Stage 25 leaves raw files unchanged and writes the standardized, availability-
-dated long dataset to `data/02_interim/controls/`. Stage 26 produces complete
-numeric correlation matrices, missingness summaries, and EDA figures. Stage 27
-exports FDR-adjusted Pearson/Spearman tests, lagged one-to-one SCFI
-associations, and VIF multicollinearity diagnostics. These optional scripts do
-not alter the existing `00`â€“`24` publication pipeline until the controls are
-explicitly incorporated into Stage 14 and the downstream models are rerun.
+---
 
-After the cleaner has completed, use the normal runner from Stage 14 so the
-forecasting, dynamic-association, causal-ML, robustness, diagnostics,
-significance, and publication stages all consume the rebuilt panels.
+## 5. Testing & Validation
 
-## Temporary pseudo annotations
-
-For pipeline plumbing only, create explicitly synthetic annotation files and
-their inter-annotator-agreement outputs with:
-
-```powershell
-.venv\Scripts\python.exe scripts\28_create_pseudo_annotations.py
-.venv\Scripts\python.exe scripts\29_inter_annotator_agreement.py --annotations data\04_validation\pseudo_test_only\annotator_1_pseudo.csv data\04_validation\pseudo_test_only\annotator_2_pseudo.csv --allow-pseudo-annotations
-```
-
-Pseudo labels are stored in `data/04_validation/pseudo_test_only/` and are
-blocked by Stage 12 unless `--allow-pseudo-annotations` is explicit. They are
-never human validation and never publication eligible.
-
-## Testing
+Execute unit and integration tests across all modules:
 
 ```powershell
 .venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py" -v
 ```
 
-## Repository notes
+---
 
-- Scripts use strict sequential names from `00_...` through `24_...`; `99` is
-  the orchestrator.
-- Large or sensitive data under `data/` are intentionally not tracked.
-- Method/configuration files live under `configs/` and `docs/`.
-- Generated audits, forecasts, inference tables, figures, and run manifests
-  live under `outputs/`.
-- Historical manifest identifiers such as `stage07d` remain unchanged for
-  backward-compatible provenance even though the executable is now Stage 18.
+## 6. Output Artifacts
+
+- **Publication Tables**: [`outputs/tables/`](file:///c:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/tables) (Tables T01–T16, Supplementary Tables S00–S08, and combined Excel workbook).
+- **Publication Figures**: [`outputs/figures/`](file:///c:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/figures) (High-resolution PDF and PNG figures F01–F15).
+- **Significance Registry**: [`outputs/significance/`](file:///c:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/significance) (Full hypothesis registry with FDR and Holm adjustments).
+- **Executive Reports**: [`outputs/reports/`](file:///c:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/reports) (`publication_v001_results_summary.md` and machine-readable run manifests).

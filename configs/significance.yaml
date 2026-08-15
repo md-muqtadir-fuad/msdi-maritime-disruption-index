@@ -135,9 +135,9 @@ semantic_duplicate_contract:
       - equation
       - term
     canonical_owner: smallest_maximum_lag_specification
-    expected_input_rows: 584
-    expected_unique_hypotheses: 212
-    expected_duplicate_rows: 372
+    expected_input_rows: 864
+    expected_unique_hypotheses: 352
+    expected_duplicate_rows: 512
     require_identical_effect_standard_error_and_p_value: true
   varx_diagnostics:
     semantic_key:
@@ -149,8 +149,8 @@ semantic_duplicate_contract:
       - details
     canonical_owner: smallest_maximum_lag_specification
     expected_input_p_value_rows: 140
-    expected_unique_hypotheses: 59
-    expected_duplicate_rows: 81
+    expected_unique_hypotheses: 68
+    expected_duplicate_rows: 72
     require_identical_statistic_and_p_value: true
 
 corrections:
@@ -260,9 +260,9 @@ registry_sources:
     standard_error: standard_error
     role: exploratory
     family_key: [frequency, msdi_path, selected_lag]
-    expected_rows: 584
-    expected_canonical_rows: 212
-    expected_family_count: 5
+    expected_rows: 864
+    expected_canonical_rows: 352
+    expected_family_count: 6
   stage09_dynamic_handoff_enrichment:
     source_tables:
       - varx_diagnostics_sensitivity

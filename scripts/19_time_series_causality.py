@@ -54,11 +54,20 @@ ENDOGENOUS_VARIABLES = (
     "news_volume_change",
 )
 SEASONAL_CONTROLS = ("season_sin", "season_cos")
-EXTERNAL_CONTROL_COLUMNS = ("cpb_world_trade_volume", "unctad_china_core_lane_lsbci")
+EXTERNAL_CONTROL_COLUMNS = (
+    "cpb_world_trade_volume",
+    "rwi_isl_container_throughput_index",
+    "wto_china_merchandise_exports",
+    "cny_usd_exchange_rate",
+    "unctad_china_core_lane_lsbci",
+)
 
 
 def exogenous_controls(frame: pd.DataFrame) -> list[str]:
-    return [*SEASONAL_CONTROLS, *[f"{column}_lag_1" for column in EXTERNAL_CONTROL_COLUMNS if f"{column}_lag_1" in frame]]
+    return [
+        *SEASONAL_CONTROLS,
+        *[f"{column}_lag_1" for column in EXTERNAL_CONTROL_COLUMNS if f"{column}_lag_1" in frame],
+    ]
 
 
 def analysis_columns(frame: pd.DataFrame) -> list[str]:
@@ -157,6 +166,7 @@ def frequency_specifications(args: argparse.Namespace) -> list[FrequencySpecific
             msdi_columns={
                 "peak": "peak_score_media_corrected",
                 "breadth": "breadth_score_media_corrected",
+                "non_freight_peak": "non_freight_peak_score_media_corrected",
             },
             maximum_lag=args.weekly_maximum_lag,
             lp_horizon=args.weekly_lp_horizon,
@@ -171,6 +181,7 @@ def frequency_specifications(args: argparse.Namespace) -> list[FrequencySpecific
             msdi_columns={
                 "peak": "peak_score_media_corrected_mean",
                 "breadth": "breadth_score_media_corrected_mean",
+                "non_freight_peak": "non_freight_peak_score_media_corrected_mean",
             },
             maximum_lag=args.monthly_maximum_lag,
             lp_horizon=args.monthly_lp_horizon,

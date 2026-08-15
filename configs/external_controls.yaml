@@ -1,48 +1,142 @@
-version: external_controls_v001
+version: external_controls_v002
 
-# Each source file should contain a date column and at least one numeric value
-# column. The cleaner selects the first matching alias below and records its
-# choice in the manifest. Amend aliases only with a documented source change.
+# Standardized external controls configuration.
+# Categorization:
+# - Core Controls: CPB, RWI/ISL, WTO China exports, DEXCHUS (CNY/USD), UNCTAD LSBCI (and Brent crude).
+# - Benchmarks / Restricted: GSCPI (benchmark only), IMF PortWatch (2019+ restricted sample).
+# - External-Shock Sensitivity: GPR, TPU, UCT, OPU, EMV.
+
 sources:
   cpb_world_trade_monitor:
     raw_directory: data/01_raw/controls/macro
     file_patterns: ["*cpb*world*trade*.csv", "*cpb*world*trade*.xlsx", "*world*trade*monitor*.csv", "*world*trade*monitor*.xlsx"]
     frequency: monthly
     release_lag_days: 45
+    role: core_control
     date_columns: [date, month, period, time_period, observation_date]
     value_columns: [world_import_volume_index, world_trade_volume_index, world_import_volume, world_trade_volume, total_world_trade]
     output_variable: cpb_world_trade_volume
     aggregation: last
+
+  rwi_isl_container_throughput:
+    raw_directory: data/01_raw/controls/container_throughput_index
+    file_patterns: ["*containerumschlag*.xlsx", "*containerumschlag*.xls", "*container*throughput*.xlsx"]
+    frequency: monthly
+    release_lag_days: 30
+    role: core_control
+    output_variable: rwi_isl_container_throughput_index
+    aggregation: last
+
+  wto_china_merchandise_exports:
+    raw_directory: data/01_raw/controls/WTO
+    file_patterns: ["*WtoData*.csv", "*wto*.csv"]
+    frequency: monthly
+    release_lag_days: 45
+    role: core_control
+    indicator_code: ITS_MTV_MX
+    reporting_economy: China
+    partner_economy: World
+    output_variable: wto_china_merchandise_exports
+    aggregation: last
+
+  cny_usd_exchange_rate:
+    raw_directory: data/01_raw/controls/exchange_rate
+    file_patterns: ["*DEXCHUS*.csv", "*dexchus*.csv", "*exchange_rate*.csv"]
+    frequency: daily
+    release_lag_days: 1
+    role: core_control
+    date_columns: [observation_date, date, period]
+    value_columns: [DEXCHUS, dexchus, cny_usd, rate, value]
+    output_variable: cny_usd_exchange_rate
+    aggregation: mean
+
+  unctad_lsbci:
+    raw_directory: data/01_raw/controls/connectivity
+    file_patterns: ["*lsbci*.csv", "*lsbci*.xlsx", "*lsci*.csv", "*lsci*.xlsx", "*US_LSBCI*.csv"]
+    frequency: annual
+    release_lag_days: 45
+    role: core_control
+    date_columns: [quarter, date, month, period, time_period, observation_date]
+    value_columns: [index, lsbci, lsci, liner_shipping_bilateral_connectivity_index, liner_shipping_connectivity_index, value]
+    origin_economy: China
+    focus_partners: [United States, Germany, Netherlands (Kingdom of the), United Kingdom, Japan, Republic of Korea, Singapore]
+    output_variable: unctad_china_core_lane_lsbci
+    aggregation: mean
+
   gscpi:
     raw_directory: data/01_raw/controls/macro
     file_patterns: ["*gscpi*.csv", "*gscpi*.xlsx", "*gscpi*.xls"]
     frequency: monthly
     release_lag_days: 5
-    date_columns: [date, month, period, time_period, observation_date]
-    value_columns: [gscpi, global_supply_chain_pressure_index, value]
+    role: benchmark_only
+    date_columns: [Date, date, month, period, time_period, observation_date]
+    value_columns: [GSCPI, gscpi, global_supply_chain_pressure_index, value]
     output_variable: gscpi
     aggregation: last
-  unctad_lsbci:
-    raw_directory: data/01_raw/controls/connectivity
-    file_patterns: ["*lsbci*.csv", "*lsbci*.xlsx", "*lsci*.csv", "*lsci*.xlsx"]
-    # The downloaded US.LSBCI extract contains one Q01 observation per year
-    # (2006Q01--2026Q01), so its empirical cadence is annual.
-    frequency: annual
-    release_lag_days: 45
-    date_columns: [quarter, date, month, period, time_period, observation_date]
-    value_columns: [index, lsbci, lsci, liner_shipping_bilateral_connectivity_index, liner_shipping_connectivity_index, value]
-    # Pre-specified China-origin lanes relevant to SCFI; do not average every
-    # bilateral link in the UNCTAD extract.
-    origin_economy: China
-    focus_partners: [United States, Germany, Netherlands (Kingdom of the), United Kingdom, Japan, Republic of Korea, Singapore]
-    output_variable: unctad_china_core_lane_lsbci
-    aggregation: mean
+
   imf_portwatch:
     raw_directory: data/01_raw/controls/portwatch
-    file_patterns: ["*portwatch*.csv", "*portwatch*.xlsx", "*daily*ports*.csv", "*daily*ports*.xlsx"]
+    file_patterns: ["*Daily_Ports_Data*.csv", "*portwatch*.csv", "*portwatch*.xlsx", "*daily*ports*.csv", "*daily*ports*.xlsx"]
     frequency: daily
     release_lag_days: 2
+    role: restricted_robustness_2019_plus
     date_columns: [date, day, period, time_period, observation_date]
     value_columns: [portcalls_container, port_calls, vessel_calls, ship_calls, shipments, shipment_volume, trade_volume, value]
     output_variable: imf_portwatch_global_container_calls
     aggregation: sum
+
+  gpr_risk:
+    raw_directory: data/01_raw/controls/gpr_risk
+    file_patterns: ["*data_gpr_export*.xls", "*data_gpr_export*.xlsx", "*data_gpr_daily*.xls", "*gpr*.csv"]
+    frequency: monthly
+    release_lag_days: 5
+    role: shock_sensitivity
+    date_columns: [month, date, day, period]
+    value_columns: [GPR, gpr, GPRD, gprd, gpr_index, value]
+    output_variable: gpr_index
+    aggregation: last
+
+  tpu:
+    raw_directory: data/01_raw/controls/TPU
+    file_patterns: ["*tpu*.xlsx", "*tpu*.xls", "*tpu*.csv"]
+    frequency: monthly
+    release_lag_days: 5
+    role: shock_sensitivity
+    sheet_name: TPU_MONTHLY
+    date_columns: [DATE, date, month, period]
+    value_columns: [TPU, tpu, tpu_index, value]
+    output_variable: tpu_index
+    aggregation: last
+
+  uct_index:
+    raw_directory: data/01_raw/controls/uct_index
+    file_patterns: ["*UCT*.csv", "*uct*.csv"]
+    frequency: monthly
+    release_lag_days: 5
+    role: shock_sensitivity
+    date_columns: [date, month, period]
+    value_columns: [UCT, uct, uct_index, value]
+    output_variable: uct_index
+    aggregation: last
+
+  opu_index:
+    raw_directory: data/01_raw/controls/OPU_Index
+    file_patterns: ["*OPU_index_monthly*.csv", "*opu*.csv"]
+    frequency: monthly
+    release_lag_days: 5
+    role: shock_sensitivity
+    date_columns: [date, month, period]
+    value_columns: [OPU_index, opu_index, opu, value]
+    output_variable: opu_index
+    aggregation: last
+
+  emv_infectious:
+    raw_directory: data/01_raw/controls/EMV_data
+    file_patterns: ["*All_Infectious_EMV_Data*.csv", "*emv*.csv"]
+    frequency: daily
+    release_lag_days: 1
+    role: shock_sensitivity
+    date_columns: [date, day, month, year]
+    value_columns: [daily_infect_emv_index, emv_index, emv, value]
+    output_variable: infectious_disease_emv
+    aggregation: mean

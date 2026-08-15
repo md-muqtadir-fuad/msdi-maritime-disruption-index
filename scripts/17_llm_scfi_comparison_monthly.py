@@ -106,9 +106,9 @@ BRENT_FEATURES = (
     *[f"brent_monthly_mean_log_change_{lag}m" for lag in BACKWARD_CHANGES],
 )
 EXTERNAL_CONTROL_RAW_COLUMNS = SUPPORT.EXTERNAL_CONTROL_RAW_COLUMNS
-EXTERNAL_CONTROL_FEATURES = (
-    "cpb_world_trade_volume_lag_1m",
-    "unctad_china_core_lane_lsbci_lag_1m",
+EXTERNAL_CONTROL_FEATURES = tuple(
+    f"{column}_lag_1m"
+    for column in EXTERNAL_CONTROL_RAW_COLUMNS
 )
 
 

@@ -102,11 +102,18 @@ BRENT_FEATURES = (
     "brent_log_change_13w",
 )
 COVERAGE_FEATURES = ("llm_common_article_count", "llm_common_effective_article_count")
-EXTERNAL_CONTROL_FEATURES = (
-    *[f"cpb_world_trade_volume_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
-    *[f"unctad_china_core_lane_lsbci_lag_{lag}w" for lag in (1, 2, 4, 8, 12)],
+EXTERNAL_CONTROL_RAW_COLUMNS = (
+    "cpb_world_trade_volume",
+    "rwi_isl_container_throughput_index",
+    "wto_china_merchandise_exports",
+    "cny_usd_exchange_rate",
+    "unctad_china_core_lane_lsbci",
 )
-EXTERNAL_CONTROL_RAW_COLUMNS = ("cpb_world_trade_volume", "unctad_china_core_lane_lsbci")
+EXTERNAL_CONTROL_FEATURES = tuple(
+    f"{column}_lag_{lag}w"
+    for column in EXTERNAL_CONTROL_RAW_COLUMNS
+    for lag in (1, 2, 4, 8, 12)
+)
 BASELINE_MODEL_IDS = {
     "naive_zero_change",
     "historical_mean_change",

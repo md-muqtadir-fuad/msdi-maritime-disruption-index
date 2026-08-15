@@ -60,6 +60,9 @@ secrets.json
 /eda/outputs/*
 !/eda/outputs/.gitkeep
 /docs/
+/.backup/
+/backup/
+/a.backup/
 
 # Experiment trackers and distributed-training state
 /wandb/
@@ -116,3 +119,4 @@ Desktop.ini
 # Codex/agent workspace 
 /.codex/
 /.agents/
+/.manu/

@@ -61,14 +61,17 @@ sc-disrupt/
 │   │   └── causal_ml/                   # reusable causal-ML package namespace
 │   ├── robustness/
 │   └── visualization/
-├── docs/
-│   ├── annotation_guidelines/
-│   ├── codebook/
-│   ├── methodology/
-│   │   ├── methodology_overview.md
-│   │   ├── q1_research_blueprint.md
-│   │   └── causal_ml.md
-│   └── reproducibility/
+├── .manu/                              # Git-ignored local research notes
+│   ├── pipeline_variables_and_mathematical_formulation.md
+│   └── docs/
+│       ├── annotation_guidelines/
+│       ├── codebook/
+│       ├── methodology/
+│       │   ├── methodology_overview.md
+│       │   ├── q1_research_blueprint.md
+│       │   └── causal_ml.md
+│       ├── misc/
+│       └── reproducibility/
 ├── annotation/
 ├── experiments/
 ├── notebooks/

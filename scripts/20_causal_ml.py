@@ -79,10 +79,15 @@ OPTIONAL_COLUMN_MAP = {
         "global_container_movement_disruption": (
             "global_container_movement_disruption_media_corrected"
         ),
+        "freight_cost_disruption": "freight_cost_disruption_media_corrected",
         "supply_disruption": "supply_disruption_media_corrected",
         "production_disruption": "production_disruption_media_corrected",
         "demand_disruption": "demand_disruption_media_corrected",
+        "non_freight_peak": "non_freight_peak_score_media_corrected",
         "cpb_world_trade_volume": "cpb_world_trade_volume",
+        "rwi_isl_container_throughput_index": "rwi_isl_container_throughput_index",
+        "wto_china_merchandise_exports": "wto_china_merchandise_exports",
+        "cny_usd_exchange_rate": "cny_usd_exchange_rate",
         "unctad_china_core_lane_lsbci": "unctad_china_core_lane_lsbci",
     },
     "monthly": {
@@ -92,10 +97,15 @@ OPTIONAL_COLUMN_MAP = {
         "global_container_movement_disruption": (
             "global_container_movement_disruption_media_corrected_mean"
         ),
+        "freight_cost_disruption": "freight_cost_disruption_media_corrected_mean",
         "supply_disruption": "supply_disruption_media_corrected_mean",
         "production_disruption": "production_disruption_media_corrected_mean",
         "demand_disruption": "demand_disruption_media_corrected_mean",
+        "non_freight_peak": "non_freight_peak_score_media_corrected_mean",
         "cpb_world_trade_volume": "cpb_world_trade_volume",
+        "rwi_isl_container_throughput_index": "rwi_isl_container_throughput_index",
+        "wto_china_merchandise_exports": "wto_china_merchandise_exports",
+        "cny_usd_exchange_rate": "cny_usd_exchange_rate",
         "unctad_china_core_lane_lsbci": "unctad_china_core_lane_lsbci",
     },
 }

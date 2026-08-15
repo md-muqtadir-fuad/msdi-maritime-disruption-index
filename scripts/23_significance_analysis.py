@@ -51,7 +51,7 @@ DEFAULT_LOG_DIR = PROJECT_ROOT / "outputs/logs"
 
 # Updated only after configs/significance.yaml is frozen.
 CANONICAL_CONFIG_SHA256 = (
-    "fef8d706cefc45e52bae360a6fdecc72df46d0e553fcc123bef7027e23257e17"
+    "55bd91437b238fbd39642038c7c213ab27ffca61ad55906cb5fe2f8e2ce655ab"
 )
 
 DYNAMIC_IDENTITY_FIELDS = (

@@ -426,6 +426,10 @@ def apply_period_event_weights(
     output["breadth_weighted_contribution"] = (
         output["breadth_severity_score"] * output["novelty_weight"]
     )
+    if "non_freight_peak_severity_score" in output.columns:
+        output["non_freight_peak_weighted_contribution"] = (
+            output["non_freight_peak_severity_score"] * output["novelty_weight"]
+        )
     return output
 
 
@@ -500,6 +504,24 @@ def build_article_scores(
     dimension_medians = [f"{column}__ensemble_median" for column in DIMENSION_COLUMNS]
     article["breadth_severity_score"] = article[dimension_medians].mean(axis=1, skipna=False)
     article["breadth_active_dimension_count"] = article[dimension_medians].gt(0).sum(axis=1)
+
+    non_freight_dim_medians = [
+        f"{column}__ensemble_median"
+        for column in DIMENSION_COLUMNS
+        if "freight_cost" not in column
+    ]
+    article["non_freight_peak_severity_score"] = article[non_freight_dim_medians].max(
+        axis=1, skipna=False
+    )
+    freight_cost_med = article["freight_cost_disruption_score__ensemble_median"].fillna(0.0)
+    non_freight_max = article["non_freight_peak_severity_score"].fillna(0.0)
+    article["freight_price_only_flag"] = (
+        (freight_cost_med.gt(0)) & (non_freight_max.le(0.0))
+    ).astype(int)
+    article["freight_price_dominant_flag"] = (
+        (freight_cost_med.ge(non_freight_max + 1.0)) & (freight_cost_med.gt(0))
+    ).astype(int)
+
     article["dimension_disagreement_sd_mean"] = article[
         [f"{column}__ensemble_sd" for column in DIMENSION_COLUMNS]
     ].mean(axis=1)
@@ -511,6 +533,9 @@ def build_article_scores(
     article["peak_weighted_contribution"] = article["peak_severity_score"] * article["novelty_weight"]
     article["breadth_weighted_contribution"] = (
         article["breadth_severity_score"] * article["novelty_weight"]
+    )
+    article["non_freight_peak_weighted_contribution"] = (
+        article["non_freight_peak_severity_score"] * article["novelty_weight"]
     )
 
     # Consolidate the many diagnostic columns before adding model-specific paths.
@@ -638,6 +663,30 @@ def aggregate_weekly(
     grouped["breadth_score_media_corrected"] = media_correct(
         grouped["breadth_score_sum"], grouped["article_count"], media_method
     )
+    if "non_freight_peak_weighted_contribution" in work.columns:
+        work_nf = work["non_freight_peak_weighted_contribution"].resample(
+            frequency, label="right", closed="right"
+        ).sum()
+        grouped["non_freight_peak_score_sum"] = work_nf.reindex(grouped.index).fillna(0.0)
+        grouped["non_freight_peak_score_media_corrected"] = media_correct(
+            grouped["non_freight_peak_score_sum"], grouped["article_count"], media_method
+        )
+    if "freight_price_only_flag" in work.columns:
+        grouped["freight_price_only_share"] = (
+            work["freight_price_only_flag"]
+            .resample(frequency, label="right", closed="right")
+            .mean()
+            .reindex(grouped.index)
+            .fillna(0.0)
+        )
+    if "freight_price_dominant_flag" in work.columns:
+        grouped["freight_price_dominant_share"] = (
+            work["freight_price_dominant_flag"]
+            .resample(frequency, label="right", closed="right")
+            .mean()
+            .reindex(grouped.index)
+            .fillna(0.0)
+        )
     grouped["peak_msdi_z_full_sample_descriptive"] = full_sample_zscore(
         grouped["peak_score_media_corrected"]
     )
@@ -700,6 +749,32 @@ def aggregate_monthly_direct(
         )
         grouped[f"{path}_msdi_z_expanding_realtime"] = expanding_realtime_zscore(
             grouped[ema_column], expanding_min_periods
+        )
+
+    if "non_freight_peak_weighted_contribution" in work.columns:
+        base_nf = "non_freight_peak_score_sqrt_effective_volume"
+        ema_nf = f"{base_nf}_ema{ema_span}"
+        sum_nf = work["non_freight_peak_weighted_contribution"].resample(
+            frequency, label="right", closed="right"
+        ).sum()
+        grouped["non_freight_peak_score_sum"] = sum_nf
+        grouped[base_nf] = sum_nf.div(denominator)
+        grouped[ema_nf] = causal_ema_restart_gaps(grouped[base_nf], span=ema_span)
+        grouped["non_freight_peak_score_media_corrected"] = grouped[ema_nf]
+
+    if "freight_price_only_flag" in work.columns:
+        grouped["freight_price_only_share"] = (
+            work["freight_price_only_flag"]
+            .resample(frequency, label="right", closed="right")
+            .mean()
+            .fillna(0.0)
+        )
+    if "freight_price_dominant_flag" in work.columns:
+        grouped["freight_price_dominant_share"] = (
+            work["freight_price_dominant_flag"]
+            .resample(frequency, label="right", closed="right")
+            .mean()
+            .fillna(0.0)
         )
 
     for dimension in DIMENSION_COLUMNS:
