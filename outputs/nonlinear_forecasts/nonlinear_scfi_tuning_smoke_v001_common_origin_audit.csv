@@ -1,6 +1,0 @@
-frequency,algorithm,index_construction,horizon_steps,models_checked,common_forecast_origins,first_origin_date,last_origin_date,origin_sets_identical
-weekly,random_forest,weekly_log_volume,1,2,1,2019-02-04,2019-02-04,True
-weekly,random_forest,weekly_log_volume,2,2,1,2019-02-11,2019-02-11,True
-weekly,random_forest,weekly_log_volume,4,2,1,2019-02-25,2019-02-25,True
-weekly,random_forest,weekly_log_volume,8,2,1,2019-03-25,2019-03-25,True
-weekly,random_forest,weekly_log_volume,12,2,1,2019-04-22,2019-04-22,True

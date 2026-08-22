@@ -316,6 +316,118 @@ def greedy_complete_linkage(
     return clusters
 
 
+def greedy_complete_linkage_from_pair_audit(
+    work: pd.DataFrame,
+    pair_audit: pd.DataFrame,
+    threshold: float,
+    window_value: int,
+    window_unit: str = "days",
+    audit_similarity_floor: float = 0.0,
+) -> list[list[int]]:
+    """Replay deterministic complete-linkage clustering from saved similarities.
+
+    ``build_pair_audit`` retains only pairs whose similarity is at least its
+    configured audit floor.  A target threshold at or above that floor can be
+    replayed without embeddings: an absent in-window pair is known to be below
+    the audit floor and therefore cannot satisfy the target threshold.
+
+    ``work`` must use the same canonical ordering as :func:`greedy_complete_linkage`:
+    publication date followed by article ID.  The caller is responsible for
+    selecting the appropriate temporal profile from a combined pair audit.
+    """
+    required_work = {"article_id", "event_day"}
+    required_pairs = {"article_id_a", "article_id_b", "cosine_similarity"}
+    missing_work = sorted(required_work.difference(work.columns))
+    missing_pairs = sorted(required_pairs.difference(pair_audit.columns))
+    if missing_work:
+        raise ValueError(f"Event work frame lacks required columns: {missing_work}")
+    if missing_pairs:
+        raise ValueError(f"Pair audit lacks required columns: {missing_pairs}")
+    if threshold < audit_similarity_floor:
+        raise ValueError(
+            "Cannot replay below the saved pair-audit similarity floor: "
+            f"threshold={threshold}, audit_floor={audit_similarity_floor}"
+        )
+
+    article_ids = work["article_id"].astype(str)
+    if article_ids.eq("").any() or article_ids.duplicated().any():
+        raise ValueError("Event work frame must contain unique non-empty article IDs")
+    days = pd.to_datetime(work["event_day"], errors="coerce")
+    if days.isna().any():
+        raise ValueError("Pair-audit replay accepts dated articles only")
+    expected_order = (
+        work.assign(_event_day_order=days, _article_id_order=article_ids)
+        .sort_values(["_event_day_order", "_article_id_order"], kind="stable")
+        .index.tolist()
+    )
+    if expected_order != work.index.tolist():
+        raise ValueError("Event work frame is not in canonical date/article-ID order")
+
+    pairs = pair_audit[list(required_pairs)].copy()
+    pairs["article_id_a"] = pairs["article_id_a"].astype(str)
+    pairs["article_id_b"] = pairs["article_id_b"].astype(str)
+    pairs["cosine_similarity"] = pd.to_numeric(
+        pairs["cosine_similarity"], errors="raise"
+    )
+    if pairs["cosine_similarity"].lt(audit_similarity_floor).any():
+        raise ValueError("Pair audit contains similarities below its declared floor")
+
+    similarity_lookup: dict[tuple[str, str], float] = {}
+    for row in pairs.itertuples(index=False):
+        left, right = sorted((str(row.article_id_a), str(row.article_id_b)))
+        key = (left, right)
+        similarity = float(row.cosine_similarity)
+        if key in similarity_lookup and not np.isclose(
+            similarity_lookup[key], similarity, rtol=0.0, atol=1e-12
+        ):
+            raise ValueError(f"Conflicting saved similarities for article pair {key}")
+        similarity_lookup[key] = similarity
+
+    work_ids = set(article_ids)
+    pair_ids = set(pairs["article_id_a"]).union(pairs["article_id_b"])
+    unknown_ids = sorted(pair_ids.difference(work_ids))
+    if unknown_ids:
+        raise ValueError(f"Pair audit references unknown article IDs: {unknown_ids[:10]}")
+
+    clusters: list[list[int]] = []
+    cluster_earliest: list[pd.Timestamp] = []
+    id_by_index = article_ids.to_dict()
+    active_cluster_start = 0
+    for row_index in range(len(work)):
+        day = pd.Timestamp(work.at[row_index, "event_day"])
+        row_id = id_by_index[row_index]
+        candidates: list[tuple[float, float, int]] = []
+        # Cluster creation follows canonical date order, so earliest dates are
+        # monotone.  Once a cluster falls outside the window it can never become
+        # eligible again for a later article.
+        while active_cluster_start < len(clusters) and not within_event_window(
+            cluster_earliest[active_cluster_start], day, window_value, window_unit
+        ):
+            active_cluster_start += 1
+        for cluster_index in range(active_cluster_start, len(clusters)):
+            members = clusters[cluster_index]
+            similarities: list[float] = []
+            for member in members:
+                member_id = id_by_index[member]
+                key = tuple(sorted((member_id, row_id)))
+                similarity = similarity_lookup.get(key)
+                if similarity is None or similarity < threshold:
+                    similarities = []
+                    break
+                similarities.append(similarity)
+            if similarities:
+                candidates.append(
+                    (min(similarities), float(np.mean(similarities)), cluster_index)
+                )
+        if not candidates:
+            clusters.append([row_index])
+            cluster_earliest.append(day)
+            continue
+        _, _, selected = max(candidates, key=lambda item: (item[0], item[1], -item[2]))
+        clusters[selected].append(row_index)
+    return clusters
+
+
 def build_pair_audit(
     work: pd.DataFrame,
     embeddings: np.ndarray,

@@ -14,7 +14,7 @@ event_clustering:
     maximum_body_characters: 12000
   matching:
     similarity: cosine
-    selected_threshold: 0.88  # interim operational choice; publication-final only after human verification
+    selected_threshold: 0.82  # publication-final; selected only from the adjudicated 300-pair human validation
     profiles:
       weekly:
         window_value: 5
@@ -25,11 +25,13 @@ event_clustering:
     algorithm: deterministic_date_ordered_greedy_complete_linkage
     anti_chaining: require_threshold_against_every_cluster_member
   validation:
-    threshold_candidates: [0.85, 0.88, 0.90, 0.92]
+    threshold_candidates: [0.82, 0.85, 0.88, 0.90, 0.92]
     pair_audit_min_similarity: 0.80
     pair_sample_size_total: 400
     seed: 20260810
     publication_final_threshold_requires_human_calibration: true
+    calibration_status: completed
+    calibration_result: validation/event_pairs/results/event_threshold_evaluation_matrix.csv
   aggregation:
     primary: fixed_event_total_within_aggregation_period
     sensitivities:

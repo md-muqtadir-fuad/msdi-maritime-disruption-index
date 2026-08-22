@@ -39,8 +39,8 @@ class ErrorDiagnosticsTests(unittest.TestCase):
             config["analysis"]["nonlinear_selected_algorithm_cells"], 50
         )
         self.assertEqual(config["analysis"]["nonlinear_models_per_cell"], 3)
-        self.assertEqual(
-            config["analysis"]["nonlinear_selected_prediction_rows"], 25050
+        self.assertNotIn(
+            "nonlinear_selected_prediction_rows", config["analysis"]
         )
         self.assertEqual(config["output_contract"]["expected_full_row_counts"], {})
 

@@ -328,13 +328,19 @@ def stable_seed(base_seed: int, *parts: Any) -> int:
 
 
 def json_default(value: Any) -> Any:
+    if pd.isna(value) or value is pd.NaT:
+        return None
     if isinstance(value, (Path, pd.Timestamp)):
         return str(value)
+    if isinstance(value, (np.integer, int)):
+        return int(value)
+    if isinstance(value, (np.floating, float)):
+        return None if np.isnan(value) else float(value)
     if isinstance(value, np.generic):
         return value.item()
     if isinstance(value, np.ndarray):
         return value.tolist()
-    raise TypeError(f"Cannot JSON-encode {type(value).__name__}")
+    return str(value)
 
 
 def configure_logging(log_dir: Path, version: str) -> tuple[logging.Logger, Path]:

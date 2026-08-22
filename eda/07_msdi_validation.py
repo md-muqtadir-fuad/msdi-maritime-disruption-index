@@ -14,6 +14,14 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import cohen_kappa_score
 
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman", "DejaVu Serif", "Times", "serif"]
+plt.rcParams["mathtext.fontset"] = "stix"
+plt.rcParams["pdf.fonttype"] = 42
+plt.rcParams["ps.fonttype"] = 42
+plt.rcParams["figure.dpi"] = 300
+plt.rcParams["savefig.dpi"] = 300
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "eda/outputs/point_07_msdi_validation"
@@ -191,7 +199,12 @@ def plots(coverage: pd.DataFrame, dimensions: pd.DataFrame, monthly: pd.DataFram
     axes[2].plot(coverage["month_end"], coverage["largest_source_share"], linewidth=1.2)
     axes[2].set_title("Largest source share", loc="left")
     for ax in axes: ax.grid(alpha=0.2)
-    fig.tight_layout(); path = output_dir / "monthly_coverage_and_concentration.png"; fig.savefig(path, dpi=180, bbox_inches="tight"); plt.close(fig); outputs.append(path.name)
+    fig.tight_layout()
+    path = output_dir / "monthly_coverage_and_concentration.png"
+    fig.savefig(path, dpi=300, bbox_inches="tight")
+    fig.savefig(path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    outputs.append(path.name)
 
     fig, ax = plt.subplots(figsize=(9, 4.8))
     positions = np.arange(len(dimensions))
@@ -199,7 +212,12 @@ def plots(coverage: pd.DataFrame, dimensions: pd.DataFrame, monthly: pd.DataFram
     ax.bar(positions + 0.18, dimensions["severe_3_or_4_share"], width=0.36, label="Score 3 or 4")
     ax.set_xticks(positions, [label.replace(" disruption", "") for label in dimensions["label"]], rotation=30, ha="right")
     ax.set_ylabel("Article share"); ax.legend(frameon=False); ax.grid(axis="y", alpha=0.2)
-    fig.tight_layout(); path = output_dir / "dimension_score_distribution.png"; fig.savefig(path, dpi=180, bbox_inches="tight"); plt.close(fig); outputs.append(path.name)
+    fig.tight_layout()
+    path = output_dir / "dimension_score_distribution.png"
+    fig.savefig(path, dpi=300, bbox_inches="tight")
+    fig.savefig(path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    outputs.append(path.name)
 
     fig, axes = plt.subplots(2, 1, figsize=(12, 6.5), sharex=True)
     axes[0].plot(monthly["month_end"], monthly["peak_minus_breadth"], linewidth=1.2)
@@ -207,7 +225,12 @@ def plots(coverage: pd.DataFrame, dimensions: pd.DataFrame, monthly: pd.DataFram
     axes[1].plot(monthly["month_end"], monthly["covid_dimension_share"], linewidth=1.2)
     axes[1].set_title("COVID-19 dimension share", loc="left")
     for ax in axes: ax.grid(alpha=0.2)
-    fig.tight_layout(); path = output_dir / "peak_breadth_and_covid_share.png"; fig.savefig(path, dpi=180, bbox_inches="tight"); plt.close(fig); outputs.append(path.name)
+    fig.tight_layout()
+    path = output_dir / "peak_breadth_and_covid_share.png"
+    fig.savefig(path, dpi=300, bbox_inches="tight")
+    fig.savefig(path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
+    plt.close(fig)
+    outputs.append(path.name)
     return outputs
 
 

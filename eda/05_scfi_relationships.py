@@ -18,6 +18,14 @@ from scipy.stats import pearsonr, spearmanr
 from statsmodels.nonparametric.smoothers_lowess import lowess
 from statsmodels.stats.multitest import multipletests
 
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman", "DejaVu Serif", "Times", "serif"]
+plt.rcParams["mathtext.fontset"] = "stix"
+plt.rcParams["pdf.fonttype"] = 42
+plt.rcParams["ps.fonttype"] = 42
+plt.rcParams["figure.dpi"] = 300
+plt.rcParams["savefig.dpi"] = 300
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "eda/outputs/point_05_scfi_relationships"
@@ -205,7 +213,8 @@ def plot_scatter_families(changes: pd.DataFrame, labeler, output_dir: Path) -> l
             ax.set_visible(False)
         fig.tight_layout()
         path = output_dir / f"{name}.png"
-        fig.savefig(path, dpi=180, bbox_inches="tight")
+        fig.savefig(path, dpi=300, bbox_inches="tight")
+        fig.savefig(path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
         plt.close(fig)
         outputs.append(path.name)
     return outputs

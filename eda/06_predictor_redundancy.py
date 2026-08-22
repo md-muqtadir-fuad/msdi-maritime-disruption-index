@@ -17,6 +17,14 @@ from scipy.cluster.hierarchy import dendrogram, linkage
 from scipy.spatial.distance import squareform
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman", "DejaVu Serif", "Times", "serif"]
+plt.rcParams["mathtext.fontset"] = "stix"
+plt.rcParams["pdf.fonttype"] = 42
+plt.rcParams["ps.fonttype"] = 42
+plt.rcParams["figure.dpi"] = 300
+plt.rcParams["savefig.dpi"] = 300
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "eda/outputs/point_06_predictor_redundancy"
@@ -168,7 +176,8 @@ def cluster_plot(frame: pd.DataFrame, labeler, output_dir: Path) -> tuple[Path, 
     ax.grid(axis="x", alpha=0.2)
     fig.tight_layout()
     path = output_dir / "predictor_hierarchical_clustering.png"
-    fig.savefig(path, dpi=180, bbox_inches="tight")
+    fig.savefig(path, dpi=300, bbox_inches="tight")
+    fig.savefig(path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
     plt.close(fig)
     order = dendrogram(tree, no_plot=True)["leaves"]
     membership = pd.DataFrame({"display_order": range(1, len(order) + 1), "variable": [eligible[i] for i in order], "label": [labeler(eligible[i]) for i in order]})

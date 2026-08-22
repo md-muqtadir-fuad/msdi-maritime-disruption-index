@@ -1,4 +1,0 @@
-frequency,index_construction,algorithm,evaluation_cells,mean_algorithm_rmse_rank,mean_rmse,mean_relative_rmse,algorithm_point_rank,point_rank_is_not_significance
-monthly,adapted_pdf_sqrt_ema3,prophet,3,1.0,0.1264569377374494,0.663798841625226,1.0,True
-monthly,mean_safe_weekly,prophet,3,1.0,0.18897152791625635,0.9672973193684294,1.0,True
-weekly,weekly_log_volume,prophet,5,1.0,0.07781600279319889,1.039843803971826,1.0,True

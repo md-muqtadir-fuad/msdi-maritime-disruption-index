@@ -1,2 +1,0 @@
-algorithm,package,available,version,missing_dependency_policy,action
-prophet,prophet,True,1.3.0,error,selected

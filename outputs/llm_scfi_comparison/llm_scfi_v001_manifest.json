@@ -4,12 +4,12 @@
   "inputs": {
     "article_scores": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\05_indices\\article_level\\article_consensus_scores.csv",
-      "sha256": "94ba306fbbcc262d6bca43663ab68e45c6a281e3f1df8986c6eb1972d3affd6e",
+      "sha256": "6f1e5032ee29c8d43def2fbab974f0235d967f3319c7b7480bb1973003d30254",
       "rows": 6542
     },
     "scfi_panel_non_msdi_fields_only": {
       "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\msdi_scfi_weekly_panel.csv",
-      "sha256": "8d63280039a7443a4e900d84a986c37dacfc91e3861b106ec63699c682fe9ccf",
+      "sha256": "14880aa590e67336c92355bd7236b5ce6088a4952e1a1266343f694905d8a645",
       "rows": 522
     },
     "model_registry": {
@@ -172,15 +172,15 @@
   "best_llm_point_rank": {
     "score_source": "gemma_2_9b_it",
     "primary_comparison_cells": 8,
-    "mean_rmse_rank": 1.0,
-    "mean_mae_rank": 1.125,
-    "mean_skill_rank": 1.0,
-    "mean_rmse_log_change": 0.19171649216358028,
-    "mean_relative_rmse_vs_coverage": 0.9237855461001847,
-    "mean_oos_r2_vs_coverage": 0.1408206397767779,
-    "mean_directional_accuracy": 0.5753039174331349,
-    "rmse_cell_wins": 8,
-    "adjusted_dm_squared_pairwise_wins": 0,
+    "mean_rmse_rank": 1.125,
+    "mean_mae_rank": 1.5,
+    "mean_skill_rank": 1.125,
+    "mean_rmse_log_change": 0.19781813557798902,
+    "mean_relative_rmse_vs_coverage": 0.9439454928326036,
+    "mean_oos_r2_vs_coverage": 0.10460385070889594,
+    "mean_directional_accuracy": 0.5518402446908796,
+    "rmse_cell_wins": 7,
+    "adjusted_dm_squared_pairwise_wins": 2,
     "adjusted_dm_squared_pairwise_losses": 0,
     "predictive_point_rank": 1,
     "ranking_scope": "equal-weight overall-max and dimension-mean7 RMSE ranks across four horizons"
@@ -216,22 +216,22 @@
     "manifest": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\llm_scfi_comparison\\llm_scfi_v001_manifest.json"
   },
   "output_sha256": {
-    "common_article_cohort": "d036ac64fa31540e0c309f19f08ff0e354c6f6458b039a2715b60834f6552891",
+    "common_article_cohort": "28eec2dde49967bdd710824934d0ba0f7ed1db563f02645dc1e663a78b687164",
     "common_cohort_audit": "84d111a56395dbef88c046dfbb8cf40401b62f3a2f22447651be715816fff212",
-    "weekly_common_signals": "3d1ffda554c586e3fd61b9a4a5324d6b5f533fa3b0aa0b851d262ae669b84155",
-    "weekly_common_coverage": "fec8d1a66b241d1da0eb8269a26e3ac45b77f05f034b3dbe1cfee5635a6bb72c",
-    "signal_differences": "996bda789a81cbf0f35557b59869f22197ed11241caf41d86ce00dcf047d63e8",
-    "aligned_panel": "947b2ad488c2f30458dd83ef3dda515557242a0be04a90374706d1bea0fc9f0e",
-    "forecasts": "75695bc091aff14cfe0b3c82571c9373790ee22ddd4c227c196274f05f26e386",
-    "metrics": "8771a294596a17e63f9bf5648f7a3b401c38e0d045e81d780eac5a342d3b48e3",
-    "statistical_tests": "5d9351ca97b349705b603f74ccada264aa52645597397ebf0ab5a2edc075dcf6",
+    "weekly_common_signals": "cb22d73e02570df7029a5a1218042500a8c8ba479c87b1b7261cff1603d0b2b2",
+    "weekly_common_coverage": "11f647dccb88b9e768a4061b31d1ac71c227ea99a2175ac652ce19f9f47fc80d",
+    "signal_differences": "7c90bd1d08851c7fa1310c3497f20ec1c8ebd14f380c12133ee6fbe6301c9e08",
+    "aligned_panel": "6eee4b705f6b3fb943ea8b81a2175756982a8284721ed82c1a85512d298683b8",
+    "forecasts": "3411efcded4cf9162cf63c294edd87f23b028bf839515b622e478bb5638caec0",
+    "metrics": "ab6240d88205331bb0465826d7ddceb568cafc44ce688ce5391046548e0cbe2c",
+    "statistical_tests": "de7c90cc620d9e109c26cac9d1c7cb6d3063519bb3f6c86ac76ca7f4c1a55f6c",
     "fit_audit": "d8f3f80d075767033a07e0f62959b0efba8e05fdf6f71723928d212518ca66dc",
     "origin_audit": "4585d70af132d0481296d67be2ffb257b7a655a349d08556c523b5ae1ca56d25",
-    "hybrid_weights": "88fce6a04951901278f09d3da714832a345fd9d5a9b63626ec3dbd8d6a28d2a8",
-    "llm_ranking": "749633efc77df9ad131f183c9dc1d52e87caacc8e7bdd77920da6bb5f2590602",
-    "llm_ranking_cells": "b76533214316e6b4801a23907c47ab30d5908e35bf00266cec43acefaac8a491",
-    "primary_predictor_ranking": "a30e9a20794f7f369024c4a53b925cc6afe88ea558bef5d52f30d6090d247c08",
-    "dimension_summary": "bedaa103b76d69d9941b8a3a254f6055414cafe8f3caff7485c5a93744519e4a",
+    "hybrid_weights": "f163c52a0348a1a10de3c0bbfa1813a4ded06ce530ca747dcea8b391f05bee33",
+    "llm_ranking": "4ba641311b77af22f46cda255e7767e8e4cb5b353f69918b97540db0314e7b22",
+    "llm_ranking_cells": "302db818415bc593ed9ced82b711cc10cf3e1aaab3dd8d50cdf1fda436a6e10a",
+    "primary_predictor_ranking": "2d9467794c08f3b6f7b826b293a00aa58f60789fc78c3d282ea6f9013a678da3",
+    "dimension_summary": "8f7c8d3bff9cbc1378808e1dd2c67af0f6572cd128fb724abbb81533abb91fec",
     "feature_sets": "1b7cc46bbb78ad291ec2ff7b468376cca91af0bbc02760e4e6737b4fa7833f8a"
   },
   "output_row_counts": {

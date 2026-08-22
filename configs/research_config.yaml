@@ -15,16 +15,17 @@ aggregation:
   semantic_event_clustering: BAAI_bge_m3_pre_llm
   semantic_event_weekly_window: 5_weeks
   semantic_event_monthly_window: 3_calendar_months
-  semantic_event_threshold_candidates: [0.85, 0.88, 0.90, 0.92]
-  semantic_event_provisional_threshold: 0.88
-  semantic_event_threshold_status: interim_operational_pending_human_validation
+  semantic_event_threshold_candidates: [0.82, 0.85, 0.88, 0.90, 0.92]
+  semantic_event_provisional_threshold: 0.82  # retained key for backward compatibility
+  semantic_event_final_threshold: 0.82
+  semantic_event_threshold_status: completed_human_validated
   primary_event_weight: fixed_total_within_aggregation_period
   event_threshold_requires_human_pair_validation: true
   uncertainty_bands: true
   z_score_index: true
 
 validation:
-  target_goldset_size: 1000
+  target_goldset_size: 400
   annotators_minimum: 2
   reliability_metrics:
     - cohens_kappa

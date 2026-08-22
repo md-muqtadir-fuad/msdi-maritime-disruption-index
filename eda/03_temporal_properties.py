@@ -18,6 +18,14 @@ import pandas as pd
 from scipy.stats import kurtosis, skew
 from statsmodels.tsa.stattools import acf, adfuller, kpss, pacf
 
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman", "DejaVu Serif", "Times", "serif"]
+plt.rcParams["mathtext.fontset"] = "stix"
+plt.rcParams["pdf.fonttype"] = 42
+plt.rcParams["ps.fonttype"] = 42
+plt.rcParams["figure.dpi"] = 300
+plt.rcParams["savefig.dpi"] = 300
+
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "eda/outputs/point_03_temporal_properties"
@@ -308,7 +316,8 @@ def plot_panels(panel: pd.DataFrame, output_dir: Path) -> list[str]:
             ax.set_visible(False)
         fig.tight_layout()
         path = output_dir / f"{family}.png"
-        fig.savefig(path, dpi=180, bbox_inches="tight")
+        fig.savefig(path, dpi=300, bbox_inches="tight")
+        fig.savefig(path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
         plt.close(fig)
         outputs.append(path.name)
     return outputs

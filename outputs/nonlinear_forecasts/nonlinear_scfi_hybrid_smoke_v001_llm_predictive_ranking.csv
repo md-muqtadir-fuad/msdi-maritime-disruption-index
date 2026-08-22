@@ -1,4 +1,0 @@
-frequency,algorithm,index_construction,score_source,evaluation_cells,mean_rmse_rank,mean_rmse,mean_relative_rmse,mean_oos_r2,predictive_point_rank,point_rank_is_not_significance
-weekly,random_forest,weekly_log_volume,gemma_2_9b_it,10,1.9,0.07432934857190407,0.9990879566597224,-0.08953541765032058,1.0,True
-weekly,random_forest,weekly_log_volume,qwen_2_5_7b,10,2.0,0.0762595003117145,0.9656386896262508,-0.05472403026125401,2.0,True
-weekly,random_forest,weekly_log_volume,qwen_3_8b,10,2.1,0.06876350583720073,0.9029336967597287,0.11092023480961073,3.0,True

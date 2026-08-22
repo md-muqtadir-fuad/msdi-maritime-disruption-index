@@ -32,7 +32,6 @@ analysis:
   nonlinear_frequency_construction_horizon_cells: 10
   nonlinear_selected_algorithm_cells: 50
   nonlinear_models_per_cell: 3
-  nonlinear_selected_prediction_rows: 25050
   required_reference_specifications:
     - no_msdi
     - peak_only

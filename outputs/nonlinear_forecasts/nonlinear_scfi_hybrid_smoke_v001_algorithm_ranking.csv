@@ -1,2 +1,0 @@
-frequency,index_construction,algorithm,evaluation_cells,mean_algorithm_rmse_rank,mean_rmse,mean_relative_rmse,algorithm_point_rank,point_rank_is_not_significance
-weekly,weekly_log_volume,random_forest,30,1.0,0.07311745157360643,0.9558867810152339,1.0,True

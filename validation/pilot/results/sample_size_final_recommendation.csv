@@ -1,0 +1,2 @@
+﻿pilot_n,required_total_n,additional_n_required,sample_size_determining_dimension,confidence_level,target_qwk_half_width,precision_success_probability,operational_total_n,operational_additional_n
+50,1000,950,Exceeds max range (production_disruption_score),0.95,0.05,0.9,400,350

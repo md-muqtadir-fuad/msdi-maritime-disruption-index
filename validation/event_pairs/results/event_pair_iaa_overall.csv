@@ -1,0 +1,2 @@
+﻿sample_size,exact_agreement_pct,unanimous_pairs,disagreements,cohen_kappa,kappa_95ci_lower,kappa_95ci_upper,krippendorff_alpha,alpha_95ci_lower,alpha_95ci_upper,true_negatives_unanimous_0,true_positives_unanimous_1,ann1_0_ann2_1,ann1_1_ann2_0
+300,96.0,288,12,0.9081,0.8533,0.9535,0.9082,0.8535,0.9536,90,198,7,5

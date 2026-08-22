@@ -116,7 +116,10 @@ secrets.json
 Thumbs.db
 Desktop.ini
 
-# Codex/agent workspace 
+# workspace 
 /.codex/
 /.agents/
 /.manu/
+scripts/generate_slides_pdf.py
+slides
+latex

@@ -142,7 +142,7 @@ outputs:
   script_sha256_lock: configs/publication_outputs_script.sha256
 
 figures:
-  dpi: 220
+  dpi: 300
   formats: [png, pdf]
   style: seaborn-v0_8-whitegrid
   color_primary: "#1f4e79"

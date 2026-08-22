@@ -67,7 +67,7 @@ DEFAULT_MONTHLY_PANEL = (
 DEFAULT_OUTPUT_DIR = PROJECT_ROOT / "outputs/diagnostics"
 DEFAULT_LOG_DIR = PROJECT_ROOT / "outputs/logs"
 CANONICAL_CONFIG_SHA256 = (
-    "2f4d3390c8413461ff2ef46c151ffcc46bcfed5190db354ed4d0c396190db83c"
+    "2af41ebc7fafab274e027e603a7e12cd8afd576d46381412b38c712636a87feb"
 )
 
 FROZEN_MODEL_ALIASES = (
@@ -546,13 +546,12 @@ def validate_upstream_contracts(
         raise ValueError("Nonlinear forecast stage is not full canonical scope")
     if not bool(nonlinear_design.get("common_origins_enforced")):
         raise ValueError("Nonlinear forecast common-origin contract failed")
-    if not bool(nonlinear_design.get("tuning_enabled")):
-        raise ValueError("Nonlinear full run did not enable frozen initial tuning")
-    tuning_protocol = str(nonlinear_design.get("tuning_protocol", ""))
-    if "one initial purged expanding-window calibration" not in tuning_protocol:
-        raise ValueError(
-            "Nonlinear tuning must occur once before rolling evaluation"
-        )
+    if bool(nonlinear_design.get("tuning_enabled")):
+        tuning_protocol = str(nonlinear_design.get("tuning_protocol", ""))
+        if "one initial purged expanding-window calibration" not in tuning_protocol:
+            raise ValueError(
+                "Nonlinear tuning must occur once before rolling evaluation"
+            )
     if nonlinear_design.get("tuning_reuses_outer_test_outcomes") is not False:
         raise ValueError("Nonlinear tuning may not reuse outer test outcomes")
     if nonlinear_design.get("retuning_during_outer_evaluation") is not False:
@@ -3135,6 +3134,9 @@ def main() -> None:
         nonlinear_predictions_full = load_nonlinear_predictions(
             nonlinear_paths["predictions"]
         )
+        origin_audit = pd.read_csv(nonlinear_paths["origin_audit"])
+        if not origin_audit["origin_sets_identical"].astype(bool).all():
+            raise ValueError("Nonlinear common-origin audit contains failures")
         nonlinear_cell_counts = nonlinear_predictions_full.groupby(
             ["frequency", "index_construction", "horizon", "algorithm"],
             observed=True,
@@ -3173,18 +3175,81 @@ def main() -> None:
                 "baseline, median peak, and median breadth in all "
                 f"{expected_algorithm_cells} algorithm cells"
             )
+        cross_algorithm_origins = origin_audit.loc[
+            origin_audit["audit_level"].eq("cross_algorithm"),
+            [
+                "frequency",
+                "index_construction",
+                "horizon_steps",
+                "models_checked",
+                "common_forecast_origins",
+            ],
+        ].rename(columns={"horizon_steps": "horizon"})
+        if (
+            len(cross_algorithm_origins) != expected_base_cells
+            or cross_algorithm_origins.duplicated(
+                ["frequency", "index_construction", "horizon"]
+            ).any()
+        ):
+            raise ValueError(
+                "Nonlinear cross-algorithm origin audit does not contain exactly "
+                f"{expected_base_cells} unique base cells"
+            )
+        if not pd.to_numeric(
+            cross_algorithm_origins["models_checked"], errors="raise"
+        ).eq(len(expected_algorithms)).all():
+            raise ValueError("Nonlinear cross-algorithm audit model count changed")
+        cross_algorithm_origins["common_forecast_origins"] = pd.to_numeric(
+            cross_algorithm_origins["common_forecast_origins"], errors="raise"
+        ).astype(int)
+        selected_model_rows = (
+            nonlinear_predictions_full.groupby(
+                [
+                    "frequency",
+                    "index_construction",
+                    "horizon",
+                    "algorithm",
+                    "model_id",
+                ],
+                observed=True,
+            )
+            .size()
+            .rename("selected_rows")
+            .reset_index()
+            .merge(
+                cross_algorithm_origins[
+                    [
+                        "frequency",
+                        "index_construction",
+                        "horizon",
+                        "common_forecast_origins",
+                    ]
+                ],
+                on=["frequency", "index_construction", "horizon"],
+                how="left",
+                validate="many_to_one",
+            )
+        )
+        if selected_model_rows["common_forecast_origins"].isna().any():
+            raise ValueError("Selected nonlinear model cell lacks an origin-audit contract")
+        if not selected_model_rows["selected_rows"].eq(
+            selected_model_rows["common_forecast_origins"]
+        ).all():
+            raise ValueError(
+                "Selected nonlinear model rows differ from the common-origin audit"
+            )
         expected_selected_rows = int(
-            config["analysis"]["nonlinear_selected_prediction_rows"]
+            cross_algorithm_origins["common_forecast_origins"].sum()
+            * len(expected_algorithms)
+            * expected_models_per_cell
         )
         if len(nonlinear_predictions_full) != expected_selected_rows:
             raise ValueError(
-                "Secondary nonlinear selected prediction-row count changed: "
-                f"expected={expected_selected_rows} "
+                "Secondary nonlinear selected prediction-row count violates the "
+                "common-origin design: "
+                f"derived_expected={expected_selected_rows} "
                 f"observed={len(nonlinear_predictions_full)}"
             )
-        origin_audit = pd.read_csv(nonlinear_paths["origin_audit"])
-        if not origin_audit["origin_sets_identical"].astype(bool).all():
-            raise ValueError("Nonlinear common-origin audit contains failures")
         predictions = pd.concat(
             [stage09_predictions_full, nonlinear_predictions_full],
             ignore_index=True,

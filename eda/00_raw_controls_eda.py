@@ -22,6 +22,14 @@ import pandas as pd
 from scipy.stats import pearsonr, spearmanr
 from statsmodels.stats.multitest import multipletests
 
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman", "DejaVu Serif", "Times", "serif"]
+plt.rcParams["mathtext.fontset"] = "stix"
+plt.rcParams["pdf.fonttype"] = 42
+plt.rcParams["ps.fonttype"] = 42
+plt.rcParams["figure.dpi"] = 300
+plt.rcParams["savefig.dpi"] = 300
+
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data/01_raw"
@@ -414,7 +422,8 @@ def plot_coverage(summary: pd.DataFrame, output: Path) -> None:
     ax.set_xlabel("Observation date")
     ax.grid(axis="x", alpha=0.25)
     fig.tight_layout()
-    fig.savefig(output, dpi=250, bbox_inches="tight")
+    fig.savefig(output, dpi=300, bbox_inches="tight")
+    fig.savefig(output.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -432,7 +441,8 @@ def plot_candidate_series(panel: pd.DataFrame, output: Path) -> None:
     for ax in axes.flat[len(candidates) :]:
         ax.set_visible(False)
     fig.tight_layout()
-    fig.savefig(output, dpi=250, bbox_inches="tight")
+    fig.savefig(output, dpi=300, bbox_inches="tight")
+    fig.savefig(output.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 
@@ -455,7 +465,8 @@ def plot_change_relationships(changes: pd.DataFrame, output: Path) -> None:
     for ax in axes.flat[len(candidates) :]:
         ax.set_visible(False)
     fig.tight_layout()
-    fig.savefig(output, dpi=180, bbox_inches="tight")
+    fig.savefig(output, dpi=300, bbox_inches="tight")
+    fig.savefig(output.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
     plt.close(fig)
 
 

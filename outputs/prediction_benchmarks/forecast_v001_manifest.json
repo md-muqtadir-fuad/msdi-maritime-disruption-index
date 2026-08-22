@@ -3,7 +3,7 @@
   "status": "provisional_pending_human_validation",
   "input": {
     "path": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\data\\06_model_ready\\prediction\\msdi_scfi_weekly_panel.csv",
-    "sha256": "47ec6151b30beff8518ffcdcb68429bb10a429bce9d68dd05549db5313cb38fc",
+    "sha256": "14880aa590e67336c92355bd7236b5ce6088a4952e1a1266343f694905d8a645",
     "rows": 522
   },
   "design": {
@@ -53,9 +53,9 @@
     },
     {
       "horizon_weeks": 2,
-      "model_id": "hist_gradient_boosting__ar_brent_both",
-      "rmse_log_change": 0.0858984244591436,
-      "oos_r2_vs_zero_change": 0.05200583062145503
+      "model_id": "hist_gradient_boosting__ar_brent",
+      "rmse_log_change": 0.08678198055623838,
+      "oos_r2_vs_zero_change": 0.03240328574650353
     },
     {
       "horizon_weeks": 4,
@@ -80,9 +80,9 @@
     "manifest": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\outputs\\prediction_benchmarks\\forecast_v001_manifest.json"
   },
   "output_sha256": {
-    "predictions": "61b912aeda6b8d5dbcca6ac3f995474b556043dca7ce4fe0600f59202e29df82",
-    "metrics": "802b081313f1cb5fbcc400ac2227313d13c38052c35e60a4a1d013d7447b951b",
-    "statistical_tests": "f05d5e140f6f7a357ee275fc658231bf5b9b38525fe7ed13f3d9cde28829e62b",
+    "predictions": "37453dab45d32467e8028ddb056ac673924945b4b32a346203d5c3cd6414a04e",
+    "metrics": "90d5d35bba346b18b7203a7d9c5d93a39e9f204718377084784cca2a5d103e33",
+    "statistical_tests": "a0e058e4715bff8cb1e5e2415034f6cfdb86e7d461d629b174c7559cb7a9896b",
     "fit_audit": "7ad3c489146d75247f5439df1ea8f8ac286bc68fcd78d369bd8c8226853a53be",
     "feature_sets": "66406b657e747c96e8fb765b8e2317baa1cd5cfd5827909a1f1036a849e1656c"
   },

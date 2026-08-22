@@ -1,0 +1,401 @@
+﻿validation_id,article_id,sample_source,year,publication_date,retrieved_title,port_disruption_score_human_gold,global_container_movement_disruption_score_human_gold,freight_cost_disruption_score_human_gold,supply_disruption_score_human_gold,production_disruption_score_human_gold,covid19_related_disruption_score_human_gold,demand_disruption_score_human_gold,overall_disruption_gold
+P001,llm_news_0003440,pilot,2019,2019-06-06,Report: Uber Freight offers below-market rates to shippers,0,0,0,0,0,0,0,0
+P002,llm_news_0009369,pilot,2024,2024-10-18,"Ocean freight rates from China set to weaken amid waning demand, overcapacity",0,3,3,0,0,0,2,3
+P003,llm_news_0007057,pilot,2022,2022-11-18,Container Ports: Land Grab,1,1,0,0,0,0,0,1
+P004,llm_news_0009785,pilot,2025,2025-03-21,Why the Shipping Industry Isn’t Rushing Back to the Red Sea,0,4,3,0,0,0,0,4
+P005,llm_news_0004662,pilot,2020,2020-11-11,UK Container Port Congestion Is Unprecedented,3,3,3,2,0,0,1,3
+P006,llm_news_0010650,pilot,2025,2025-10-14,"As China and US impose rival port fees, global shipping industry braces for disruption",1,1,1,0,0,0,0,1
+P007,llm_news_0005842,pilot,2021,2021-11-16,The Supply Chain Report- From Industry Magnates' Lens,0,3,3,3,3,2,3,3
+P008,llm_news_0005853,pilot,2021,2021-11-18,"Global Food Prices to Stay High on Labor Crunch, Cargill CEO Says",2,0,3,3,2,1,0,3
+P009,llm_news_0007006,pilot,2022,2022-11-02,Why Retailers are Pushing Overstock Inventory into the Secondary Market,0,0,0,2,0,1,3,3
+P010,llm_news_0004015,pilot,2020,2020-02-25,Walmart steps up competition with Amazon by fulfilling orders for third-party vendors,0,0,0,0,0,0,0,0
+P011,llm_news_0003436,pilot,2019,2019-06-05,Limassol Container Terminal completes first investment phase,0,0,0,0,0,0,0,0
+P012,llm_news_0001384,pilot,2016,2016-12-01,Maersk Line announces acquisition of Hamburg Sud,0,0,0,0,0,0,1,1
+P013,llm_news_0007884,pilot,2023,2023-09-16,Dispute over extra charges at Hazira Port resolved,2,1,1,1,0,0,0,2
+P014,llm_news_0002077,pilot,2017,2017-11-01,Top 8 Logistics Challenges Facing the Industry,0,0,0,0,0,0,0,0
+P015,llm_news_0001387,pilot,2016,2016-12-02,It’s all relative: the four keys to family business longevity,0,0,0,0,0,0,0,0
+P016,llm_news_0001829,pilot,2017,2017-07-11,SupplyChainBrain,0,0,0,0,0,0,0,0
+P017,llm_news_0009076,pilot,2024,2024-07-29,End of Trucking Recession Finally in Sight as Freight Rates Rise,3,3,0,0,0,0,1,3
+P018,llm_news_0010302,pilot,2025,2025-07-24,Mobility at the Margins: What Border Crossings Reveal Before the Data Does,0,0,0,0,0,0,0,0
+P019,llm_news_0010098,pilot,2025,2025-06-11,Early peak coming as trans-Pacific container rates double,3,3,3,0,0,0,3,3
+P020,llm_news_0003486,pilot,2019,2019-06-27,How The Modern Supply Chain Is Evolving,0,0,0,0,0,0,0,0
+P021,llm_news_0002749,pilot,2018,2018-09-07,"CMA CGM Takes Delivery of France’s Biggest Ship, the 20,600 TEU ‘Antoine De Saint Exupery ‘",0,0,0,0,0,0,0,0
+P022,llm_news_0004734,pilot,2020,2020-12-08,DCSA publishes eB/L standards,0,0,0,0,0,0,0,0
+P023,llm_news_0005267,pilot,2021,2021-06-15,Ford begins shipping new Bronco SUVs for consumers,0,0,0,0,0,1,1,1
+P024,llm_news_0008080,pilot,2023,2023-11-27,Walmart to create platform that easily works with suppliers,0,0,0,0,0,0,0,0
+P025,llm_news_0007037,pilot,2022,2022-11-10,The global shipping industry is facing a new problem — too many containers,2,3,3,1,0,0,3,3
+P026,llm_news_0000452,pilot,2015,2015-09-09,Amazon Is Killing Off the Fire Phone,0,0,0,0,0,0,0,0
+P027,legacy_news_0004022,pilot,2024,2024-03-07,Millions affected by German air and rail strikes,0,0,0,0,0,0,0,0
+P028,llm_news_0006024,pilot,2022,2022-01-06,MSC officially dethrones Maersk from the top of the container rankings,0,0,0,0,0,0,0,0
+P029,llm_news_0007576,pilot,2023,2023-05-20,"Maruti Suzuki’s automated driving test track at Lado Sarai, Delhi, goes on stream",0,0,0,0,0,0,0,0
+P030,llm_news_0001044,pilot,2016,2016-06-25,Why Brexit is Bad for Tech Companies in the UK (And Everywhere Else),0,0,0,0,0,0,0,0
+P031,llm_news_0007017,pilot,2022,2022-11-04,US$5 million bounty offered for Singaporean over North Korea oil shipments,0,0,0,0,0,0,0,0
+P032,llm_news_0002594,pilot,2018,2018-07-16,"Reimagining the supply chain: Exclusive interview with Barry Padgett, SAP Ariba President",0,0,0,0,0,0,0,0
+P033,llm_news_0008062,pilot,2023,2023-11-17,"Melrose Says Engine Snags Threaten Airbus, Boeing Delivery Goals",0,0,0,3,3,0,2,3
+P034,llm_news_0000048,pilot,2015,2015-02-02,Why a Danish manager had an incredibly hard time running a Russian team,0,0,0,0,0,0,0,0
+P035,llm_news_0005499,pilot,2021,2021-09-01,“Makeshift” boxships gain pace with Starbulk capesize carrying containers,0,3,2,0,0,0,0,3
+P036,llm_news_0000127,pilot,2015,2015-03-16,Filling Ultra-Large Container Ships,0,0,0,0,0,0,0,0
+P037,llm_news_0009058,pilot,2024,2024-07-22,Why is Singapore’s recycling rate falling?,0,4,3,0,0,0,1,4
+P038,llm_news_0007257,pilot,2023,2023-01-24,HR Lines adds two more container vessels to fleet,0,0,1,0,0,0,0,1
+P039,llm_news_0005713,pilot,2021,2021-10-20,"HMM to launch new service linking S. Korea, S. America in December",0,3,0,2,0,0,0,3
+P040,llm_news_0009215,pilot,2024,2024-09-17,"Coffee set to get even pricier on supply worries, ‘it’s all about the weather’, say analysts",3,3,0,3,1,0,2,3
+P041,llm_news_0002757,pilot,2018,2018-09-10,Levi Strauss shakes up management to prioritize supply chain,0,0,0,0,0,0,0,0
+P042,llm_news_0005875,pilot,2021,2021-11-23,US Navy Opens California Seabee Base To Help Relieve LA Port Congestion,3,3,0,3,0,0,3,3
+P043,llm_news_0004743,pilot,2020,2020-12-09,A Canadian couple lives in a tiny house made of shipping containers where 'the landscape is the artwork.' See inside their modern home.,0,0,0,0,0,0,0,0
+P044,llm_news_0010575,pilot,2025,2025-09-30,China Expands Global Trade Network with Launch of First ‘Arctic Express’ Container Service,0,0,0,0,0,0,0,0
+P045,llm_news_0004217,pilot,2020,2020-05-14,Coronavirus: Food sellers grapple with container shortage as takeaway orders shoot up,0,0,0,1,0,1,1,1
+P046,llm_news_0002183,pilot,2017,2017-12-19,Long-haul trucks covering greater distance post GST: Govt Study,0,0,0,0,0,0,0,0
+P047,llm_news_0009303,pilot,2024,2024-10-03,ILA port strike ends through tentative deal,3,3,0,2,0,0,0,3
+P048,llm_news_0003459,pilot,2019,2019-06-18,Philadelphia Port sees second drug bust on container ship this year (with video),0,0,0,0,0,0,0,0
+P049,llm_news_0006860,pilot,2022,2022-09-15,Transpacific Rate Decline and Strong Dollar Could Bolster U.S. Imports,3,2,3,2,1,0,3,3
+P050,legacy_news_0003280,pilot,2023,2023-03-27,Civil servants to strike in April,0,0,0,0,0,0,0,0
+V051,llm_news_0005501,additional,2021,2021-09-03 00:00:00,Ida Tests America’s Grain Export Infrastructure,3,0,0,3,0,0,0,3
+V052,llm_news_0010317,additional,2025,2025-07-29 00:00:00,"Supplier expects to benefit from $16.5B Tesla, Samsung AI chip deal",0,0,0,0,0,0,0,0
+V053,llm_news_0009681,additional,2025,2025-02-11 00:00:00,Procurement & Supply Chain LIVE,0,0,0,0,0,0,0,0
+V054,llm_news_0008075,additional,2023,2023-11-26 00:00:00,"Greener shipping: China can bolster global climate change fight by using biofuel in ships instead of exporting it, Dutch start-up 123Carbon says",0,0,0,0,0,0,0,0
+V055,llm_news_0005222,additional,2021,2021-06-01 00:00:00,Two small feeders enhance Zeebrugge estuary container services,0,0,0,0,0,0,0,0
+V056,llm_news_0009431,additional,2024,2024-11-04 00:00:00,Introducing SourceDay Intelligence,0,0,0,0,0,0,0,0
+V057,llm_news_0008399,additional,2024,2024-01-26 00:00:00,Israel's Ashdod port sees strategic risk from China during Gaza war,2,4,2,2,0,0,0,4
+V058,legacy_news_0003404,additional,2023,2023-05-30 00:00:00,Moscow drone attack: What we know about the strikes,0,0,0,0,0,0,0,0
+V059,llm_news_0009304,additional,2024,2024-10-03 00:00:00,"Interview | Dynalog MD Akshay Adhalrao on India’s manufacturing growth, smart factory adoption and MSME transformation",0,0,0,0,0,0,0,0
+V060,llm_news_0006354,additional,2022,2022-04-14 00:00:00,Hits and misses: India’s solar power energy targets,0,0,0,1,0,1,0,1
+V061,llm_news_0002979,additional,2018,2018-12-12 00:00:00,Christmas shopping online creates waste mountain of packaging from luxury retailers,0,0,0,0,0,0,0,0
+V062,llm_news_0004096,additional,2020,2020-03-26 00:00:00,Ruby Has Ecommerce Fulfillment Acquires EasyPost Fulfillment Services,0,0,0,0,0,0,0,0
+V063,llm_news_0005906,additional,2021,2021-12-01 00:00:00,Ex-Tesco boss ‘humbled to get knighthood on behalf of food industry heroes’,0,1,1,2,0,1,0,2
+V064,llm_news_0004626,additional,2020,2020-10-27 00:00:00,Hiltzik: How China outmaneuvered Trump on trade,0,0,0,0,0,0,0,0
+V065,llm_news_0005681,additional,2021,2021-10-13 00:00:00,White House plan aims to help key West Coast ports stay open 24/7 to ease supply chain bottlenecks,3,3,3,3,1,3,3,3
+V066,llm_news_0001338,additional,2016,2016-11-02 00:00:00,Shipping Giant Maersk May Not Be Sunk But it Sure is Taking on Water,0,0,0,0,0,0,0,0
+V067,llm_news_0009167,additional,2024,2024-09-03 00:00:00,India rice traders want easing of export curbs as competition from Pakistan stiffens,0,0,0,1,0,0,0,1
+V068,llm_news_0002336,additional,2018,2018-03-09 00:00:00,UK ban on Bangladesh air freight ends: but nothing changes,0,0,0,2,0,0,0,2
+V069,llm_news_0002123,additional,2017,2017-11-23 00:00:00,MSC mega container ship collides with vessel off China,0,1,0,0,0,0,0,1
+V070,llm_news_0004685,additional,2020,2020-11-23 00:00:00,Boatloads of Cargo Off Los Angeles Grind Gears of World Economy,3,3,3,3,0,3,3,3
+V071,llm_news_0007362,additional,2023,2023-02-23 00:00:00,9 ocean carriers commit to 100% electronic bill of lading by 2030,0,0,0,0,0,0,0,0
+V072,llm_news_0001860,additional,2017,2017-07-26 00:00:00,Consortium signs for concession of Kribi container terminal,0,0,0,0,0,0,0,0
+V073,llm_news_0006988,additional,2022,2022-10-28 00:00:00,Five Essential Ways a Buy-Sell Solution Brings Resiliency and Agility to the Supply Chain — and the Business,0,0,0,0,0,0,0,0
+V074,llm_news_0008712,additional,2024,2024-04-09 00:00:00,DTDC Express elevates Abhishek Chakraborty to the role of CEO,0,0,0,0,0,0,0,0
+V075,llm_news_0002399,additional,2018,2018-04-10 00:00:00,VW cancels contracts with Prevent Group after supply problems,0,0,0,3,3,0,0,3
+V076,llm_news_0000893,additional,2016,2016-03-31 00:00:00,China military to set up first overseas base in Horn of Africa,0,0,0,0,0,0,0,0
+V077,llm_news_0007287,additional,2023,2023-02-01 00:00:00,Maritime logistics unplugged,3,4,3,3,1,4,3,4
+V078,llm_news_0000431,additional,2015,2015-08-23 00:00:00,Secret wartime agents who defied Japanese during occupation of Hong Kong,0,0,0,0,0,0,0,0
+V079,llm_news_0003374,additional,2019,2019-05-15 00:00:00,The next Uber will come from the $1.2 trillion global truck and shipping industry,0,0,0,0,0,0,0,0
+V080,llm_news_0006466,additional,2022,2022-05-19 00:00:00,Giant container ships are ruining everything,3,3,3,3,0,2,2,3
+V081,llm_news_0008932,additional,2024,2024-06-19 00:00:00,Ship attacked by Yemen’s Houthi rebels in fatal assault sinks in Red Sea in their second sinking,0,4,0,0,0,0,0,4
+V082,llm_news_0005597,additional,2021,2021-09-27 00:00:00,Fuel Shortages Pile Pressure on Johnson as U.K. Crisis Escalates,0,0,0,0,0,0,0,0
+V083,llm_news_0001012,additional,2016,2016-06-11 00:00:00,Sink or swim: Hong Kong company defies the doomsayers on Nicaragua Canal project,0,0,0,0,0,0,0,0
+V084,llm_news_0004226,additional,2020,2020-05-18 00:00:00,An in-depth look at Service Corporation International’s trailblazing supply chain transformation,0,0,0,0,0,0,0,0
+V085,llm_news_0009428,additional,2024,2024-11-04 00:00:00,Carriers drop calls at Hamburg after congestion builds at CTA,1,1,0,1,0,0,0,1
+V086,llm_news_0001853,additional,2017,2017-07-20 00:00:00,Shell provides lubricants to world’s largest container ship,0,0,0,0,0,0,0,0
+V087,llm_news_0001537,additional,2017,2017-02-17 00:00:00,Logistically Minded: Hanjin's last breath,0,4,0,2,0,0,0,4
+V088,llm_news_0001309,additional,2016,2016-10-26 00:00:00,Ex-Cheniere boss Charif Souki says natural gas market to balance as prices slide,0,0,0,0,0,0,0,0
+V089,llm_news_0006374,additional,2022,2022-04-21 00:00:00,Amazon opens up Prime delivery service to other retailers in its latest move to compete with FedEx and UPS,0,0,0,0,0,0,0,0
+V090,llm_news_0008796,additional,2024,2024-05-13 00:00:00,Disruptions in the Supply Chain Affect the Automotive Industry,0,3,0,3,3,0,0,3
+V091,llm_news_0004281,additional,2020,2020-06-03 00:00:00,Al Fakher Tobacco,0,0,0,0,0,0,0,0
+V092,llm_news_0002306,additional,2018,2018-02-24 00:00:00,Supply Chain Visibility,0,0,0,0,0,0,0,0
+V093,llm_news_0010550,additional,2025,2025-09-24 00:00:00,China launches first Arctic container service to Europe,0,0,0,0,0,0,0,0
+V094,llm_news_0000446,additional,2015,2015-09-03 00:00:00,MOL Testing New Containership ‘Windshield’,0,0,0,0,0,0,0,0
+V095,llm_news_0007494,additional,2023,2023-04-17 00:00:00,ESR Group plans Rs 400-crore logistics park in Gujarat,0,0,0,0,0,0,0,0
+V096,llm_news_0005182,additional,2021,2021-05-12 00:00:00,Supply Chain Digital's 'Advertising Solutions' Section,0,0,0,0,0,0,0,0
+V097,llm_news_0001677,additional,2017,2017-05-04 00:00:00,Amazon gambled on expansion and won lower shipping costs,0,0,0,0,0,0,0,0
+V098,llm_news_0008457,additional,2024,2024-02-02 00:00:00,Nextracker CEO says 'solar is unstoppable' as market sees 'unprecedented demand growth',0,3,2,2,0,0,0,3
+V099,llm_news_0002511,additional,2018,2018-06-05 00:00:00,Australia to Investigate Loss of 83 Containers from Ship in Heavy Weather,2,2,0,1,0,0,0,2
+V100,llm_news_0010154,additional,2025,2025-06-23 00:00:00,Shipping groups avoid the Strait of Hormuz to reduce exposure after U.S. strikes on Iran,0,3,2,2,0,0,0,3
+V101,llm_news_0010888,additional,2025,2025-11-29 00:00:00,Nexperia accused by parent Wingtech and Chinese unit of plotting to move supply chain,0,0,0,2,0,0,0,2
+V102,llm_news_0000284,additional,2015,2015-06-09 00:00:00,Here's how I moved across the country and spent just $100 to ship my stuff,0,0,0,0,0,0,0,0
+V103,llm_news_0003444,additional,2019,2019-06-07 00:00:00,Walmart explains why it isn't racing to close its biggest gap with Amazon on next-day delivery,0,0,0,0,0,0,0,0
+V104,llm_news_0003454,additional,2019,2019-06-13 00:00:00,Target expands same-day shipping option in the latest move in the delivery wars with Walmart and Amazon,0,0,0,0,0,0,0,0
+V105,llm_news_0007771,additional,2023,2023-08-07 00:00:00,Container shipping’s Danaos buys into dry bulk amid rate slump,0,0,1,0,0,0,1,1
+V106,llm_news_0009302,additional,2024,2024-10-03 00:00:00,How BigBasket is delivering the new iPhone 16 within 10 mins,0,0,0,0,0,0,0,0
+V107,llm_news_0002027,additional,2017,2017-10-15 00:00:00,Brambles reports strong progress towards its 2020 Sustainability Goals,0,0,0,0,0,0,0,0
+V108,llm_news_0006507,additional,2022,2022-05-29 00:00:00,OPINION | What India needs to do to increase containerization and cut logistics costs,0,0,0,0,0,0,0,0
+V109,llm_news_0002820,additional,2018,2018-10-11 00:00:00,The Post Office wants to raise the fees it charges Amazon and other shippers,0,0,0,0,0,0,0,0
+V110,llm_news_0004298,additional,2020,2020-06-03 00:00:00,Martin Brower,0,0,0,0,0,0,0,0
+V111,llm_news_0004918,additional,2021,2021-02-22 00:00:00,Unilever finds short-term sustainability costs lead to long-term savings,0,0,0,0,0,0,0,0
+V112,llm_news_0000771,additional,2016,2016-02-02 00:00:00,These four-foot-tall robots could change the way warehouse workers do their jobs,0,0,0,0,0,0,0,0
+V113,llm_news_0002994,additional,2018,2018-12-18 00:00:00,High Bay Storage System Could ‘Revolutionize’ Container Handling in Ports,0,0,0,0,0,0,0,0
+V114,llm_news_0010258,additional,2025,2025-07-15 00:00:00,Thousands of vehicles sit idle at EU port as Trump’s tariffs leave their mark,2,3,0,1,0,0,3,3
+V115,llm_news_0002771,additional,2018,2018-09-19 00:00:00,Lighthouse Shipping Private Limited Information,0,0,0,0,0,0,0,0
+V116,llm_news_0003855,additional,2019,2019-12-03 00:00:00,Supplier network puts spotlight on Mini’s new plant in China,0,0,0,0,0,0,0,0
+V117,llm_news_0004999,additional,2021,2021-03-24 00:00:00,Low tide slows work to clear Suez Canal ship blockage; traffic jam builds,0,4,2,4,0,0,1,4
+V118,llm_news_0005006,additional,2021,2021-03-24 00:00:00,"Suez blockage could affect 'anything you see in the stores,' shipping experts say",3,4,3,3,0,3,3,4
+V119,llm_news_0006800,additional,2022,2022-08-26 00:00:00,Amazon expands hydrogen supplier deal as it strives for carbon neutrality,0,0,0,0,0,0,0,0
+V120,llm_news_0010112,additional,2025,2025-06-14 00:00:00,Schools IB geography class: Shipping lines go cool on Arctic Ocean route,0,0,0,0,0,0,0,0
+V121,llm_news_0007867,additional,2023,2023-09-12 00:00:00,Payra port’s first terminal likely to open by October,0,0,0,0,0,0,0,0
+V122,llm_news_0002546,additional,2018,2018-06-20 00:00:00,FedEx Freight sets record profits amid strong demand for LTL shipments,0,0,0,0,0,0,0,0
+V123,llm_news_0003664,additional,2019,2019-09-13 00:00:00,Inventory Is ‘Evil’? Not So Fast,0,0,0,0,0,0,0,0
+V124,llm_news_0000152,additional,2015,2015-03-30 00:00:00,Watch out for shipping container investment scams,0,0,0,0,0,0,0,0
+V125,llm_news_0002611,additional,2018,2018-07-26 00:00:00,SupplyChainBrain,0,0,0,0,0,0,0,0
+V126,llm_news_0009390,additional,2024,2024-10-23 00:00:00,Indian ceramic tiles industry faces export slowdown in FY25: ICRA,0,1,2,0,0,0,2,2
+V127,llm_news_0000401,additional,2015,2015-08-11 00:00:00,Amos International grows into technical services role,0,0,0,0,0,0,0,0
+V128,llm_news_0004365,additional,2020,2020-07-01 00:00:00,Lloyd refresh global charges,0,0,1,0,0,0,0,1
+V129,llm_news_0006862,additional,2022,2022-09-16 00:00:00,DB Schenker Completes Acquisition of USA Truck,0,0,0,0,0,0,0,0
+V130,legacy_news_0004362,additional,2024,2024-10-24 00:00:00,What we know about the McDonald's E. coli outbreak in the US,0,0,0,2,0,0,0,2
+V131,llm_news_0010521,additional,2025,2025-09-16 00:00:00,Woman admits cheating 18 victims including friends of nearly $277k in total,0,0,0,0,0,0,0,0
+V132,llm_news_0004429,additional,2020,2020-08-05 00:00:00,Heavy Weather Topples Cranes at India’s Top Container Port,2,0,0,0,0,0,0,2
+V133,llm_news_0005530,additional,2021,2021-09-12 00:00:00,Global shipping lines have their best year since 2008 as economic reopening after Covid-19 spurs demand for goods,3,3,3,3,0,3,3,3
+V134,llm_news_0003520,additional,2019,2019-07-09 00:00:00,"Insurance rates have 'increased 10-fold' after attacks in the Strait of Hormuz, shipping CEO says",0,2,3,0,0,0,0,3
+V135,legacy_news_0003651,additional,2023,2023-09-26 00:00:00,Storm Agnes: How was it named and how did we know it was coming?,0,0,0,0,0,0,0,0
+V136,llm_news_0002086,additional,2017,2017-11-06 00:00:00,Wilbur Ross says reports he didn't disclose ties to Putin-linked firm are 'totally wrong',0,0,0,0,0,0,0,0
+V137,llm_news_0009627,additional,2025,2025-01-20 00:00:00,"Mediterranean Shipping Company, the world’s top box line, eyes India for shipbuilding and repairs",0,0,0,0,0,0,0,0
+V138,llm_news_0007417,additional,2023,2023-03-14 00:00:00,Congestion reported at India's Nhava Sheva Port after APMT berth closure,2,2,0,1,0,0,0,2
+V139,llm_news_0008005,additional,2023,2023-11-01 00:00:00,Top 10 fastest growing businesses in 2023,0,0,0,0,0,0,0,0
+V140,llm_news_0006445,additional,2022,2022-05-12 00:00:00,Why the Shanghai Supply Chain Meltdown Is an Opportunity for AI,4,4,1,3,0,4,0,4
+V141,llm_news_0010477,additional,2025,2025-09-09 00:00:00,67 containers fall off Zim ship in Port of Long Beach,2,2,0,1,0,0,0,2
+V142,llm_news_0000427,additional,2015,2015-08-20 00:00:00,Davao Sasa port upgrade project shot down,0,0,0,0,0,0,0,0
+V143,llm_news_0004785,additional,2020,2020-12-20 00:00:00,Top 5 Indian cities capture 25% of smartphone market in October,0,0,0,1,0,0,1,1
+V144,llm_news_0001146,additional,2016,2016-08-22 00:00:00,"Updated deal allows US, Mexican air cargo flights access to all of each country's ports",0,0,0,0,0,0,0,0
+V145,llm_news_0008361,additional,2024,2024-01-18 00:00:00,Supplier sues UNFI in chargeback spat,0,0,0,0,0,0,0,0
+V146,llm_news_0010062,additional,2025,2025-06-02 00:00:00,"JLR alternative fuels, digital tools and close supplier collaboration",0,4,0,2,0,0,0,4
+V147,llm_news_0006807,additional,2022,2022-08-29 00:00:00,Pipavav Port ranked above Mundra and J N Port by World Bank-S&P Container Port Performance Index 2021,0,0,0,0,0,0,0,0
+V148,llm_news_0007612,additional,2023,2023-05-31 00:00:00,Top 5PL logistics providers,0,0,0,0,0,0,0,0
+V149,llm_news_0010857,additional,2025,2025-11-21 00:00:00,Congestion at Tangier producing weeks,3,3,2,1,0,0,0,3
+V150,llm_news_0006212,additional,2022,2022-03-01 00:00:00,Mike Simpson,0,0,0,0,0,0,0,0
+V151,llm_news_0004687,additional,2020,2020-11-24 00:00:00,Container lines diverting reefers from Tianjin due to Covid tests,3,3,2,2,0,3,0,3
+V152,legacy_news_0003264,additional,2023,2023-03-17 00:00:00,Heathrow security to strike for 10 days including Easter,0,0,0,0,0,0,0,0
+V153,llm_news_0010478,additional,2025,2025-09-09 00:00:00,"DP World Mundra handles record 142,273 TEUs in August",0,0,0,0,0,0,0,0
+V154,llm_news_0009738,additional,2025,2025-03-06 00:00:00,Change in control to help Hutchison Port Holdings bid for Indian port deals,0,0,0,0,0,0,0,0
+V155,llm_news_0000677,additional,2015,2015-12-23 00:00:00,SupplyChainBrain,0,0,0,0,0,0,0,0
+V156,llm_news_0004409,additional,2020,2020-07-28 00:00:00,Safety and Maintenance Issues in UK Report on Evergreen Container Loss,0,2,0,0,0,0,0,2
+V157,llm_news_0002205,additional,2018,2018-01-04 00:00:00,Audi’s logistics part 2: Pursuing practical progression,0,0,0,1,0,0,0,1
+V158,llm_news_0004106,additional,2020,2020-03-31 00:00:00,Container ship runs aground on Mississippi River,1,2,0,0,0,0,0,2
+V159,llm_news_0000542,additional,2015,2015-10-28 00:00:00,Samsung retains leadership in smartphone shipments as Huawei gains,0,0,0,0,0,0,0,0
+V160,llm_news_0006267,additional,2022,2022-03-15 00:00:00,"A Year After Suez Canal Fiasco, Bad Luck Strikes Again for Evergreen",0,1,0,0,0,0,0,1
+V161,llm_news_0003077,additional,2019,2019-01-30 00:00:00,Retail real estate finds new life as warehouse space,0,0,0,0,0,0,0,0
+V162,llm_news_0008897,additional,2024,2024-06-11 00:00:00,Kolkata port-Shanghai direct cargo service begins,0,0,0,0,0,0,0,0
+V163,llm_news_0000912,additional,2016,2016-04-14 00:00:00,Efficio: the world's largest procurement consultancy,0,0,0,0,0,0,0,0
+V164,llm_news_0007538,additional,2023,2023-05-04 00:00:00,Bed Bath & Beyond owes over $95M to these 14 vendors in its supply chain,0,0,0,1,0,0,0,1
+V165,llm_news_0005363,additional,2021,2021-07-21 00:00:00,"Global liner congestion worsens, 116 ports report disruption",3,3,2,0,0,3,0,3
+V166,llm_news_0005168,additional,2021,2021-05-06 00:00:00,"Q&A: Malcolm Wilson, XPO Logistics, CEO, Europe, and incoming CEO, GXO Logistics",0,0,0,0,0,1,1,1
+V167,llm_news_0010775,additional,2025,2025-11-05 00:00:00,Chip industry supplier Entegris reshores wafer carrier manufacturing to Colorado,0,0,0,0,0,0,0,0
+V168,llm_news_0008271,additional,2024,2024-01-05 00:00:00,Global shipping delays cast shadow over strong December jobs report,0,4,0,2,0,0,0,4
+V169,llm_news_0008282,additional,2024,2024-01-07 00:00:00,‘Likely to agitate China’: European powers step up their Indo-Pacific presence – to a mixed Southeast Asian reaction,0,0,0,0,0,0,0,0
+V170,llm_news_0006006,additional,2021,2021-12-28 00:00:00,Protecting Your Retail Business From Supply Chain Disruption,3,3,3,3,2,3,3,3
+V171,llm_news_0001812,additional,2017,2017-07-06 00:00:00,Fortune 500: XPO Logistics CEO on Avoiding Disruption From Amazon,0,0,0,0,0,0,0,0
+V172,llm_news_0005467,additional,2021,2021-08-24 00:00:00,McDonald’s left shaken by milkshake supply shortage,0,0,0,2,0,2,0,2
+V173,llm_news_0009309,additional,2024,2024-10-03 00:00:00,Port strike ends as workers agree to tentative deal on wages and contract extension,3,3,2,3,0,0,1,3
+V174,llm_news_0004382,additional,2020,2020-07-13 00:00:00,Cargo Ship and Container Discovered With Potentially Dangerous Moths,0,0,0,0,0,0,0,0
+V175,llm_news_0005444,additional,2021,2021-08-18 00:00:00,China port congestion worsens as ships divert away from Ningbo,3,3,3,2,0,3,0,3
+V176,llm_news_0000622,additional,2015,2015-12-03 00:00:00,How To Avoid Chaos From New Container Weight Verification Laws,1,1,0,1,0,0,0,1
+V177,llm_news_0006663,additional,2022,2022-07-20 00:00:00,"Think Like a Boss – Chief Procurement Officers Need to Step Up, Broaden Approach, Finds Gartner Report",0,0,0,0,0,0,0,0
+V178,llm_news_0000457,additional,2015,2015-09-11 00:00:00,Lectures in your living room: how to host a salon,0,0,0,0,0,0,0,0
+V179,llm_news_0007243,additional,2023,2023-01-18 00:00:00,How Digitization Is Addressing Customs and Drayage Labor Shortages,2,1,0,1,0,0,1,2
+V180,llm_news_0007968,additional,2023,2023-10-17 00:00:00,Evergreen Declares Force Majeure on Israeli-Bound Shipment,3,3,3,2,0,0,0,3
+V181,llm_news_0000194,additional,2015,2015-04-20 00:00:00,IBM was saved this quarter by one of its oldest product lines: the mainframe,0,0,0,0,0,0,0,0
+V182,llm_news_0005274,additional,2021,2021-06-17 00:00:00,Satellite images show backlog of containers awaiting export at Port of Yantian after Covid outbreak,3,3,1,3,0,3,2,3
+V183,llm_news_0008959,additional,2024,2024-06-26 00:00:00,Singapore port congestion shows global ripple impact of Red Sea attacks,3,4,3,3,0,0,3,4
+V184,llm_news_0002341,additional,2018,2018-03-12 00:00:00,Photos: The Worst Containership Disasters in Recent History,0,4,0,1,0,0,0,4
+V185,llm_news_0007152,additional,2022,2022-12-16 00:00:00,What Apple’s shifting China strategy could mean for the manufacturing industry,0,0,0,3,3,3,0,3
+V186,llm_news_0006440,additional,2022,2022-05-11 00:00:00,"Global Infrastructure Partners backed Pristine Logistics & Infraprojects files draft IPO documents with SEBI to raise Rs1,300 crore.",0,0,0,0,0,0,0,0
+V187,llm_news_0004909,additional,2021,2021-02-17 00:00:00,"Maersk says it will launch a carbon neutral vessel by 2023, seven years ahead of schedule",0,0,0,0,0,0,0,0
+V188,llm_news_0005067,additional,2021,2021-03-29 00:00:00,"The ship that blocked the Suez Canal may be free, but experts warn the supply chain impact could last months",3,4,2,3,2,2,3,4
+V189,legacy_news_0003656,additional,2023,2023-09-27 00:00:00,Storm Agnes: Woman rescued from car during floods,0,0,0,0,0,0,0,0
+V190,llm_news_0010291,additional,2025,2025-07-22 00:00:00,Xeneta: U.S. Tariffs trigger global container shipping rebalancing,3,3,3,0,0,0,3,3
+V191,llm_news_0003595,additional,2019,2019-08-09 00:00:00,Amazon applies for waiver with FAA to allow drone delivery,0,0,0,0,0,0,0,0
+V192,llm_news_0002486,additional,2018,2018-05-18 00:00:00,Burberry will acquire its supplier for 'greater control',0,0,0,0,0,0,0,0
+V193,llm_news_0009004,additional,2024,2024-07-09 00:00:00,Ningbo-Zhoushan port sees 8.4% container volume growth in H1,0,0,0,0,0,0,0,0
+V194,llm_news_0003849,additional,2019,2019-11-29 00:00:00,Fresh floes: What does the Northern Sea Route mean for automotive logistics?,0,0,0,0,0,0,0,0
+V195,llm_news_0004055,additional,2020,2020-03-11 00:00:00,Heung-A Shipping to undergo KDB-led debt restructuring,0,0,0,0,0,0,0,0
+V196,llm_news_0008378,additional,2024,2024-01-22 00:00:00,Lamb Weston begins ERP transition for North America operations,0,0,0,1,1,0,0,1
+V197,llm_news_0003133,additional,2019,2019-02-22 00:00:00,It's becoming clearer than ever that Amazon is developing a 3rd-party logistics service to edge out FedEx and UPS now that Stamps.com has dumped USPS,0,0,0,0,0,0,0,0
+V198,llm_news_0010636,additional,2025,2025-10-10 00:00:00,"With U.S. port fees on Chinese-built ships coming, ocean freight carriers scramble to avoid surprise financial hit",0,1,2,0,0,0,0,2
+V199,llm_news_0002425,additional,2018,2018-04-24 00:00:00,SupplyChainBrain,0,0,0,0,0,0,0,0
+V200,llm_news_0001001,additional,2016,2016-06-06 00:00:00,Technology - Articles - Page 155,0,0,0,0,0,0,0,0
+V201,llm_news_0001213,additional,2016,2016-09-09 00:00:00,SupplyChainBrain,0,0,0,0,0,0,0,0
+V202,llm_news_0005475,additional,2021,2021-08-25 00:00:00,First B777-300ER Passenger to Cargo Cabin Conversion by JADE,0,0,0,0,0,0,0,0
+V203,llm_news_0004490,additional,2020,2020-08-27 00:00:00,Walmart: More than 2K suppliers are participating in Project Gigaton,0,0,0,0,0,0,0,0
+V204,llm_news_0002716,additional,2018,2018-08-24 00:00:00,10 crazy things Silicon Valley thinks are normal that make the rest of the country think it's out of touch,0,0,0,0,0,0,0,0
+V205,legacy_news_0004088,additional,2024,2024-04-24 00:00:00,Labour pledges to renationalise most rail services within five years,0,0,0,0,0,0,0,0
+V206,llm_news_0008462,additional,2024,2024-02-02 00:00:00,"Red Sea disruptions may drive port congestion, inflation",2,4,3,2,0,0,1,4
+V207,llm_news_0004529,additional,2020,2020-09-11 00:00:00,Legal vise tightens on MSC container-ship cocaine gang,0,0,0,0,0,0,0,0
+V208,llm_news_0004882,additional,2021,2021-02-04 00:00:00,Californian port congestion spreads north to Oakland,3,3,0,3,0,3,3,3
+V209,llm_news_0007055,additional,2022,2022-11-17 00:00:00,Nissan: Chip shortages hurt production more than expected,0,0,0,2,2,1,0,2
+V210,llm_news_0003259,additional,2019,2019-05-06 00:00:00,Adani reaches agreement to develop new container terminal in Yangon,0,0,0,0,0,0,0,0
+V211,llm_news_0009085,additional,2024,2024-08-02 00:00:00,Maersk Sees Global Trade Disruptions Lasting Throughout 2024,0,4,3,3,0,0,1,4
+V212,llm_news_0006099,additional,2022,2022-01-31 00:00:00,Shortages 2022: 5 products expected to be in tight supply this year,0,0,0,2,2,2,2,2
+V213,llm_news_0008872,additional,2024,2024-06-04 00:00:00,"Maersk faces significant port congestion in Asia, Mediterranean",3,4,2,3,0,0,3,4
+V214,llm_news_0005413,additional,2021,2021-08-06 00:00:00,Top 10 Procure-to-Pay Solutions Providers,0,0,0,0,0,0,0,0
+V215,llm_news_0009370,additional,2024,2024-10-18 00:00:00,"PIL welcomes the first two 14,000 TEU LNG dual-fuel container vessels",0,0,0,0,0,0,0,0
+V216,llm_news_0005700,additional,2021,2021-10-18 00:00:00,The shipping crisis has gotten so bad that some companies are chartering air cargo planes for $2 million or more for a single flight,3,3,2,3,3,3,3,3
+V217,llm_news_0008106,additional,2023,2023-12-05 00:00:00,Amazon to expand AWS Supply Chain capabilities,0,0,0,0,0,0,0,0
+V218,llm_news_0007683,additional,2023,2023-06-28 00:00:00,"NMPA signs deal with CWC, SDCL to set up container freight station",0,0,0,0,0,0,0,0
+V219,llm_news_0007627,additional,2023,2023-06-06 00:00:00,"West Coast port labor issues continue as some Los Angeles, Long Beach rail shipments get temporarily paused",3,3,0,2,0,0,0,3
+V220,llm_news_0003947,additional,2020,2020-01-20 00:00:00,Lloyd boss points to 2020 major issues,0,0,1,0,0,0,0,1
+V221,llm_news_0000982,additional,2016,2016-05-24 00:00:00,An online dollar store sounds like a terrible business. This CEO wants to prove it's not,0,0,0,0,0,0,0,0
+V222,llm_news_0000172,additional,2015,2015-04-11 00:00:00,Top 10 useful websites for procurement specialists,0,0,0,0,0,0,0,0
+V223,llm_news_0006748,additional,2022,2022-08-15 00:00:00,"Amazon audit reveals wage, benefit issues at 40% of potential suppliers",0,0,0,0,0,0,0,0
+V224,llm_news_0006739,additional,2022,2022-08-11 00:00:00,"From Twinkies to Nutter Butters, lack of ingredients hampers snack food production",3,2,0,3,3,0,0,3
+V225,llm_news_0004632,additional,2020,2020-10-28 00:00:00,Ranpak’s Sustainable Shipping Materials And Packaging Automation Help Companies Win At eCommerce,0,0,0,0,0,0,1,1
+V226,llm_news_0006108,additional,2022,2022-02-02 00:00:00,Mexican ports moved historic container volumes in 2021,0,0,0,0,0,0,0,0
+V227,llm_news_0007793,additional,2023,2023-08-14 00:00:00,"China’s maritime ambitions boosted, claims largest shipping fleet title from Greece",0,0,0,0,0,0,0,0
+V228,llm_news_0003954,additional,2020,2020-01-22 00:00:00,Mysterious GPS outages are wracking the shipping industry,1,2,0,0,0,0,0,2
+V229,llm_news_0009911,additional,2025,2025-04-30 00:00:00,OOCL in $3.1 bn container ship order splash,0,0,0,0,0,0,0,0
+V230,llm_news_0010237,additional,2025,2025-07-11 00:00:00,Entering Markets in New Countries: What to Consider When Building New Supply Chains,0,0,0,0,0,0,0,0
+V231,llm_news_0010963,additional,2025,2025-12-16 00:00:00,Airbus Supplier Tells Workers Quality Fixes Are Coming,0,0,0,2,1,0,0,2
+V232,llm_news_0010926,additional,2025,2025-12-08 00:00:00,Retailers see container import hangover for 2026,0,1,2,0,0,0,3,3
+V233,llm_news_0005292,additional,2021,2021-06-24 00:00:00,Congestion at US west coast ports will 'get worse before it gets better',3,1,0,1,0,0,0,3
+V234,llm_news_0008863,additional,2024,2024-06-03 00:00:00,"Shipping Pollution Curbs Made Climate Change Worse, Controversial NASA Study Claims",0,0,0,0,0,0,0,0
+V235,llm_news_0010716,additional,2025,2025-10-23 00:00:00,Atlantic Container Line faces $34m annual USTR bill,0,1,2,0,0,0,0,2
+V236,llm_news_0004977,additional,2021,2021-03-18 00:00:00,"Honda, Toyota limit production amid Port of LA congestion, supply shortages",3,2,0,3,3,3,2,3
+V237,llm_news_0007991,additional,2023,2023-10-24 00:00:00,Reefer container production on downward trend,0,0,0,0,0,0,0,0
+V238,llm_news_0000411,additional,2015,2015-08-14 00:00:00,China experts focus on chemicals in Tianjin explosion,3,2,0,2,0,0,0,3
+V239,llm_news_0004359,additional,2020,2020-06-26 00:00:00,Interview: Aaron Jones of Bastian Solutions,0,0,0,1,0,1,1,1
+V240,llm_news_0007573,additional,2023,2023-05-18 00:00:00,Toyota Kirloskar Motor ramps up production by 30% with third shift operations,0,0,0,0,0,0,0,0
+V241,llm_news_0006235,additional,2022,2022-03-07 00:00:00,Price hike of essentials: Is war the real cause?,2,2,3,3,0,0,0,3
+V242,llm_news_0008750,additional,2024,2024-04-26 00:00:00,How the C3 AI Supply Chain Suite Drives Increased Resilience,0,0,0,0,0,0,0,0
+V243,llm_news_0004302,additional,2020,2020-06-03 00:00:00,Rusta,0,0,0,0,0,0,0,0
+V244,llm_news_0008822,additional,2024,2024-05-22 00:00:00,Container Shipping Industry Bounces Back with $5.4 Billion Profit in Q1 2024,0,4,3,1,0,0,2,4
+V245,llm_news_0006996,additional,2022,2022-10-31 00:00:00,ONE’s Profit Surges Despite ‘Sudden Decline’ in Demand,3,2,2,1,0,0,3,3
+V246,legacy_news_0004361,additional,2024,2024-10-24 00:00:00,Bowen: Gaza nurse who filmed moments after Israeli strike describes chaos and grief,0,0,0,0,0,0,0,0
+V247,llm_news_0004341,additional,2020,2020-06-18 00:00:00,Six Common Logistics Mistakes and How to Avoid Them,0,0,0,0,0,0,0,0
+V248,llm_news_0002810,additional,2018,2018-10-09 00:00:00,Face Off: Should all physical books be replaced by e-books?,0,0,0,0,0,0,0,0
+V249,legacy_news_0004301,additional,2024,2024-09-29 00:00:00,Israeli strikes may have displaced million people - Lebanon PM,0,0,0,0,0,0,0,0
+V250,llm_news_0001135,additional,2016,2016-08-15 00:00:00,Hurricane watch: Developing a flood-resilient supply chain,1,0,0,1,0,0,0,1
+V251,llm_news_0002695,additional,2018,2018-08-16 00:00:00,Vard to build electric vessel for Yara,0,0,0,0,0,0,0,0
+V252,llm_news_0009516,additional,2024,2024-11-30 00:00:00,Turning Point: The Shipping Opportunity,0,0,0,0,0,0,0,0
+V253,llm_news_0003241,additional,2019,2019-04-29 00:00:00,"Shipping agent APL and Chinese captain fined HK$99,000 over Singaporean Terrex armoured troop carriers impounded in Hong Kong",0,0,0,0,0,0,0,0
+V254,llm_news_0007825,additional,2023,2023-08-25 00:00:00,Savannah Port Expansion Continues with Arrival of Massive Container Cranes,0,0,0,0,0,0,0,0
+V255,llm_news_0006034,additional,2022,2022-01-10 00:00:00,Bangladesh Bank to weaken taka in phases,0,0,0,0,0,0,0,0
+V256,llm_news_0004215,additional,2020,2020-05-14 00:00:00,Capacity and rate discipline pays off for RCL,0,2,0,1,0,3,3,3
+V257,llm_news_0006482,additional,2022,2022-05-24 00:00:00,"Fighting inflation, forex crisis: Is hiking policy rate the next tool for BB?",0,0,0,0,0,0,0,0
+V258,llm_news_0007382,additional,2023,2023-03-01 00:00:00,"MSC, world's biggest shipping company and U.S.-China trade bellwether, is betting on a rebound for global economy",0,2,3,2,0,0,3,3
+V259,llm_news_0001753,additional,2017,2017-06-17 00:00:00,Tsing Ma Bridge height debacle costing Hong Kong billions,3,2,0,0,0,0,0,3
+V260,llm_news_0009640,additional,2025,2025-01-27 00:00:00,"Los Angeles, the busiest US container port, plans even bigger future",0,0,0,0,0,0,0,0
+V261,llm_news_0002929,additional,2018,2018-11-26 00:00:00,"""Cebu Port congestion getting absurd""",2,0,0,0,0,0,0,2
+V262,llm_news_0007414,additional,2023,2023-03-13 00:00:00,World's largest container ship is delivered to MSC,0,0,0,0,0,0,0,0
+V263,llm_news_0003120,additional,2019,2019-02-18 00:00:00,"Insurance News: Insurance News Today, Latest Insurance News and Updates",0,0,0,0,0,0,0,0
+V264,llm_news_0006873,additional,2022,2022-09-20 00:00:00,4 ways collaboration helps build supply chain resiliency,0,0,0,0,0,1,2,2
+V265,llm_news_0002783,additional,2018,2018-09-23 00:00:00,Bhavani Shipping Services (india) Private Limited Information,0,0,0,0,0,0,0,0
+V266,llm_news_0004971,additional,2021,2021-03-16 00:00:00,"A couple built a 406-square-foot shipping container tiny home after a near-death experience, and they say it changed their lives",0,0,0,0,0,0,0,0
+V267,llm_news_0000672,additional,2015,2015-12-21 00:00:00,When Your Supplier Becomes Your Competitor,0,0,0,0,0,0,0,0
+V268,llm_news_0001244,additional,2016,2016-09-22 00:00:00,New | Hanjin wins brief reprieve by securing Korean Airlines funds as court says revival at risk,1,4,0,3,0,0,0,4
+V269,llm_news_0000979,additional,2016,2016-05-21 00:00:00,SupplyChainBrain,0,0,0,0,0,0,0,0
+V270,llm_news_0005328,additional,2021,2021-07-07 00:00:00,Watch: Auto Supply Chains in the Age of the Electric Vehicle,0,0,0,3,0,0,0,3
+V271,llm_news_0004141,additional,2020,2020-04-13 00:00:00,"MSC confirms malware attack, site comes back online",0,1,0,0,0,0,0,1
+V272,llm_news_0005753,additional,2021,2021-10-26 00:00:00,Supply Chain ‘Centers of Excellence’ Live Up to the Hype,0,0,0,0,0,0,0,0
+V273,llm_news_0006279,additional,2022,2022-03-18 00:00:00,"War, inflation, fuel and food shortages: the Asia-Pacific’s biggest economic risks",0,0,0,0,0,0,0,0
+V274,llm_news_0003948,additional,2020,2020-01-20 00:00:00,"Malaysia sends back 150 containers of plastic waste, says it will not be a ‘garbage dump’",0,0,0,0,0,0,0,0
+V275,llm_news_0008225,additional,2023,2023-12-24 00:00:00,Major shipping firms are imposing surcharges to reroute ships from the Red Sea attacks — just as inflation is starting to stabilize,0,4,4,2,0,0,0,4
+V276,llm_news_0001723,additional,2017,2017-05-31 00:00:00,"Japanese shippers K Line, MOL, NYK to merge as ONE",0,0,0,0,0,0,0,0
+V277,llm_news_0003523,additional,2019,2019-07-09 00:00:00,Using the past to better predict the future of vehicle logistics,0,0,0,1,0,0,0,1
+V278,llm_news_0009276,additional,2024,2024-10-01 00:00:00,"Car companies have plenty of inventory, but the port strike will affect European brands the most",3,2,0,1,0,0,0,3
+V279,llm_news_0005971,additional,2021,2021-12-16 00:00:00,"DP World to develop container port in Banana, Congo",0,0,0,0,0,0,0,0
+V280,llm_news_0006722,additional,2022,2022-08-05 00:00:00,Cargo ships to pay 9 per cent more in marine aids to navigation dues after Govt revises rates,0,0,1,0,0,0,0,1
+V281,llm_news_0004761,additional,2020,2020-12-15 00:00:00,3Gtms Names Paul Brady Chief Executive Officer,0,0,0,0,0,0,0,0
+V282,llm_news_0001513,additional,2017,2017-02-02 00:00:00,Amazon plans more than 200 daily flights from new cargo hub,0,0,0,0,0,0,0,0
+V283,llm_news_0003248,additional,2019,2019-05-01 00:00:00,Amazon: 1-day delivery doesn't require changes at fulfillment centers,0,0,0,0,0,0,0,0
+V284,llm_news_0010086,additional,2025,2025-06-07 00:00:00,Why Celebrate International Supply Chain Professionals Day?,0,0,0,1,0,0,0,1
+V285,llm_news_0006687,additional,2022,2022-08-01 00:00:00,Commentary: Why more S'pore firms should adopt flexi-wage systems to protect business and jobs,0,0,0,0,0,0,0,0
+V286,llm_news_0004723,additional,2020,2020-12-03 00:00:00,The importance of teamwork when planning a container ship stow,0,0,0,0,0,0,0,0
+V287,llm_news_0000763,additional,2016,2016-01-29 00:00:00,Vessel fined for discharge of garbage and sewage in Bohai Sea,0,0,0,0,0,0,0,0
+V288,llm_news_0009925,additional,2025,2025-05-05 00:00:00,Shaping the port of the future,1,0,0,0,0,0,0,1
+V289,legacy_news_0001780,additional,2020,2020-03-28 00:00:00,These Are The Sacrifices Medical Workers Make To Fight Coronavirus,0,0,0,0,0,0,0,0
+V290,llm_news_0008785,additional,2024,2024-05-08 00:00:00,Cognizant CPO Melanie Temkin to speak at P&SC LIVE New York,0,0,0,0,0,0,0,0
+V291,llm_news_0000161,additional,2015,2015-04-06 00:00:00,"Samsung Heavy: OOCL Mega Ships Will Be a Record-Breaking 21,100 TEU",0,0,0,0,0,0,0,0
+V292,llm_news_0000277,additional,2015,2015-06-03 00:00:00,Amazon Places 'Minions' Ads On Shipping Packaging,0,0,0,0,0,0,0,0
+V293,llm_news_0010250,additional,2025,2025-07-15 00:00:00,Carrier groups likely to have eyes on DP World's Nhava Sheva concession,2,2,2,0,0,0,0,2
+V294,llm_news_0009282,additional,2024,2024-10-01 00:00:00,One in six new directors on boards of SGX-listed companies is accredited by SID,0,0,0,0,0,0,0,0
+V295,llm_news_0010937,additional,2025,2025-12-09 00:00:00,"When are Vuori's final Holiday shipping dates, and what sales are still available?",0,0,0,0,0,0,0,0
+V296,llm_news_0003808,additional,2019,2019-11-11 00:00:00,"How to print a shipping label on eBay, to send out items you've sold by mail or another shipment service",0,0,0,0,0,0,0,0
+V297,llm_news_0008033,additional,2023,2023-11-07 00:00:00,The global freight recession will continue in 2024: CNBC Supply Chain Survey,0,0,3,0,0,0,3,3
+V298,llm_news_0006426,additional,2022,2022-05-05 00:00:00,Shanghai port container handling drops by 25% in April lockdown,3,2,0,3,3,3,0,3
+V299,llm_news_0008316,additional,2024,2024-01-12 00:00:00,How attacks on ships in the Red Sea by Yemen’s Houthi rebels are crimping global trade,0,4,3,3,3,0,0,4
+V300,llm_news_0006844,additional,2022,2022-09-09 00:00:00,Chinese shippers face abyss as freight rates plummet 60 per cent from ‘unprecedented’ highs at height of coronavirus pandemic,0,0,3,0,0,0,1,3
+V301,llm_news_0007015,additional,2022,2022-11-04 00:00:00,Coal comes to the rescue of Adani Ports as container volume begins to slow,0,0,2,0,0,0,2,2
+V302,llm_news_0003162,additional,2019,2019-03-18 00:00:00,US welcomes largest container ship ever at its ports,1,1,0,0,0,0,1,1
+V303,llm_news_0004984,additional,2021,2021-03-21 00:00:00,CP Rail Agrees to Buy Kansas City Southern for $25 Billion,0,0,0,0,0,0,0,0
+V304,llm_news_0003778,additional,2019,2019-10-29 00:00:00,Beyond Meat to triple pea protein sourcing in 2020 to avoid past bottlenecks,0,0,0,2,1,0,2,2
+V305,llm_news_0001118,additional,2016,2016-08-08 00:00:00,Bloomberg,0,0,0,0,0,0,0,0
+V306,llm_news_0006627,additional,2022,2022-07-12 00:00:00,"First, Ukraine Liberated Snake Island. Now, It’s Shipping Grain From Nearby Ports.",4,4,0,3,0,0,0,4
+V307,legacy_news_0001514,additional,2018,2018-05-29 00:00:00,Nipah Virus Outbreak: Death Toll Rises In India As Brain-Damaging Disease Spreads,0,0,0,0,0,0,0,0
+V308,llm_news_0001474,additional,2017,2017-01-13 00:00:00,VLCC Rates to Hold Steady as Ship Supply Matches Demand,0,0,0,0,0,0,0,0
+V309,llm_news_0001166,additional,2016,2016-08-31 00:00:00,French Coca-Cola Workers Accidentally Found a Huge Shipment of Cocaine,0,0,0,0,0,0,0,0
+V310,llm_news_0006031,additional,2022,2022-01-07 00:00:00,New year brings new all-time high for shipping’s epic traffic jam,3,3,0,3,0,1,3,3
+V311,llm_news_0009935,additional,2025,2025-05-07 00:00:00,Japan’s Mitsui O.S.K. Lines expands Indian flag fleet with a Very Large Gas Carrier,0,0,0,0,0,0,0,0
+V312,llm_news_0000913,additional,2016,2016-04-14 00:00:00,"Iran ends free crude oil shipping to India, insists on being paid in euros instead of rupee",0,0,1,0,0,0,0,1
+V313,llm_news_0009023,additional,2024,2024-07-11 00:00:00,Lego to mandate sustainability targets across supply chain,0,0,0,0,0,0,0,0
+V314,llm_news_0007772,additional,2023,2023-08-07 00:00:00,DP World to sign concession pact for Tuna-Tekra terminal on Tuesday,0,0,0,0,0,0,0,0
+V315,llm_news_0007604,additional,2023,2023-05-29 00:00:00,CONCOR hit as local container manufacturing lags,0,2,0,2,0,0,1,2
+V316,llm_news_0005066,additional,2021,2021-03-29 00:00:00,Suez Canal blockage adds to pressure points in global trade,0,4,3,3,1,1,0,4
+V317,llm_news_0009115,additional,2024,2024-08-13 00:00:00,Essential Measures for Minimizing Disruption Amid Ningbo Port Closure: Container xChange,3,3,0,3,0,0,0,3
+V318,legacy_news_0001998,additional,2020,2020-09-22 00:00:00,Pentagon Gave Most Of Its $1 Billion Coronavirus Aid Package To Defense Contractors: Report,0,0,0,1,0,1,0,1
+V319,llm_news_0002866,additional,2018,2018-10-30 00:00:00,Uber for empty containers could solve repositioning challenges,2,2,1,1,0,0,1,2
+V320,llm_news_0004752,additional,2020,2020-12-12 00:00:00,"Coffee importers are worried about post-Brexit shipping bottlenecks, as the UK coffee shop market value shrinks by 37.5%",1,0,0,1,0,0,2,2
+V321,llm_news_0004179,additional,2020,2020-04-27 00:00:00,Ships filled with jet fuel to petrol wait in Singapore Strait amid slump in oil demand,2,1,0,0,0,0,3,3
+V322,llm_news_0000035,additional,2015,2015-01-27 00:00:00,Amazon Prime Members May Spend More Than Double What Non-Members Do,0,0,0,0,0,0,0,0
+V323,llm_news_0002310,additional,2018,2018-02-26 00:00:00,Buyers must learn to manage the 4 stages of product lifecycles,0,0,0,0,0,0,0,0
+V324,llm_news_0000645,additional,2015,2015-12-11 00:00:00,"It’s Official: China Confirms COSCO, China Shipping Merger",0,1,3,0,0,0,1,3
+V325,llm_news_0005930,additional,2021,2021-12-08 00:00:00,Berthing delays push up export container dwell times,3,3,0,2,0,0,0,3
+V326,llm_news_0001866,additional,2017,2017-07-27 00:00:00,Rent the Runway is launching a new service for getting designer clothes on demand,0,0,0,0,0,0,0,0
+V327,llm_news_0010718,additional,2025,2025-10-23 00:00:00,Business leaders reveal how SMEs can scale their operations amid economic uncertainties,0,0,0,0,0,0,0,0
+V328,llm_news_0008405,additional,2024,2024-01-29 00:00:00,Australia’s pro-Palestinian activists to continue targeting Israeli ships,3,2,0,2,0,0,0,3
+V329,llm_news_0006922,additional,2022,2022-10-04 00:00:00,Air cargo rates slump but some companies see long-term strength,0,0,0,0,0,0,0,0
+V330,legacy_news_0004308,additional,2024,2024-10-01 00:00:00,Belfast cruise: Ship's departure delayed for second day,0,0,0,0,0,0,0,0
+V331,llm_news_0007935,additional,2023,2023-10-12 00:00:00,"Levi’s brings inventory under control, expands supplier base",0,0,0,1,0,0,0,1
+V332,llm_news_0006872,additional,2022,2022-09-19 00:00:00,Port Houston sets container record in August,2,1,0,1,0,0,1,2
+V333,llm_news_0006280,additional,2022,2022-03-20 00:00:00,Explained | What is the National Pharmaceutical Pricing Authority’s role in fixing drug prices?,0,0,0,0,0,0,0,0
+V334,llm_news_0010485,additional,2025,2025-09-09 00:00:00,U.S. Container Imports Set to Decline Through 2025 as Tariff Uncertainty Weighs on Trade,0,0,0,0,0,0,3,3
+V335,llm_news_0007477,additional,2023,2023-04-07 00:00:00,"COSCO Shipping Development sees fluctuating box market as sales, leasing revenue down",0,0,0,0,0,0,0,0
+V336,llm_news_0009699,additional,2025,2025-02-18 00:00:00,Mattel leverages diversified supply chain amid new China tariffs,0,0,0,0,0,0,0,0
+V337,llm_news_0009949,additional,2025,2025-05-09 00:00:00,Maersk: US-China trade war will swing world container demand,0,0,0,0,0,0,1,1
+V338,legacy_news_0004416,additional,2024,2024-11-22 00:00:00,Storm Bert amber snow warning extended in Scotland,0,0,0,0,0,0,0,0
+V339,llm_news_0006817,additional,2022,2022-09-01 00:00:00,Automakers race to build EV battery supply chains in North America,0,0,0,2,0,0,2,2
+V340,llm_news_0005343,additional,2021,2021-07-13 00:00:00,"China’s June exports make ‘surprise’ surge, but questions linger over trade outlook",2,3,3,2,0,0,0,3
+V341,llm_news_0001985,additional,2017,2017-09-27 00:00:00,This map of Amazon's warehouse locations shows how it's taking over America,0,0,0,0,0,0,0,0
+V342,llm_news_0006228,additional,2022,2022-03-04 00:00:00,"Nike, IKEA close Russian stores as sanctions, trade restrictions bite",0,3,0,3,3,0,0,3
+V343,llm_news_0006986,additional,2022,2022-10-28 00:00:00,‘No Jobs Available’: The Feast or Famine Careers of America’s Port Drivers.,0,0,0,0,0,0,0,0
+V344,llm_news_0007456,additional,2023,2023-03-29 00:00:00,Alibaba to Split Into Six Groups and Explore IPOs,0,0,0,0,0,0,0,0
+V345,llm_news_0003362,additional,2019,2019-05-13 00:00:00,American Shipping Is Dying. But We Can Bring It Back,1,1,1,1,0,0,0,1
+V346,llm_news_0001674,additional,2017,2017-05-03 00:00:00,Maersk is buying Hamburg Süd – here’s what you need to know,0,0,1,0,0,0,0,1
+V347,llm_news_0000481,additional,2015,2015-09-29 00:00:00,"Harbor Star Shipping Services Inc, TUGS:PHS summary",0,0,0,0,0,0,0,0
+V348,llm_news_0002013,additional,2017,2017-10-09 00:00:00,"TRANSPORTATION AND LOGISTICS BRIEFING: Men, urbanites more comfortable with self-driving cars — GM and Rolls-Royce partner on autonomous shipping — Ride-hailing firms' challenges in Western Europe",0,0,0,0,0,0,0,0
+V349,llm_news_0003006,additional,2018,2018-12-21 00:00:00,Tesla had quite a year in 2018,0,0,0,1,0,0,0,1
+V350,llm_news_0006022,additional,2022,2022-01-05 00:00:00,New index measures supply chain pressure — and it’s really high,3,3,3,3,0,3,3,3
+V351,llm_news_0001351,additional,2016,2016-11-10 00:00:00,UPS pact gives companies access to large-scale 3D printing and virtual warehousing,0,0,0,0,0,0,0,0
+V352,llm_news_0007720,additional,2023,2023-07-13 00:00:00,Tesla supplier to establish factory in New Mexico,0,0,0,0,0,0,0,0
+V353,llm_news_0003596,additional,2019,2019-08-09 00:00:00,"Oil Markets Could See Volatility, Arbitrage As Shipping Fuel Shifts",0,1,1,1,0,0,0,1
+V354,llm_news_0002165,additional,2017,2017-12-11 00:00:00,Shanghai port embraces new technology in arms race to defend global shipping hub status,0,0,0,0,0,0,0,0
+V355,llm_news_0007691,additional,2023,2023-06-30 00:00:00,How Multi-Enterprise Platforms Optimize Supply Chain Management,0,0,0,0,0,0,0,0
+V356,llm_news_0007840,additional,2023,2023-08-31 00:00:00,Container Shipping Lines Rake In $8.9 Billion Profit in Q2,0,0,0,0,0,0,0,0
+V357,llm_news_0000103,additional,2015,2015-03-05 00:00:00,SupplyChainBrain,0,0,0,0,0,0,0,0
+V358,llm_news_0003601,additional,2019,2019-08-12 00:00:00,Pacmar Shipping’s take-charge approach connects continents,0,0,0,0,0,0,0,0
+V359,llm_news_0009400,additional,2024,2024-10-25 00:00:00,How J N Port is tackling empty container yards to promote efficiency and check prices,2,1,2,0,0,0,0,2
+V360,llm_news_0005911,additional,2021,2021-12-02 00:00:00,"Abandoned shipping containers at ports can hold mystery prizes for opportunistic buyers, just like 'Storage Wars'",3,2,2,2,0,0,0,3
+V361,llm_news_0010325,additional,2025,2025-07-31 00:00:00,Carbon Emissions in Container Shipping Improve as Industry Navigates Red Sea Crisis,0,4,0,0,0,0,0,4
+V362,llm_news_0004753,additional,2020,2020-12-12 00:00:00,Pfizer’s Covid vaccine is now shipping. Here's how the U.S. plans to deliver it,0,0,0,0,0,0,0,0
+V363,llm_news_0008917,additional,2024,2024-06-15 00:00:00,"chilika lake fishing: Latest News & Videos, Photos about chilika lake fishing",0,0,0,0,0,0,0,0
+V364,llm_news_0010569,additional,2025,2025-09-27 00:00:00,CEO of Hong Kong firm alleges ₹15-crore cargo fraud,0,0,0,0,0,0,0,0
+V365,legacy_news_0003775,additional,2023,2023-11-06 00:00:00,Plan for 40% of train services to run during strikes,0,0,0,0,0,0,0,0
+V366,llm_news_0002154,additional,2017,2017-12-04 00:00:00,This start-up helps companies avoid a user revolt when they launch new features,0,0,0,0,0,0,0,0
+V367,llm_news_0002068,additional,2017,2017-10-27 00:00:00,Maersk Containership Sets Cargo Handling World Record at Port of Los Angeles,0,0,0,0,0,0,0,0
+V368,llm_news_0005866,additional,2021,2021-11-22 00:00:00,How to Get Started With International Shipping,0,0,0,0,0,0,0,0
+V369,llm_news_0006298,additional,2022,2022-03-29 00:00:00,Shipping container maker Singamas rides pandemic demand boom to post record 40-fold surge in profit,3,3,3,3,0,3,3,3
+V370,llm_news_0010493,additional,2025,2025-09-11 00:00:00,Dockworkers not to blame for Long Beach container spill,2,1,0,0,0,0,0,2
+V371,llm_news_0007082,additional,2022,2022-11-28 00:00:00,Container Freight Downturn Seen Short-Lived,0,0,2,0,0,0,1,2
+V372,llm_news_0005395,additional,2021,2021-07-30 00:00:00,"Are you shipping me?!? $32,000 container move from China to LA",3,4,4,3,1,3,3,4
+V373,llm_news_0001542,additional,2017,2017-02-20 00:00:00,"Box lessor Textainer sinks into the red, but insists it can 'turn the corner'",0,0,0,0,0,0,0,0
+V374,llm_news_0001504,additional,2017,2017-01-31 00:00:00,Japan’s Top Shipping Lines Trim Loss Estimates,0,0,0,0,0,0,2,2
+V375,llm_news_0008069,additional,2023,2023-11-22 00:00:00,Deltabulk Shipping India wins MMLP Nagpur bid,0,0,0,0,0,0,0,0
+V376,llm_news_0008068,additional,2023,2023-11-21 00:00:00,"The ROI of Resilience: How to Be Lean, Global and Resilient at the Same Time",1,1,1,2,2,1,0,2
+V377,llm_news_0001053,additional,2016,2016-06-30 00:00:00,"New | China risks ‘outlaw’ status if it rejects South China Sea ruling, says chief lawyer",0,0,0,0,0,0,0,0
+V378,llm_news_0009981,additional,2025,2025-05-15 00:00:00,China to US container bookings soar nearly 300% after trade war truce,0,1,0,0,0,0,3,3
+V379,llm_news_0005493,additional,2021,2021-08-31 00:00:00,"China’s shipping-container costs hit all-time highs, and shortage will further push up prices in coming months",3,3,3,3,0,3,3,3
+V380,llm_news_0008992,additional,2024,2024-07-04 00:00:00,MSC commands almost a quarter of global container market share,0,0,0,0,0,0,0,0
+V381,legacy_news_0002392,additional,2022,2022-04-14 00:00:00,Durban floods: South Africa floods kill more than 300,3,2,0,2,0,0,0,3
+V382,llm_news_0008397,additional,2024,2024-01-26 00:00:00,"UN: Global trade is being disrupted by Red Sea attacks, war in Ukraine and low water in Panama Canal",0,4,4,3,0,0,0,4
+V383,legacy_news_0003569,additional,2023,2023-09-03 00:00:00,Rail disruption: Train cancellations as high as 13% in 2023,0,0,0,0,0,0,0,0
+V384,llm_news_0008586,additional,2024,2024-02-28 00:00:00,New container shipping line established in Saudi Arabia,0,0,0,0,0,0,0,0
+V385,llm_news_0005474,additional,2021,2021-08-25 00:00:00,Battle of the shipping booms: Containers ‘21 vs dry bulk ‘07-‘08,3,3,3,0,0,0,2,3
+V386,llm_news_0004684,additional,2020,2020-11-20 00:00:00,How Amazon Has Struggled — and Thrived — in the Age of COVID-19,0,0,0,1,0,1,1,1
+V387,llm_news_0005598,additional,2021,2021-09-27 00:00:00,Los Angeles Port Chief Calls for More Federal Funding for Congested West Coast Ports,3,3,0,3,0,3,3,3
+V388,llm_news_0003628,additional,2019,2019-08-23 00:00:00,Podcast | Will We Ever Solve the Driver Shortage?,0,0,0,0,0,0,0,0
+V389,llm_news_0003884,additional,2019,2019-12-18 00:00:00,Investors punish FedEx as it struggles to adapt to rise in e-commerce amid slowing global growth,0,0,0,0,0,0,0,0
+V390,llm_news_0010988,additional,2025,2025-12-22 00:00:00,ICIS: Transpacific container rates set to fall nearly 50%,0,2,3,0,0,0,3,3
+V391,legacy_news_0002723,additional,2022,2022-08-22 00:00:00,"Who's going on strike, and when?",3,2,0,2,0,0,0,3
+V392,llm_news_0004776,additional,2020,2020-12-17 00:00:00,"Elemica Acquires ProcessWeaver, Integrates Parcel TMS",0,0,0,0,0,0,0,0
+V393,llm_news_0009677,additional,2025,2025-02-08 00:00:00,Why so many problems with FDI?,0,0,0,0,0,0,0,0
+V394,llm_news_0000825,additional,2016,2016-02-29 00:00:00,Oman Port Targets Bigger Iran Shipping Ties,0,1,0,0,0,0,0,1
+V395,llm_news_0006938,additional,2022,2022-10-11 00:00:00,FPDA militaries to train against supply chain disruptions amid 'uncertain' geopolitical environment,2,1,0,2,0,2,0,2
+V396,llm_news_0002855,additional,2018,2018-10-25 00:00:00,JD.com Is Turning Its Logistics Network Into a Broader Delivery Service,0,0,0,0,0,0,0,0
+V397,llm_news_0003124,additional,2019,2019-02-20 00:00:00,11 tips to make more money on eBay,0,0,0,0,0,0,0,0
+V398,llm_news_0009582,additional,2024,2024-12-30 00:00:00,Continental to make Automotive a separate European company and sell OESL business,0,0,0,0,0,0,0,0
+V399,llm_news_0010378,additional,2025,2025-08-07 00:00:00,"US' 100% semiconductor tariff: Singapore firms likely to be hit, with ripple effects on supporting industries",0,0,0,1,0,0,0,1
+V400,llm_news_0003626,additional,2019,2019-08-22 00:00:00,Top 10 risks related to container terminals,0,0,0,0,0,0,0,0

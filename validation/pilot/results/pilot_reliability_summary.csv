@@ -1,0 +1,8 @@
+﻿dimension,quadratic_weighted_kappa,unweighted_kappa,krippendorff_alpha,exact_agreement_pct,within_1_pct
+port_disruption_score,0.9174,0.6788,0.9182,88.0,98.0
+global_container_movement_disruption_score,0.9504,0.7598,0.9509,88.0,98.0
+freight_cost_disruption_score,0.9453,0.8041,0.9458,92.0,98.0
+supply_disruption_score,0.8927,0.6535,0.8935,86.0,98.0
+production_disruption_score,0.8528,0.6042,0.8543,94.0,98.0
+covid19_related_disruption_score,0.0,0.0,-0.0312,90.0,96.0
+demand_disruption_score,0.786,0.502,0.784,80.0,92.0

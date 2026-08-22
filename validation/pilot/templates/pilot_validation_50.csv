@@ -1,0 +1,51 @@
+﻿validation_id,year,publication_date,retrieved_title,annotator_id,relevance_label,port_disruption_score,global_container_movement_disruption_score,freight_cost_disruption_score,supply_disruption_score,production_disruption_score,covid19_related_disruption_score,demand_disruption_score,overall_disruption_score,dominant_dimension,annotator_confidence,original_article_id
+P001,2019,2019-06-06,Report: Uber Freight offers below-market rates to shippers,,,,,,,,,,,,,llm_news_0003440
+P002,2024,2024-10-18,"Ocean freight rates from China set to weaken amid waning demand, overcapacity",,,,,,,,,,,,,llm_news_0009369
+P003,2022,2022-11-18,Container Ports: Land Grab,,,,,,,,,,,,,llm_news_0007057
+P004,2025,2025-03-21,Why the Shipping Industry Isn’t Rushing Back to the Red Sea,,,,,,,,,,,,,llm_news_0009785
+P005,2020,2020-11-11,UK Container Port Congestion Is Unprecedented,,,,,,,,,,,,,llm_news_0004662
+P006,2025,2025-10-14,"As China and US impose rival port fees, global shipping industry braces for disruption",,,,,,,,,,,,,llm_news_0010650
+P007,2021,2021-11-16,The Supply Chain Report- From Industry Magnates' Lens,,,,,,,,,,,,,llm_news_0005842
+P008,2021,2021-11-18,"Global Food Prices to Stay High on Labor Crunch, Cargill CEO Says",,,,,,,,,,,,,llm_news_0005853
+P009,2022,2022-11-02,Why Retailers are Pushing Overstock Inventory into the Secondary Market,,,,,,,,,,,,,llm_news_0007006
+P010,2020,2020-02-25,Walmart steps up competition with Amazon by fulfilling orders for third-party vendors,,,,,,,,,,,,,llm_news_0004015
+P011,2019,2019-06-05,Limassol Container Terminal completes first investment phase,,,,,,,,,,,,,llm_news_0003436
+P012,2016,2016-12-01,Maersk Line announces acquisition of Hamburg Sud,,,,,,,,,,,,,llm_news_0001384
+P013,2023,2023-09-16,Dispute over extra charges at Hazira Port resolved,,,,,,,,,,,,,llm_news_0007884
+P014,2017,2017-11-01,Top 8 Logistics Challenges Facing the Industry,,,,,,,,,,,,,llm_news_0002077
+P015,2016,2016-12-02,It’s all relative: the four keys to family business longevity,,,,,,,,,,,,,llm_news_0001387
+P016,2017,2017-07-11,SupplyChainBrain,,,,,,,,,,,,,llm_news_0001829
+P017,2024,2024-07-29,End of Trucking Recession Finally in Sight as Freight Rates Rise,,,,,,,,,,,,,llm_news_0009076
+P018,2025,2025-07-24,Mobility at the Margins: What Border Crossings Reveal Before the Data Does,,,,,,,,,,,,,llm_news_0010302
+P019,2025,2025-06-11,Early peak coming as trans-Pacific container rates double,,,,,,,,,,,,,llm_news_0010098
+P020,2019,2019-06-27,How The Modern Supply Chain Is Evolving,,,,,,,,,,,,,llm_news_0003486
+P021,2018,2018-09-07,"CMA CGM Takes Delivery of France’s Biggest Ship, the 20,600 TEU ‘Antoine De Saint Exupery ‘",,,,,,,,,,,,,llm_news_0002749
+P022,2020,2020-12-08,DCSA publishes eB/L standards,,,,,,,,,,,,,llm_news_0004734
+P023,2021,2021-06-15,Ford begins shipping new Bronco SUVs for consumers,,,,,,,,,,,,,llm_news_0005267
+P024,2023,2023-11-27,Walmart to create platform that easily works with suppliers,,,,,,,,,,,,,llm_news_0008080
+P025,2022,2022-11-10,The global shipping industry is facing a new problem — too many containers,,,,,,,,,,,,,llm_news_0007037
+P026,2015,2015-09-09,Amazon Is Killing Off the Fire Phone,,,,,,,,,,,,,llm_news_0000452
+P027,2024,2024-03-07,Millions affected by German air and rail strikes,,,,,,,,,,,,,legacy_news_0004022
+P028,2022,2022-01-06,MSC officially dethrones Maersk from the top of the container rankings,,,,,,,,,,,,,llm_news_0006024
+P029,2023,2023-05-20,"Maruti Suzuki’s automated driving test track at Lado Sarai, Delhi, goes on stream",,,,,,,,,,,,,llm_news_0007576
+P030,2016,2016-06-25,Why Brexit is Bad for Tech Companies in the UK (And Everywhere Else),,,,,,,,,,,,,llm_news_0001044
+P031,2022,2022-11-04,US$5 million bounty offered for Singaporean over North Korea oil shipments,,,,,,,,,,,,,llm_news_0007017
+P032,2018,2018-07-16,"Reimagining the supply chain: Exclusive interview with Barry Padgett, SAP Ariba President",,,,,,,,,,,,,llm_news_0002594
+P033,2023,2023-11-17,"Melrose Says Engine Snags Threaten Airbus, Boeing Delivery Goals",,,,,,,,,,,,,llm_news_0008062
+P034,2015,2015-02-02,Why a Danish manager had an incredibly hard time running a Russian team,,,,,,,,,,,,,llm_news_0000048
+P035,2021,2021-09-01,“Makeshift” boxships gain pace with Starbulk capesize carrying containers,,,,,,,,,,,,,llm_news_0005499
+P036,2015,2015-03-16,Filling Ultra-Large Container Ships,,,,,,,,,,,,,llm_news_0000127
+P037,2024,2024-07-22,Why is Singapore’s recycling rate falling?,,,,,,,,,,,,,llm_news_0009058
+P038,2023,2023-01-24,HR Lines adds two more container vessels to fleet,,,,,,,,,,,,,llm_news_0007257
+P039,2021,2021-10-20,"HMM to launch new service linking S. Korea, S. America in December",,,,,,,,,,,,,llm_news_0005713
+P040,2024,2024-09-17,"Coffee set to get even pricier on supply worries, ‘it’s all about the weather’, say analysts",,,,,,,,,,,,,llm_news_0009215
+P041,2018,2018-09-10,Levi Strauss shakes up management to prioritize supply chain,,,,,,,,,,,,,llm_news_0002757
+P042,2021,2021-11-23,US Navy Opens California Seabee Base To Help Relieve LA Port Congestion,,,,,,,,,,,,,llm_news_0005875
+P043,2020,2020-12-09,A Canadian couple lives in a tiny house made of shipping containers where 'the landscape is the artwork.' See inside their modern home.,,,,,,,,,,,,,llm_news_0004743
+P044,2025,2025-09-30,China Expands Global Trade Network with Launch of First ‘Arctic Express’ Container Service,,,,,,,,,,,,,llm_news_0010575
+P045,2020,2020-05-14,Coronavirus: Food sellers grapple with container shortage as takeaway orders shoot up,,,,,,,,,,,,,llm_news_0004217
+P046,2017,2017-12-19,Long-haul trucks covering greater distance post GST: Govt Study,,,,,,,,,,,,,llm_news_0002183
+P047,2024,2024-10-03,ILA port strike ends through tentative deal,,,,,,,,,,,,,llm_news_0009303
+P048,2019,2019-06-18,Philadelphia Port sees second drug bust on container ship this year (with video),,,,,,,,,,,,,llm_news_0003459
+P049,2022,2022-09-15,Transpacific Rate Decline and Strong Dollar Could Bolster U.S. Imports,,,,,,,,,,,,,llm_news_0006860
+P050,2023,2023-03-27,Civil servants to strike in April,,,,,,,,,,,,,legacy_news_0003280

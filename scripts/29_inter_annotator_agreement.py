@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-VALIDATION_SCRIPT = ROOT / "scripts/12_human_validation_metrics.py"
+VALIDATION_SCRIPT = ROOT / "scripts/12_human_validation_and_llm_benchmark.py"
 
 
 def load_validation_module():

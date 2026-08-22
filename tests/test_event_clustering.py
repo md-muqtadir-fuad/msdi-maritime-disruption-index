@@ -15,6 +15,7 @@ if str(SRC) not in sys.path:
 from msdi.preprocessing.event_clustering import (  # noqa: E402
     EventClusteringConfig,
     cluster_event_articles,
+    greedy_complete_linkage_from_pair_audit,
     within_event_window,
 )
 
@@ -91,6 +92,49 @@ class EventClusteringTests(unittest.TestCase):
         first = cluster_event_articles(frame, config, embeddings=embeddings)[1]
         second = cluster_event_articles(frame, config, embeddings=embeddings)[1]
         self.assertEqual(first["event_id"].tolist(), second["event_id"].tolist())
+
+    def test_pair_audit_replay_preserves_complete_linkage(self) -> None:
+        work = pd.DataFrame(
+            {
+                "article_id": ["a", "b", "c"],
+                "event_day": pd.to_datetime(["2024-01-01", "2024-01-02", "2024-01-03"]),
+            }
+        )
+        # a-b and b-c qualify, but the absent a-c edge is known to be below
+        # the 0.80 audit floor.  Complete linkage must therefore reject c.
+        pair_audit = pd.DataFrame(
+            {
+                "article_id_a": ["a", "b"],
+                "article_id_b": ["b", "c"],
+                "cosine_similarity": [0.90, 0.90],
+            }
+        )
+        clusters = greedy_complete_linkage_from_pair_audit(
+            work,
+            pair_audit,
+            threshold=0.82,
+            window_value=5,
+            window_unit="weeks",
+            audit_similarity_floor=0.80,
+        )
+        self.assertEqual(clusters, [[0, 1], [2]])
+
+    def test_pair_audit_replay_rejects_threshold_below_floor(self) -> None:
+        work = pd.DataFrame(
+            {"article_id": ["a"], "event_day": pd.to_datetime(["2024-01-01"])}
+        )
+        pair_audit = pd.DataFrame(
+            columns=["article_id_a", "article_id_b", "cosine_similarity"]
+        )
+        with self.assertRaisesRegex(ValueError, "below the saved pair-audit"):
+            greedy_complete_linkage_from_pair_audit(
+                work,
+                pair_audit,
+                threshold=0.79,
+                window_value=5,
+                window_unit="weeks",
+                audit_similarity_floor=0.80,
+            )
 
 
 if __name__ == "__main__":

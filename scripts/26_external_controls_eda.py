@@ -9,6 +9,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman", "DejaVu Serif", "Times", "serif"]
+plt.rcParams["mathtext.fontset"] = "stix"
+plt.rcParams["pdf.fonttype"] = 42
+plt.rcParams["ps.fonttype"] = 42
+plt.rcParams["figure.dpi"] = 300
+plt.rcParams["savefig.dpi"] = 300
+
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONTROLS = ROOT / "data/02_interim/controls/external_controls_clean_long.csv"
 DEFAULT_WEEKLY = ROOT / "data/06_model_ready/prediction/msdi_scfi_weekly_panel.csv"
@@ -160,7 +168,10 @@ def run_frequency(
             axis.set_yticklabels(plot_cols, fontsize=7)
             fig.colorbar(image, ax=axis, fraction=0.046, pad=0.04)
         fig.tight_layout()
-        fig.savefig(prefix.with_name(f"{name}_correlation_matrices.png"), dpi=200)
+        out_png = prefix.with_name(f"{name}_correlation_matrices.png")
+        out_pdf = prefix.with_name(f"{name}_correlation_matrices.pdf")
+        fig.savefig(out_png, dpi=300, bbox_inches="tight")
+        fig.savefig(out_pdf, dpi=300, bbox_inches="tight")
         plt.close(fig)
 
     return {

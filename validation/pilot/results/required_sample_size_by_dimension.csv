@@ -1,0 +1,8 @@
+﻿dimension,pilot_qwk,pilot_krippendorff_alpha,required_total_n_qwk
+port_disruption_score,0.9174,0.9182,400
+global_container_movement_disruption_score,0.9504,0.9509,175
+freight_cost_disruption_score,0.9453,0.9458,300
+supply_disruption_score,0.8927,0.8935,575
+production_disruption_score,0.8528,0.8543,> 1000
+covid19_related_disruption_score,0.0,-0.0312,100
+demand_disruption_score,0.786,0.784,1000

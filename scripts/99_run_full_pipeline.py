@@ -51,6 +51,16 @@ OPTIONAL_EXTENSION_SCRIPTS = (
     "28_create_pseudo_annotations.py",
     "29_inter_annotator_agreement.py",
     "30_portwatch_event_study.py",
+    "31_generate_publication_eda_figures.py",
+    "33_sample_pilot_validation.py",
+    "34_compute_pilot_agreement.py",
+    "35_human_validation_sample_size_and_allocation.py",
+    "37_sample_event_pair_validation.py",
+    "38_event_pair_reliability_and_threshold_evaluation.py",
+    "39_persistent_event_shocks_and_ripple_effects.py",
+    "40_external_disruption_benchmark.py",
+    "41_plot_pcmci_directed_graph.py",
+    "42_apply_human_validated_event_threshold.py",
 )
 
 
@@ -154,11 +164,12 @@ STAGES: tuple[Stage, ...] = (
     ),
     Stage(
         12,
-        "12_human_validation_metrics.py",
-        "Create or evaluate the human gold set",
+        "12_human_validation_and_llm_benchmark.py",
+        "Compute human inter-rater reliability, gold reference, and LLM benchmarking",
         "human_validation",
         completion_artifacts=(
-            "data/04_validation/annotation_samples/goldset_sampling_manifest.json",
+            "validation/full/results/human_gold_reference_400.csv",
+            "validation/full/results/human_inter_rater_reliability_400.csv",
         ),
     ),
     Stage(

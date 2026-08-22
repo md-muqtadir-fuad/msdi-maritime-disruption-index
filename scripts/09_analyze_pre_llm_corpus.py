@@ -48,6 +48,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+plt.rcParams["font.family"] = "serif"
+plt.rcParams["font.serif"] = ["Times New Roman", "DejaVu Serif", "Times", "serif"]
+plt.rcParams["mathtext.fontset"] = "stix"
+plt.rcParams["pdf.fonttype"] = 42
+plt.rcParams["ps.fonttype"] = 42
+plt.rcParams["figure.dpi"] = 300
+plt.rcParams["savefig.dpi"] = 300
+
 
 DEFAULT_INPUT = Path(
     "data/03_processed/news_full_text/pre_llm_filter/pre_llm_kept.csv"
@@ -540,7 +548,8 @@ def plot_character_distribution(character_count: pd.Series, output_path: Path) -
     plt.ylabel("Number of articles")
     plt.title("Distribution of full-text character counts")
     plt.tight_layout()
-    plt.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.savefig(output_path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
     plt.close()
 
 
@@ -559,7 +568,8 @@ def plot_top_sources(source_statistics: pd.DataFrame, output_path: Path, top_n: 
     plt.ylabel("Publisher/source")
     plt.title(f"Top {len(top)} publishers in the pre-LLM kept dataset")
     plt.tight_layout()
-    plt.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.savefig(output_path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
     plt.close()
 
 
@@ -578,7 +588,8 @@ def plot_year_distribution(year_statistics: pd.DataFrame, output_path: Path) -> 
     plt.title("Articles by publication year")
     plt.xticks(rotation=45)
     plt.tight_layout()
-    plt.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.savefig(output_path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
     plt.close()
 
 
@@ -601,7 +612,8 @@ def plot_monthly_timeline(month_statistics: pd.DataFrame, output_path: Path) -> 
     axis.xaxis.set_major_formatter(mdates.DateFormatter("%Y"))
     plt.xticks(rotation=45)
     plt.tight_layout()
-    plt.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.savefig(output_path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
     plt.close()
 
 
@@ -616,7 +628,8 @@ def plot_month_of_year(month_of_year: pd.DataFrame, output_path: Path) -> None:
     plt.ylabel("Number of articles")
     plt.title("Article distribution by calendar month")
     plt.tight_layout()
-    plt.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.savefig(output_path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
     plt.close()
 
 
@@ -631,7 +644,8 @@ def plot_top_keywords(keyword_statistics: pd.DataFrame, output_path: Path, top_n
     plt.ylabel("Matched maritime keyword")
     plt.title(f"Top {len(top)} maritime filter keywords")
     plt.tight_layout()
-    plt.savefig(output_path, dpi=200, bbox_inches="tight")
+    plt.savefig(output_path, dpi=300, bbox_inches="tight")
+    plt.savefig(output_path.with_suffix(".pdf"), dpi=300, bbox_inches="tight")
     plt.close()
 
 

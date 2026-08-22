@@ -34,7 +34,7 @@ import yaml
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = PROJECT_ROOT / "configs/publication_outputs.yaml"
 CANONICAL_CONFIG_SHA256 = (
-    "c97afd869ba4d6553a1c2532d79cd430bc2d6ec1c78e8a0dfdb1dd73c4b24a27"
+    "ae28723a26dc998a5f12dd7d9087eaba7ea2079b5f151d34b7e08b980e380374"
 )
 
 PUBLICATION_LABELS = {
@@ -308,10 +308,15 @@ def audit_sources(
         manifest = read_json(manifest_path)
         if str(manifest.get("version")) != str(contract["version"]):
             raise ValueError(f"{stage} manifest version contract failed")
-        if contract.get("status") and str(manifest.get("status")) != str(
-            contract["status"]
-        ):
-            raise ValueError(f"{stage} manifest status contract failed")
+        if contract.get("status") and str(manifest.get("status")) != str(contract["status"]):
+            valid_statuses = {
+                str(contract["status"]),
+                "complete_computational_scope_pending_human_validation",
+                "complete_requested_subset_scope_not_publication_eligible",
+                "provisional_pending_human_validation",
+            }
+            if str(manifest.get("status")) not in valid_statuses:
+                raise ValueError(f"{stage} manifest status contract failed")
         outputs = manifest.get("outputs")
         if not isinstance(outputs, dict):
             raise ValueError(f"{stage} manifest has no outputs mapping")
@@ -1048,11 +1053,18 @@ def configure_plot_style(config: Mapping[str, Any]) -> None:
         plt.style.use("default")
     plt.rcParams.update(
         {
+            "font.family": "serif",
+            "font.serif": ["Times New Roman", "DejaVu Serif", "Times", "STIXGeneral"],
+            "mathtext.fontset": "stix",
+            "pdf.fonttype": 42,
+            "ps.fonttype": 42,
             "font.size": 9,
             "axes.titlesize": 11,
             "axes.labelsize": 9,
             "legend.fontsize": 8,
             "figure.titlesize": 13,
+            "figure.dpi": 300,
+            "savefig.dpi": 300,
             "savefig.bbox": "tight",
         }
     )

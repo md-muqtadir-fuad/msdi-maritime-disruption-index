@@ -1,0 +1,5 @@
+﻿stratum_band,sample_size,exact_agreement_pct,cohen_kappa,krippendorff_alpha,unanimous_0,unanimous_1,disagreements
+0_82,75,96.0,0.9186,0.9191,41,31,3
+0_85,75,97.33,0.9318,0.9323,19,54,2
+0_88,75,94.67,0.8544,0.8548,16,55,4
+0_9,75,96.0,0.8783,0.8788,14,58,3

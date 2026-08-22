@@ -487,6 +487,19 @@ def add_weekly_features(panel: pd.DataFrame) -> tuple[pd.DataFrame, list[dict[st
                 feature_entry(column, "external control", f"Released {control} lagged {lag} weeks", f"t-{lag}")
             )
 
+    for predictor in PRIMARY_PREDICTORS:
+        if predictor in result.columns:
+            for window in ROLLING_WINDOWS_WEEKS:
+                col_mean = f"{predictor}_rolling_mean_{window}w"
+                col_sd = f"{predictor}_rolling_sd_{window}w"
+                result[col_mean] = result[predictor].rolling(window, min_periods=max(2, window // 4)).mean()
+                result[col_sd] = result[predictor].rolling(window, min_periods=max(2, window // 4)).std().fillna(0.0)
+                dictionary.append(feature_entry(col_mean, "rolling feature", f"{predictor} rolling mean {window}w", f"t-{window}w:t"))
+                dictionary.append(feature_entry(col_sd, "rolling feature", f"{predictor} rolling std {window}w", f"t-{window}w:t"))
+            col_acc = f"{predictor}_acceleration_1w"
+            result[col_acc] = result[predictor].diff(1) - result[predictor].shift(1).diff(1)
+            dictionary.append(feature_entry(col_acc, "acceleration feature", f"{predictor} acceleration 1w", "t-2w:t"))
+
     for horizon in (1, 4, 13, 26, 52):
         result[f"scfi_log_change_{horizon}w"] = result["scfi_log"].diff(horizon)
         result[f"brent_log_change_{horizon}w"] = result["brent_log"].diff(horizon)
@@ -783,6 +796,65 @@ def missingness_table(frame: pd.DataFrame, panel_name: str) -> pd.DataFrame:
     )
 
 
+def compute_vif_audit(panel: pd.DataFrame, frequency: str = "monthly") -> pd.DataFrame:
+    """Computes Variance Inflation Factors (VIF) and condition number for all regressor blocks."""
+    from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+    feature_blocks = {
+        "msdi_dimension_medians": [
+            "port_disruption_score",
+            "global_container_movement_disruption_score",
+            "freight_cost_disruption_score",
+            "supply_disruption_score",
+            "production_disruption_score",
+            "covid19_related_disruption_score",
+            "demand_disruption_score",
+        ],
+        "core_economic_controls": [
+            "cpb_world_trade_volume",
+            "rwi_isl_container_throughput_index",
+            "wto_china_merchandise_exports",
+            "cny_usd_exchange_rate",
+            "unctad_china_core_lane_lsbci",
+            "brent_price",
+            "brent_monthly_mean",
+        ],
+        "external_shock_indices": [
+            "gpr_index",
+            "tpu_index",
+            "uct_index",
+            "opu_index",
+            "infectious_disease_emv",
+        ],
+    }
+
+    vif_records = []
+    for block_name, cols in feature_blocks.items():
+        avail_cols = [c for c in cols if c in panel.columns]
+        if len(avail_cols) < 2:
+            continue
+        sub = panel[avail_cols].dropna()
+        if len(sub) < 10:
+            continue
+        std_matrix = (sub - sub.mean()) / (sub.std() + 1e-12)
+        cond_num = float(np.linalg.cond(std_matrix.values))
+        for idx, col in enumerate(avail_cols):
+            try:
+                v = float(variance_inflation_factor(std_matrix.values, idx))
+            except Exception:
+                v = np.nan
+            vif_records.append({
+                "frequency": frequency,
+                "feature_block": block_name,
+                "variable": col,
+                "vif": round(v, 4) if np.isfinite(v) else np.nan,
+                "vif_threshold_status": "acceptable" if (np.isfinite(v) and v < 5.0) else ("moderate" if (np.isfinite(v) and v < 10.0) else "high_multicollinearity"),
+                "block_condition_number": round(cond_num, 4),
+                "complete_cases": len(sub),
+            })
+    return pd.DataFrame(vif_records)
+
+
 def write_data_dictionary(
     entries: list[dict[str, Any]], frame: pd.DataFrame, path: Path
 ) -> None:
@@ -853,6 +925,16 @@ def main() -> None:
         ignore_index=True,
     )
     missing_df.to_csv(args.audit_dir / f"{args.version}_missingness_audit.csv", index=False)
+
+    vif_df = pd.concat(
+        [
+            compute_vif_audit(weekly_panel, "weekly"),
+            compute_vif_audit(monthly_panel, "monthly"),
+        ],
+        ignore_index=True,
+    )
+    vif_df.to_csv(args.audit_dir / f"{args.version}_vif_multicollinearity_audit.csv", index=False)
+    logger.info("VIF Multicollinearity audit written to %s", args.audit_dir / f"{args.version}_vif_multicollinearity_audit.csv")
 
     manifest = {
         "version": args.version,
