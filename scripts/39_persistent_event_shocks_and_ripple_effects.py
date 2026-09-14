@@ -104,6 +104,15 @@ LANDMARK_SHOCKS = [
     },
 ]
 
+SHORT_EVENT_LABELS = {
+    "hanjin_bankruptcy": "Hanjin Bankruptcy",
+    "covid19_initial_shock": "COVID-19",
+    "ever_given_suez": "Ever Given",
+    "shanghai_zero_covid_lockdowns": "Shanghai Lockdown",
+    "panama_canal_drought": "Panama Drought",
+    "red_sea_crisis": "Red Sea Crisis",
+}
+
 DIMENSIONS = [
     "port_disruption_media_corrected",
     "global_container_movement_disruption_media_corrected",
@@ -234,6 +243,10 @@ def plot_persistent_shocks_figure(w_df: pd.DataFrame, summary_df: pd.DataFrame) 
 
     # Highlight the 6 landmark shock spans
     colors = ["#e41a1c", "#377eb8", "#4daf4a", "#984ea3", "#ff7f00", "#a65628"]
+
+    y0, y1 = ax1.get_ylim()
+    ax1.set_ylim(y0, y1 * 1.35)  # modest headroom for the short labels
+
     for idx, row in summary_df.iterrows():
         s = pd.to_datetime(row["start_date"])
         e = pd.to_datetime(row["end_date"])
@@ -241,9 +254,11 @@ def plot_persistent_shocks_figure(w_df: pd.DataFrame, summary_df: pd.DataFrame) 
         ax1.axvspan(s, e, color=c, alpha=0.15)
         ax2.axvspan(s, e, color=c, alpha=0.15)
 
-        # Annotate peak
+        # Annotate peak — short label; full event name stays in summary_df/description for the table
         mid = s + (e - s) / 2
-        ax1.text(mid, ax1.get_ylim()[1] * 0.88, f"{row['event_name'][:18]}...", rotation=90, fontsize=8, color="#333333", ha="center", va="top")
+        label = SHORT_EVENT_LABELS[row["event_key"]]
+        ax1.text(mid, ax1.get_ylim()[1] * 0.88, label, rotation=90,
+                  fontsize=8, color="#333333", ha="center", va="top", clip_on=False)
 
     ax1.legend(loc="upper left", frameon=True)
     ax2.legend(loc="upper left", frameon=True)

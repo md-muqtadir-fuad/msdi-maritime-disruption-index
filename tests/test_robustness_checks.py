@@ -292,6 +292,9 @@ class RobustnessChecksTests(unittest.TestCase):
         breadth = "reference_breadth_median7"
         controls = {
             "cpb_world_trade_volume": [101.0, 102.0],
+            "rwi_isl_container_throughput_index": [120.0, 121.0],
+            "wto_china_merchandise_exports": [200.0, 201.0],
+            "cny_usd_exchange_rate": [7.10, 7.12],
             "unctad_china_core_lane_lsbci": [0.71, 0.72],
         }
         weekly = pd.DataFrame(

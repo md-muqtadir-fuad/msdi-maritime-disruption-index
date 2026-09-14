@@ -26,6 +26,9 @@ import matplotlib
 
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.patches import Arc, Circle, FancyArrowPatch
+from matplotlib.ticker import ScalarFormatter
 import numpy as np
 import pandas as pd
 import yaml
@@ -65,7 +68,7 @@ PUBLICATION_LABELS = {
     "msdi_change": "MSDI",
     "scfi_return": "SCFI",
     "conditional_varx": "VARX",
-    "conditional_ols_hac_prespecified_max_lag": "OLS–HAC",
+    "conditional_ols_hac_prespecified_max_lag": "OLS-HAC",
     # Frozen index constructions used in trajectory panels.
     "weekly_log_volume": "Weekly index",
     "adapted_pdf_sqrt_ema3": "Adapted PDF",
@@ -473,8 +476,8 @@ def complete_residual_model_family(frame: pd.DataFrame) -> pd.DataFrame:
     return result
 
 
-def any_adjusted_rejection(frame: pd.DataFrame) -> pd.Series:
-    candidates = [
+def adjusted_rejection_flag_columns(frame: pd.DataFrame) -> list[str]:
+    return [
         column
         for column in frame.columns
         if (
@@ -483,9 +486,52 @@ def any_adjusted_rejection(frame: pd.DataFrame) -> pd.Series:
         )
         or column in {"significant_fdr", "simultaneous_band_significant"}
     ]
+
+
+def adjusted_p_value_columns(frame: pd.DataFrame) -> list[str]:
+    return [
+        column
+        for column in frame.columns
+        if column.startswith("p_value_")
+        and any(token in column for token in ("adjust", "fdr", "holm"))
+    ]
+
+
+def rejection_basis(frame: pd.DataFrame) -> str:
+    """Say how (or whether) an adjusted rejection count is defined for a stream."""
+    if adjusted_rejection_flag_columns(frame):
+        return "registered_adjusted_rejection_flag"
+    if adjusted_p_value_columns(frame):
+        return "derived_from_adjusted_p_values"
+    return "not_applicable_no_adjusted_inference"
+
+
+def any_adjusted_rejection(frame: pd.DataFrame) -> pd.Series:
+    """Flag rows rejected after multiple-testing adjustment.
+
+    Streams publishing an explicit adjusted rejection flag are read directly. Streams
+    that publish adjusted p-values but name their flag without an adjustment token
+    (e.g. `reject_at_alpha`) would otherwise report a structural zero regardless of
+    their data, so their rejections are derived from the adjusted p-values against the
+    stream's own alpha. Streams with neither remain zero and are marked not-applicable
+    by `rejection_basis`.
+    """
     result = pd.Series(False, index=frame.index)
-    for column in candidates:
-        result |= strict_bool_series(frame[column], column)
+    flag_columns = adjusted_rejection_flag_columns(frame)
+    if flag_columns:
+        for column in flag_columns:
+            result |= strict_bool_series(frame[column], column)
+        return result
+    p_value_columns = adjusted_p_value_columns(frame)
+    if not p_value_columns:
+        return result
+    if "alpha" in frame.columns:
+        alpha = pd.to_numeric(frame["alpha"], errors="coerce").fillna(0.05)
+    else:
+        alpha = pd.Series(0.05, index=frame.index)
+    for column in p_value_columns:
+        values = pd.to_numeric(frame[column], errors="coerce")
+        result |= values.lt(alpha).fillna(False)
     return result
 
 
@@ -527,6 +573,7 @@ def summarize_sensitivity(
                 ),
                 "rows_or_tests": int(len(subset)),
                 "adjusted_rejections_any_registered_stream": int(rejection.sum()),
+                "rejection_basis": rejection_basis(subset),
                 "minimum_adjusted_p_value": minimum_adjusted_p(subset),
                 "causal_claim_allowed": False,
             }
@@ -1188,76 +1235,370 @@ def plot_primary_effects(primary: pd.DataFrame, colors: Mapping[str, str]) -> pl
 
 
 def plot_local_projections(lp: pd.DataFrame, colors: Mapping[str, str]) -> plt.Figure:
-    fig, axes = plt.subplots(2, 2, figsize=(11.5, 7.2), sharey=False)
-    for row, frequency in enumerate(["weekly", "monthly"]):
-        for column, path in enumerate(["peak", "breadth"]):
-            ax = axes[row, column]
-            data = lp.loc[(lp["frequency"] == frequency) & (lp["msdi_path"] == path)].sort_values("horizon")
-            x = pd.to_numeric(data["horizon"], errors="raise").to_numpy(dtype=float)
-            y = pd.to_numeric(data["effect_percent"], errors="raise").to_numpy(dtype=float)
-            lower = pd.to_numeric(data["simultaneous_lower_percent"], errors="coerce").to_numpy(dtype=float)
-            upper = pd.to_numeric(data["simultaneous_upper_percent"], errors="coerce").to_numpy(dtype=float)
-            ax.plot(x, y, color=colors["primary"], marker="o", lw=1.25)
-            if np.isfinite(lower).any() and np.isfinite(upper).any():
-                ax.fill_between(x, lower, upper, color=colors["primary"], alpha=0.18, label="Simultaneous band")
-            ax.axhline(0.0, color="#111827", lw=0.7)
-            ax.set_title(
-                f"{publication_label(frequency)}: {publication_label(path).lower()}"
+    # Local projections follow the same monthly-primary / weekly-robustness convention as
+    # every other table in this pipeline (frequency_role); only monthly is reported here.
+    data_monthly = lp.loc[lp["frequency"] == "monthly"]
+    fig, axes = plt.subplots(1, 2, figsize=(11.2, 3.9), sharey=False)
+    for column, path in enumerate(["peak", "breadth"]):
+        ax = axes[column]
+        data = data_monthly.loc[data_monthly["msdi_path"] == path].sort_values("horizon")
+        x = pd.to_numeric(data["horizon"], errors="raise").to_numpy(dtype=float)
+        y = pd.to_numeric(data["effect_percent"], errors="raise").to_numpy(dtype=float)
+        simultaneous_lower = pd.to_numeric(data["simultaneous_lower_percent"], errors="coerce").to_numpy(dtype=float)
+        simultaneous_upper = pd.to_numeric(data["simultaneous_upper_percent"], errors="coerce").to_numpy(dtype=float)
+        pointwise_lower = pd.to_numeric(data["ci_lower_percent"], errors="coerce").to_numpy(dtype=float)
+        pointwise_upper = pd.to_numeric(data["ci_upper_percent"], errors="coerce").to_numpy(dtype=float)
+        # Nest the naive pointwise HAC band inside the family-wise-valid simultaneous
+        # (sup-t) band: the pointwise band excludes zero at some horizons, the
+        # simultaneous band never does, which is itself the substantive point.
+        if np.isfinite(simultaneous_lower).any() and np.isfinite(simultaneous_upper).any():
+            ax.fill_between(
+                x, simultaneous_lower, simultaneous_upper,
+                color=colors["robustness"], alpha=0.28, linewidth=0,
+                label="95% simultaneous (sup-t)",
             )
-            ax.set_xlabel(f"Horizon ({'weeks' if frequency == 'weekly' else 'months'})")
-            ax.set_ylabel("SCFI response (%)")
+        if np.isfinite(pointwise_lower).any() and np.isfinite(pointwise_upper).any():
+            ax.fill_between(
+                x, pointwise_lower, pointwise_upper,
+                color=colors["secondary"], alpha=0.35, linewidth=0,
+                label="95% pointwise (HAC)",
+            )
+        ax.plot(x, y, color=colors["primary"], marker="o", lw=1.25, label="Point estimate")
+        ax.axhline(0.0, color="#111827", lw=0.7)
+        ax.set_title(f"Monthly: {publication_label(path).lower()}")
+        ax.set_xlabel("Horizon (months)")
+        ax.set_ylabel("SCFI response (%)")
+        ax.legend(loc="upper left", frameon=False, fontsize=7)
     fig.tight_layout()
     return fig
+
+
+DML_LEARNER_LABELS = {
+    "elastic_net": "Elastic net",
+    "histogram_gradient_boosting": "Grad. boosting",
+    "random_forest": "Random forest",
+}
+DML_LEARNER_MARKERS = {
+    "elastic_net": ("primary", "o"),
+    "histogram_gradient_boosting": ("secondary", "s"),
+    "random_forest": ("robustness", "^"),
+}
 
 
 def plot_dml(dml: pd.DataFrame, colors: Mapping[str, str]) -> plt.Figure:
-    primary_learner = strict_bool_series(dml["primary_learner"], "primary_learner")
-    data = dml.loc[primary_learner].copy()
-    fig, axes = plt.subplots(2, 2, figsize=(11.5, 7.2), sharey=False)
-    for row, frequency in enumerate(["weekly", "monthly"]):
-        for column, path in enumerate(["peak", "breadth"]):
-            ax = axes[row, column]
-            subset = data.loc[(data["frequency"] == frequency) & (data["msdi_path"] == path)].sort_values("horizon")
-            x = pd.to_numeric(subset["horizon"], errors="raise").to_numpy(dtype=float)
-            y = pd.to_numeric(subset["effect_percent_per_one_sd_innovation"], errors="raise").to_numpy(dtype=float)
-            lower = pd.to_numeric(subset["ci_lower_percent"], errors="coerce").to_numpy(dtype=float)
-            upper = pd.to_numeric(subset["ci_upper_percent"], errors="coerce").to_numpy(dtype=float)
-            ax.plot(x, y, color=colors["secondary"], marker="o", lw=1.25)
-            ax.fill_between(x, lower, upper, color=colors["secondary"], alpha=0.18, label="95% HAC CI")
-            ax.axhline(0.0, color="#111827", lw=0.7)
-            ax.set_title(
-                f"{publication_label(frequency)}: {publication_label(path).lower()}"
+    """Forest plot of the DML effect at each horizon for every nuisance learner, with
+    both HAC and block-bootstrap intervals, so learner sensitivity is visible directly."""
+    # Weekly DML is tagged higher_frequency_robustness (monthly is the primary frequency)
+    # and its effects are an order of magnitude apart, so only monthly is reported.
+    data = dml.loc[dml["frequency"].eq("monthly")].copy()
+    unknown = set(data["learner"]).difference(DML_LEARNER_LABELS)
+    if unknown:
+        raise ValueError(f"Unregistered DML learner(s) in figure: {sorted(unknown)}")
+    learners = [name for name in DML_LEARNER_LABELS if name in set(data["learner"])]
+    horizons = sorted(pd.to_numeric(data["horizon"], errors="raise").unique())
+
+    fig, axes = plt.subplots(1, 2, figsize=(11.6, 4.6))
+    for ax, path in zip(axes, ["peak", "breadth"]):
+        subset = data.loc[data["msdi_path"] == path]
+        placements = [
+            (horizon, learner) for horizon in horizons for learner in learners
+        ]
+        row_count = len(placements)
+        for index, (horizon, learner) in enumerate(placements):
+            record = subset.loc[
+                subset["horizon"].eq(horizon) & subset["learner"].eq(learner)
+            ]
+            if len(record) != 1:
+                raise ValueError(
+                    f"Expected one DML estimate for path={path}, horizon={horizon}, "
+                    f"learner={learner}; found {len(record)}"
+                )
+            record = record.iloc[0]
+            color_key, marker = DML_LEARNER_MARKERS[learner]
+            color = colors[color_key]
+            y = row_count - 1 - index
+            ax.plot(
+                [record["bootstrap_ci_lower_percent"], record["bootstrap_ci_upper_percent"]],
+                [y, y], color=color, lw=4.5, alpha=0.25, solid_capstyle="butt", zorder=2,
             )
-            ax.set_xlabel(f"Horizon ({'weeks' if frequency == 'weekly' else 'months'})")
-            ax.set_ylabel("SCFI association per 1-SD innovation (%)")
-    fig.tight_layout()
+            ax.plot(
+                [record["ci_lower_percent"], record["ci_upper_percent"]], [y, y],
+                color=color, lw=1.4, zorder=3,
+            )
+            ax.plot(
+                record["effect_percent_per_one_sd_innovation"], y, marker=marker,
+                markersize=6.5, color=color, zorder=4,
+            )
+        ax.axvline(0.0, color="#111827", lw=0.8, zorder=1)
+        # symlog keeps the long multiplicative upper tails from compressing the short
+        # horizons into an unreadable strip, while still showing the zero reference
+        ax.set_xscale("symlog", linthresh=50, linscale=0.55)
+        ax.set_xticks([0, 25, 50, 100, 200, 500, 1000])
+        ax.get_xaxis().set_major_formatter(ScalarFormatter())
+        ax.set_yticks(range(row_count))
+        ax.set_yticklabels([""] * row_count)
+        ax.tick_params(axis="y", length=0)
+        ax.set_ylim(-0.8, row_count - 0.2)
+        ax.set_title(f"Monthly: {publication_label(path).lower()}")
+        ax.set_xlabel("SCFI association per 1-SD innovation (%)")
+        for horizon in horizons:
+            positions = [
+                row_count - 1 - index
+                for index, (candidate, _) in enumerate(placements)
+                if candidate == horizon
+            ]
+            draw_axis_group_bracket(
+                ax, -0.055, min(positions) - 0.42, max(positions) + 0.42,
+                f"h = {int(horizon)}", 8.5,
+            )
+
+    legend_handles = [
+        Line2D([0], [0], marker=DML_LEARNER_MARKERS[name][1],
+               color=colors[DML_LEARNER_MARKERS[name][0]], linestyle="none",
+               markersize=6.5, label=DML_LEARNER_LABELS[name])
+        for name in learners
+    ]
+    legend_handles += [
+        Line2D([0], [0], color="#444444", lw=1.4, label="95% HAC CI"),
+        Line2D([0], [0], color="#444444", lw=4.5, alpha=0.25, label="95% bootstrap CI"),
+    ]
+    fig.legend(
+        handles=legend_handles, loc="lower center", ncol=5, frameon=False, fontsize=8,
+        bbox_to_anchor=(0.5, -0.04),
+    )
+    fig.tight_layout(rect=[0, 0.06, 1, 1])
+    fig.subplots_adjust(left=0.08, wspace=0.18)
     return fig
 
 
-def plot_temporal_evidence(
-    granger: pd.DataFrame, pcmci: pd.DataFrame, colors: Mapping[str, str]
-) -> plt.Figure:
-    fig, axes = plt.subplots(1, 2, figsize=(12.2, 5.2))
-    conditional = granger.loc[granger["granger_design"] == "conditional"].copy()
-    adjusted = pd.to_numeric(conditional["p_value_holm"], errors="coerce").clip(lower=1e-12)
-    labels = conditional.apply(granger_label, axis=1)
-    order = np.argsort(-np.log10(adjusted.to_numpy()))
-    axes[0].barh(np.arange(len(order)), -np.log10(adjusted.iloc[order]), color=colors["primary"])
-    axes[0].set_yticks(np.arange(len(order)), labels.iloc[order], fontsize=6)
-    axes[0].axvline(-math.log10(0.05), color=colors["warning"], linestyle="--", lw=1)
-    axes[0].set(title="Conditional Granger tests", xlabel="−log10(Holm-adjusted p)")
+PCMCI_GRAPH_NODE_LABELS = {
+    "scfi_return": "SCFI\nreturn",
+    "msdi_change": "MSDI\nchange",
+    "brent_return": "Brent\nreturn",
+    "news_volume_change": "News\nvolume",
+}
+PCMCI_GRAPH_POSITIONS = {
+    "scfi_return": (0.0, 1.0),
+    "msdi_change": (1.0, 0.0),
+    "brent_return": (0.0, -1.0),
+    "news_volume_change": (-1.0, 0.0),
+}
+PCMCI_GRAPH_PAIR_RADIUS = {
+    ("brent_return", "msdi_change"): 0.16,
+    ("msdi_change", "news_volume_change"): 0.30,
+}
 
-    counts = (
-        pcmci.groupby(["frequency", "msdi_path"])["significant_fdr_bool"]
-        .sum()
-        .unstack(fill_value=0)
+
+def draw_pcmci_causal_graph(ax: plt.Axes, subset: pd.DataFrame, colors: Mapping[str, str], title: str) -> None:
+    """Draw FDR-significant PCMCI+ links as a lagged process graph: nodes are variables,
+    loop-back arrows denote a variable's own-lag autocorrelation, and directed arrows
+    denote cross-variable dependence (see figure legend for the node/loop distinction)."""
+    node_r, loop_r = 0.32, 0.19
+    ax.set_xlim(-2.5, 2.5)
+    ax.set_ylim(-1.95, 1.95)
+    ax.set_aspect("equal")
+    ax.axis("off")
+    ax.set_title(title, fontsize=11)
+
+    for name, (x, y) in PCMCI_GRAPH_POSITIONS.items():
+        ax.add_patch(Circle((x, y), node_r, facecolor="#eef2f7", edgecolor="#111827", zorder=4, lw=1.4))
+        ax.text(x, y, PCMCI_GRAPH_NODE_LABELS[name], ha="center", va="center", fontsize=8.8, zorder=5)
+
+    cross = subset.loc[subset["source"] != subset["target"]]
+    self_loops = subset.loc[subset["source"] == subset["target"]]
+
+    pair_iterators = {
+        key: iter([base, -base]) for key, base in PCMCI_GRAPH_PAIR_RADIUS.items()
+    }
+    for _, row in cross.iterrows():
+        x0, y0 = PCMCI_GRAPH_POSITIONS[row["source"]]
+        x1, y1 = PCMCI_GRAPH_POSITIONS[row["target"]]
+        key = tuple(sorted([row["source"], row["target"]]))
+        rad = next(pair_iterators[key])
+        width = 1.0 + 3.6 * abs(row["partial_correlation"])
+        arrow = FancyArrowPatch(
+            (x0, y0), (x1, y1),
+            connectionstyle=f"arc3,rad={rad}",
+            arrowstyle="-|>", mutation_scale=16,
+            shrinkA=24, shrinkB=24,
+            linewidth=width, color=colors["primary"], zorder=2,
+        )
+        ax.add_patch(arrow)
+        # bias the along-chord position (t) and perpendicular offset per pair so labels
+        # for edges converging on the same node from different sides don't collide
+        t, offset = 0.5, 0.32
+        if key == ("brent_return", "msdi_change"):
+            t, offset = 0.28, 0.42
+        elif key == ("msdi_change", "news_volume_change"):
+            t, offset = (0.38, 0.30) if rad > 0 else (0.68, 0.30)
+        mx, my = x0 + t * (x1 - x0), y0 + t * (y1 - y0)
+        dx, dy = x1 - x0, y1 - y0
+        perpendicular_x, perpendicular_y = -dy, dx
+        norm = math.hypot(perpendicular_x, perpendicular_y)
+        perpendicular_x, perpendicular_y = perpendicular_x / norm, perpendicular_y / norm
+        label_x, label_y = mx + offset * perpendicular_x, my + offset * perpendicular_y
+        ax.text(
+            label_x, label_y, f"lag {int(row['source_lag'])}", fontsize=9.5, ha="center",
+            color=colors["primary"], zorder=6, fontweight="bold",
+        )
+
+    for name, (ux, uy) in PCMCI_GRAPH_POSITIONS.items():
+        rows = self_loops.loc[self_loops["source"] == name]
+        if rows.empty:
+            continue
+        distance = 1.0 + node_r + loop_r + 0.05
+        loop_x, loop_y = ux * distance, uy * distance
+        max_strength = pd.to_numeric(rows["partial_correlation"], errors="coerce").abs().max()
+        loop_width = 1.2 + 2.6 * max_strength
+        # loop-back arrow (a 310-degree arc plus an arrowhead at the return point) reads
+        # as a directed self-loop rather than a plain, ambiguous ring
+        ax.add_patch(Arc(
+            (loop_x, loop_y), 2 * loop_r, 2 * loop_r, angle=0, theta1=25, theta2=335,
+            edgecolor=colors["robustness"], lw=loop_width, zorder=3,
+        ))
+        head_angle = math.radians(25)
+        tail_angle = head_angle + math.radians(18)
+        head_x = loop_x + loop_r * math.cos(head_angle)
+        head_y = loop_y + loop_r * math.sin(head_angle)
+        tail_x = loop_x + loop_r * math.cos(tail_angle)
+        tail_y = loop_y + loop_r * math.sin(tail_angle)
+        ax.annotate(
+            "", xy=(head_x, head_y), xytext=(tail_x, tail_y),
+            arrowprops=dict(arrowstyle="-|>", color=colors["robustness"], lw=loop_width, mutation_scale=11),
+            zorder=3,
+        )
+        lags = ", ".join(str(int(value)) for value in sorted(rows["source_lag"]))
+        label_distance = distance + loop_r + 0.20
+        ax.text(
+            ux * label_distance, uy * label_distance, f"lags {lags}",
+            fontsize=9.2, ha="center", va="center", color=colors["robustness"], zorder=6, fontweight="bold",
+        )
+
+
+def draw_axis_group_bracket(
+    ax: plt.Axes, x: float, low: float, high: float, label: str, fontsize: float
+) -> None:
+    """Draw a spanning bracket plus one merged label left of the y axis, so repeated
+    row tokens (design, frequency) appear once per block instead of on every row."""
+    transform = ax.get_yaxis_transform()
+    ax.plot([x, x], [low, high], color="#9ca3af", lw=0.9, transform=transform, clip_on=False)
+    for edge in (low, high):
+        ax.plot([x, x + 0.012], [edge, edge], color="#9ca3af", lw=0.9,
+                transform=transform, clip_on=False)
+    ax.text(
+        x - 0.012, (low + high) / 2, label, transform=transform, fontsize=fontsize,
+        ha="right", va="center", rotation=90, color="#374151", clip_on=False,
     )
-    counts = counts.rename(index=publication_label, columns=publication_label)
-    counts.plot(kind="bar", ax=axes[1], color=[colors["primary"], colors["secondary"]])
-    axes[1].set(title="FDR-significant PCMCI links", xlabel="Frequency", ylabel="Link-lag count")
-    axes[1].tick_params(axis="x", rotation=0)
-    axes[1].legend(title="MSDI path")
+
+
+def plot_granger_correction_shift(granger: pd.DataFrame, colors: Mapping[str, str]) -> plt.Figure:
+    """Dumbbell plot of raw vs. Holm-adjusted p-values for every conditional Granger test.
+    Each arrow shows where multiple-testing correction moves that test relative to alpha."""
+    data = granger.loc[granger["granger_design"] == "conditional"].copy()
+    data["raw_p"] = pd.to_numeric(data["p_value"], errors="raise")
+    data["holm_p"] = pd.to_numeric(data["p_value_holm"], errors="raise")
+    data["row_label"] = data.apply(
+        lambda row: f"{publication_label(row['msdi_path'])} · "
+                    f"{publication_label(row['causing'])}→{publication_label(row['caused'])}",
+        axis=1,
+    )
+    # order by design, then frequency, then a fixed path/direction pattern so the repeated
+    # design/frequency tokens form mergeable blocks and every block reads identically:
+    # peak MSDI→SCFI, peak SCFI→MSDI, breadth MSDI→SCFI, breadth SCFI→MSDI
+    design_order = ["conditional_ols_hac_prespecified_max_lag", "conditional_varx"]
+    data["design_rank"] = data["model"].map({name: i for i, name in enumerate(design_order)})
+    data["frequency_rank"] = data["frequency"].map({"monthly": 0, "weekly": 1})
+    data["path_rank"] = data["msdi_path"].map({"peak": 0, "breadth": 1})
+    data["direction_rank"] = data["causing"].map({"msdi_change": 0, "scfi_return": 1})
+    data = data.sort_values(
+        ["design_rank", "frequency_rank", "path_rank", "direction_rank"]
+    ).reset_index(drop=True)
+    row_count = len(data)
+    data["y"] = row_count - 1 - data.index
+
+    design_colors = {
+        "conditional_ols_hac_prespecified_max_lag": colors["primary"],
+        "conditional_varx": colors["secondary"],
+    }
+
+    fig, ax = plt.subplots(figsize=(10.2, 6.4))
+    ax.set_xscale("log")
+    ax.axvspan(0.008, 0.05, color=colors["warning"], alpha=0.07, zorder=0)
+    ax.axvline(0.05, color=colors["warning"], linestyle="--", lw=1.2, zorder=1)
+    ax.text(
+        0.054, row_count - 0.25, r"$\alpha=0.05$", color=colors["warning"], fontsize=9,
+        ha="left", va="center", style="italic",
+    )
+
+    for _, row in data.iterrows():
+        design_color = design_colors[row["model"]]
+        ax.annotate(
+            "", xy=(row["holm_p"], row["y"]), xytext=(row["raw_p"], row["y"]),
+            arrowprops=dict(arrowstyle="-|>", color=design_color, lw=1.5, alpha=0.55,
+                            shrinkA=3, shrinkB=3, mutation_scale=13),
+            zorder=2,
+        )
+        ax.plot(row["raw_p"], row["y"], marker="o", markersize=8, markerfacecolor="white",
+                markeredgecolor=design_color, markeredgewidth=1.7, zorder=3)
+        ax.plot(row["holm_p"], row["y"], marker="o", markersize=8, color=design_color, zorder=3)
+
+    ax.set_yticks(data["y"].to_numpy())
+    ax.set_yticklabels(data["row_label"], fontsize=8.5)
+    ax.set_ylim(-0.9, row_count + 0.2)
+    ax.set_xlim(0.019, 1.45)
+    ax.set_xlabel(r"$p$-value (log scale)")
+
+    for (design, frequency), group in data.groupby(["model", "frequency"], sort=False):
+        draw_axis_group_bracket(
+            ax, -0.235, group["y"].min() - 0.42, group["y"].max() + 0.42,
+            publication_label(frequency), 8.5,
+        )
+    for design, group in data.groupby("model", sort=False):
+        draw_axis_group_bracket(
+            ax, -0.315, group["y"].min() - 0.42, group["y"].max() + 0.42,
+            publication_label(design), 9.5,
+        )
+
+    legend_handles = [
+        Line2D([0], [0], marker="o", linestyle="none", markerfacecolor="white",
+               markeredgecolor="#444444", markersize=8, label=r"Raw $p$"),
+        Line2D([0], [0], marker="o", linestyle="none", color="#444444", markersize=8,
+               label=r"Holm-adjusted $p$"),
+        Line2D([0], [0], color=colors["primary"], lw=2.5, label="OLS-HAC design"),
+        Line2D([0], [0], color=colors["secondary"], lw=2.5, label="VARX design"),
+    ]
+    ax.legend(handles=legend_handles, loc="lower left", frameon=False, fontsize=8)
     fig.tight_layout()
+    fig.subplots_adjust(left=0.32)
+    return fig
+
+
+def plot_pcmci_link_graphs(pcmci: pd.DataFrame, colors: Mapping[str, str]) -> plt.Figure:
+    fig, (ax_weekly, ax_monthly) = plt.subplots(1, 2, figsize=(11.5, 5.6))
+
+    significant = pcmci.loc[strict_bool_series(pcmci["significant_fdr_bool"], "significant_fdr_bool")]
+    # "Peak" is the only path with any FDR-significant cross-variable link at either
+    # frequency (breadth has self-loops only), so it is used for both panels to make
+    # the weekly-vs-monthly contrast an apples-to-apples comparison.
+    weekly_peak = significant.loc[(significant["frequency"] == "weekly") & (significant["msdi_path"] == "peak")]
+    monthly_peak = significant.loc[(significant["frequency"] == "monthly") & (significant["msdi_path"] == "peak")]
+    draw_pcmci_causal_graph(ax_weekly, weekly_peak, colors, "PCMCI+ links: weekly (peak)")
+    draw_pcmci_causal_graph(ax_monthly, monthly_peak, colors, "PCMCI+ links: monthly (peak)")
+
+    legend_handles = [
+        Line2D([0], [0], marker="o", linestyle="none", markerfacecolor="#eef2f7",
+               markeredgecolor="#111827", markersize=15, label="Variable (node)"),
+        Line2D([0], [0], marker="o", linestyle="none", markerfacecolor="none",
+               markeredgecolor=colors["robustness"], markersize=9,
+               label="Self-loop: own-lag autocorrelation"),
+        Line2D([0], [0], marker=r"$\rightarrow$", linestyle="none", color=colors["primary"],
+               markersize=16, label="Arrow: FDR-significant cross-link"),
+    ]
+    fig.legend(
+        handles=legend_handles, loc="lower center", ncol=3, frameon=False, fontsize=9,
+        bbox_to_anchor=(0.5, -0.03),
+    )
+    fig.tight_layout(rect=[0, 0.05, 1, 1])
     return fig
 
 
@@ -1319,26 +1660,40 @@ def plot_diagnostics(
 
 
 def plot_var_irf(irf: pd.DataFrame, colors: Mapping[str, str]) -> plt.Figure:
+    # Weekly VARX systems fail the multivariate residual-whiteness diagnostic and are
+    # excluded here; only the monthly (diagnostics-passing) systems are reported.
     data = irf.loc[
-        (irf["impulse"] == "msdi_change") & (irf["response"] == "scfi_return")
+        (irf["impulse"] == "msdi_change")
+        & (irf["response"] == "scfi_return")
+        & (irf["frequency"] == "monthly")
     ].copy()
-    fig, axes = plt.subplots(2, 2, figsize=(11.2, 7.0), sharey=False)
-    for row, frequency in enumerate(["weekly", "monthly"]):
-        for column, path in enumerate(["peak", "breadth"]):
-            ax = axes[row, column]
-            subset = data.loc[(data["frequency"] == frequency) & (data["msdi_path"] == path)].sort_values("horizon")
-            diagnostic_pass = strict_bool_series(subset["diagnostics_pass"], "VAR diagnostics").all()
-            color = colors["primary"] if diagnostic_pass else colors["robustness"]
-            linestyle = "-" if diagnostic_pass else "--"
-            ax.plot(subset["horizon"], subset["cumulative_scfi_percent"], color=color, linestyle=linestyle, marker="o", lw=1.2)
-            ax.axhline(0.0, color="#111827", lw=0.7)
-            status = "passed" if diagnostic_pass else "failed"
-            ax.set_title(
-                f"{publication_label(frequency)}: "
-                f"{publication_label(path).lower()} (diagnostics {status})"
+    fig, axes = plt.subplots(1, 2, figsize=(11.2, 3.9), sharey=False)
+    for column, path in enumerate(["peak", "breadth"]):
+        ax = axes[column]
+        subset = data.loc[data["msdi_path"] == path].sort_values("horizon")
+        diagnostic_pass = strict_bool_series(subset["diagnostics_pass"], "VAR diagnostics").all()
+        if not diagnostic_pass:
+            raise AssertionError(
+                f"Monthly VARX diagnostics failed for path={path}; this figure only "
+                "supports diagnostics-passing systems, so there is no valid panel to plot."
             )
-            ax.set_xlabel("Horizon")
-            ax.set_ylabel("Cumulative SCFI response (%)")
+        # Convert the Monte Carlo bounds (log points) to the same percent scale as the
+        # point estimate (cumulative_scfi_percent = 100 * expm1(cumulative_response));
+        # expm1 is monotone, so the ordering of lower/upper is preserved.
+        band_lower = 100 * np.expm1(subset["cumulative_lower_pointwise"])
+        band_upper = 100 * np.expm1(subset["cumulative_upper_pointwise"])
+        confidence_level = float(subset["confidence_level"].iloc[0])
+        ax.fill_between(
+            subset["horizon"], band_lower, band_upper,
+            color=colors["primary"], alpha=0.18, linewidth=0,
+            label=f"{confidence_level:.0%} Monte Carlo band",
+        )
+        ax.plot(subset["horizon"], subset["cumulative_scfi_percent"], color=colors["primary"], linestyle="-", marker="o", lw=1.2, label="Point estimate")
+        ax.axhline(0.0, color="#111827", lw=0.7)
+        ax.set_title(f"Monthly: {publication_label(path).lower()}")
+        ax.set_xlabel("Horizon")
+        ax.set_ylabel("Cumulative SCFI response (%)")
+        ax.legend(loc="best", frameon=False, fontsize=8)
     fig.tight_layout()
     return fig
 
@@ -1827,7 +2182,7 @@ def build_figures(
         ),
         (
             "figure06_temporal_dependence",
-            plot_temporal_evidence(main_tables["T07_granger_tests"], pcmci, colors),
+            plot_pcmci_link_graphs(pcmci, colors),
         ),
         (
             "figure07_ablation_sensitivity",
@@ -1889,6 +2244,10 @@ def build_figures(
                 config["forecast_trajectory_figures"],
                 colors,
             ),
+        ),
+        (
+            "figure19_granger_multiple_testing",
+            plot_granger_correction_shift(main_tables["T07_granger_tests"], colors),
         ),
     ]
     paths: list[Path] = []

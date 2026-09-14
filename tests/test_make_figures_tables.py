@@ -111,7 +111,7 @@ class PublicationOutputUnitTests(unittest.TestCase):
                 }
             )
         )
-        self.assertEqual(dynamic, "Monthly · Breadth · SCFI→MSDI · OLS–HAC")
+        self.assertEqual(dynamic, "Monthly · Breadth · SCFI→MSDI · OLS-HAC")
         self.assertLessEqual(len(dynamic), 48)
 
     def test_no_overall_figure_titles_are_embedded(self) -> None:

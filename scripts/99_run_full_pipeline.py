@@ -61,6 +61,9 @@ OPTIONAL_EXTENSION_SCRIPTS = (
     "40_external_disruption_benchmark.py",
     "41_plot_pcmci_directed_graph.py",
     "42_apply_human_validated_event_threshold.py",
+    "43_dimension_pca.py",
+    "44_validation_sample_size_figure.py",
+    "45_entropy_weighted_topsis.py",
 )
 
 

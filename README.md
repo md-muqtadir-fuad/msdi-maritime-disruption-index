@@ -1,101 +1,136 @@
-# SC-Disrupt
+# Maritime Supply Chain Disruption Code and Dataset
 
-Reproducible research pipeline for building an LLM-derived, human-validated Maritime Supply Chain Disruption Index (MSDI), forecasting container freight rates (SCFI), and conducting econometric time-series causality, causal machine learning (Double/Debiased ML), statistical significance audits, and sensitivity analyses.
+Reproducible pipeline for an LLM-derived, human-validated Maritime Supply Chain
+Disruption Index (MSDI), used to forecast Shanghai Containerized Freight Index
+(SCFI) movements and to run time-series causality, causal-ML, multiplicity, and
+sensitivity analyses.
 
----
+Monthly is the primary frequency; weekly is robustness. No result in this
+repository supports a structural causal claim.
 
-## 1. Environment & Setup
-
-All commands must be executed using the project virtual environment.
+## Setup
 
 ```powershell
 python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements.txt
-.venv\Scripts\python.exe -m pip install -r requirements-forecasting.txt
 ```
 
-> **Requirements note**: `requirements-forecasting.txt` provides PyTorch, Prophet, and specialized time-series dependencies. Scikit-learn, statsmodels, linearmodels, and core scientific libraries are included in `requirements.txt`.
+`requirements.txt` covers everything, including `torch`, `prophet` and
+`xgboost`. There is no separate forecasting requirements file.
 
----
+## Running
 
-## 2. Pipeline Execution
-
-### Smoke Verification (Fast Architecture & DAG Check)
-Run the read-only verification check first. It compiles every script, checks dependencies, validates configuration hashes, and verifies artifact contracts without executing long fits:
+Read-only structural check (compiles every script, validates the stage registry,
+configs, and artifact contracts; runs no fits and writes nothing):
 
 ```powershell
 .venv\Scripts\python.exe scripts\99_run_full_pipeline.py smoke
 ```
 
-### Full End-to-End Pipeline
-To run the full sequential pipeline across Stages `00` through `24`:
+Expected: `111/111 structural checks passed`.
+
+Full sequential run, stages 00–24:
 
 ```powershell
-.venv\Scripts\python.exe scripts\99_run_full_pipeline.py full --allow-pending-human-validation
+.venv\Scripts\python.exe scripts\99_run_full_pipeline.py full `
+  --annotations validation\full\completed\human_validation_annotator_1.csv validation\full\completed\human_validation_annotator_2.csv `
+  --adjudicated validation\event_pairs\results\event_pair_adjudicated_ground_truth_300.csv
 ```
 
-For publication-ready runs requiring completed dual-human annotations:
-```powershell
-.venv\Scripts\python.exe scripts\99_run_full_pipeline.py full --annotations data/04_validation/human_annotations/
-```
+Human validation is complete (400 articles, 300 event pairs), so
+`--allow-pending-human-validation` is not the current research state; it exists
+only for development reruns and marks the run publication-ineligible.
 
----
+Stage 10 (LLM scoring) is an external manual gate: score archives must already
+exist under `data/03_processed/model_scores/scores_zips`.
 
-## 3. Pipeline Stages & Architecture
+Partial reruns use `--run-id`, `--resume-pipeline`, `--from-stage`, `--to-stage`.
 
-| Stage | Script | Description |
-| :--- | :--- | :--- |
-| **00–04** | `scripts/00_...` to `04_...` | Ingestion, news normalization, deduplication, full-text enrichment. |
-| **05–08** | `scripts/05_...` to `08_...` | Embedding generation, BGE-M3 event clustering, text-quality filtering. |
-| **09–13** | `scripts/09_...` to `13_...` | LLM scoring prompts, dual-prompt evaluation, MSDI index aggregation (Peak & Breadth). |
-| **14–15** | `scripts/14_...` to `15_...` | Multi-horizon panel construction (weekly/monthly) and EDA. |
-| **16–17** | `scripts/16_...` & `17_...` | Out-of-sample LLM comparison benchmarks (Weekly & Monthly). |
-| **18** | `scripts/18_nonlinear_forecasting.py` | Multi-model forecasting benchmarks (GLM, Random Forest, XGBoost, LSTM, Prophet). |
-| **19** | `scripts/19_time_series_causality.py` | Econometric time-series causality (VARX, Granger causality, PCMCI+ graphical discovery, Jordà local projections). |
-| **20** | `scripts/20_causal_ml.py` | Double/Debiased Machine Learning (Partially Linear DML, Causal Forest GATE/BLP heterogeneity, placebo falsifications). |
-| **21** | `scripts/21_ablation_sensitivity_checks.py` | Comprehensive ablation matrix (69 index variants, media controls, prompt architectures). |
-| **22** | `scripts/22_error_diagnostics.py` | Forecast error diagnostics, Mincer–Zarnowitz calibration, extreme-case article traces. |
-| **23** | `scripts/23_significance_analysis.py` | Multiplicity-aware statistical audit (Holm FWER & Benjamini–Hochberg FDR adjustments across 14,000+ hypotheses). |
-| **24** | `scripts/24_make_figures_tables.py` | Publication package generator (26 publication tables, 30 vector/raster figures, summary reports). |
-| **25–27** | `scripts/25_...` to `27_...` | External control data ingestion, cleaning, EDA, and statistical association tests. |
-| **28–30** | `scripts/28_...` to `30_...` | Synthetic validation plumbing, inter-annotator agreement, and PortWatch event studies. |
+## Stages
 
----
+| # | Script | Purpose |
+|---|---|---|
+| 00 | `00_audit_legacy_project.py` | Audit legacy inputs |
+| 01 | `01_ingest_sources.py` | Register source inputs |
+| 02 | `02_normalize_legacy_news.py` | Normalize legacy news |
+| 03 | `03_normalize_llm_news.py` | Normalize LLM-search news |
+| 04 | `04_enrich_full_text.py` | Full-text umbrella stage |
+| 05 | `05_retrieve_legacy_full_text.py` | Retrieve legacy full text |
+| 06 | `06_retrieve_llm_full_text.py` | Retrieve LLM-search full text |
+| 07 | `07_merge_full_text_deduplicate.py` | Merge and deduplicate full text |
+| 08 | `08_filter_irrelevant_news.py` | Relevance gate; assign canonical events |
+| 09 | `09_analyze_pre_llm_corpus.py` | Describe the retained pre-LLM corpus |
+| 10 | `10_run_llm_scoring.py` | External LLM scoring (manual gate) |
+| 11 | `11_merge_llm_scores.py` | Merge LLM score archives |
+| 12 | `12_human_validation_and_llm_benchmark.py` | Inter-rater reliability, gold reference, LLM benchmark |
+| 13 | `13_build_disruption_index.py` | Article, monthly-primary and weekly-robustness indices |
+| 14 | `14_build_model_panels.py` | Leakage-safe model panels |
+| 15 | `15_prediction_benchmarks.py` | Statistical and ML benchmarks |
+| 16 | `16_llm_scfi_comparison_weekly.py` | Weekly LLM signal comparison |
+| 17 | `17_llm_scfi_comparison_monthly.py` | Monthly LLM signal comparison |
+| 18 | `18_forecasting_models.py` | GLM, RF, XGBoost, LSTM, Prophet forecasts |
+| 19 | `19_time_series_causality.py` | VAR/VARX, Granger, PCMCI, local projections |
+| 20 | `20_causal_ml.py` | Time-aware causal-ML diagnostics |
+| 21 | `21_ablation_sensitivity_checks.py` | Ablation and sensitivity checks |
+| 22 | `22_error_diagnostics.py` | Forecast and model diagnostics |
+| 23 | `23_significance_analysis.py` | Multiplicity-aware inference |
+| 24 | `24_make_figures_tables.py` | Publication tables and figures |
 
-## 4. Integrated External Controls
+### Outside the sequential run
 
-The core model panels integrate five macroeconomic and maritime trade controls merged strictly by backward availability date:
+Registered in `OPTIONAL_EXTENSION_SCRIPTS` and compiled by `smoke`, but not part
+of stages 00–24:
 
-1. **CPB World Trade Volume** (`cpb_world_trade_volume`): Global import/export merchandise demand.
-2. **RWI/ISL Container Throughput Index** (`rwi_isl_container_throughput_index`): Global physical container throughput across 90+ international ports.
-3. **WTO China Merchandise Exports** (`wto_china_merchandise_exports`): Export origin volume benchmark.
-4. **CNY/USD Exchange Rate** (`cny_usd_exchange_rate`): Bilateral monetary control.
-5. **UNCTAD Liner Shipping Bilateral Connectivity Index** (`unctad_china_core_lane_lsbci`): Bilateral container network connectivity for China-origin core trade lanes.
+- `25`–`27` external control cleaning, EDA, statistical association tests
+- `28`–`29` pseudo-annotation plumbing, inter-annotator agreement
+- `30` PortWatch event study
+- `31` publication EDA figures
+- `33`–`35` pilot validation sampling, pilot agreement, sample-size allocation
+- `37`–`38` event-pair sampling, reliability and threshold evaluation
+- `39` persistent event shocks and ripple effects
+- `40` external disruption benchmark
+- `41` PCMCI directed graph
+- `42` apply human-validated event threshold
+- `43` article-level dimension PCA
+- `44` validation sample-size figure
+- `45` entropy-weighted TOPSIS (reporting path for the operational ranking)
 
-For complete details on data sources, portal URLs, and ingestion protocols, see [DATA_SOURCES.md](DATA_SOURCES.md).
+## Data
 
-To clean and analyze external control series:
+Outcome: SCFI. Energy control: Brent crude. Five external controls, merged
+strictly backward by release date:
+
+| Column | Series |
+|---|---|
+| `cpb_world_trade_volume` | CPB World Trade Monitor |
+| `rwi_isl_container_throughput_index` | RWI/ISL Container Throughput Index |
+| `wto_china_merchandise_exports` | WTO China merchandise exports |
+| `cny_usd_exchange_rate` | CNY/USD exchange rate |
+| `unctad_china_core_lane_lsbci` | UNCTAD LSBCI, China-origin core lanes |
+
+Sources, portal URLs and availability-lag rules: `.manu/DATA_SOURCES.md`.
+
 ```powershell
 .venv\Scripts\python.exe scripts\25_clean_external_controls.py
 .venv\Scripts\python.exe scripts\26_external_controls_eda.py
 .venv\Scripts\python.exe scripts\27_external_controls_statistical_analysis.py
 ```
 
----
-
-## 5. Testing & Validation
-
-Execute unit and integration tests across all modules:
+## Tests
 
 ```powershell
-.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py" -v
+.venv\Scripts\python.exe -m unittest discover -s tests -p "test_*.py"
 ```
 
----
+150 tests.
 
-## 6. Output Artifacts
+## Outputs
 
-- **Publication Tables**: [`outputs/tables/`](file:///c:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/tables) (Tables T01–T16, Supplementary Tables S00–S08, and combined Excel workbook).
-- **Publication Figures**: [`outputs/figures/`](file:///c:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/figures) (High-resolution PDF and PNG figures F01–F15).
-- **Significance Registry**: [`outputs/significance/`](file:///c:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/significance) (Full hypothesis registry with FDR and Holm adjustments).
-- **Executive Reports**: [`outputs/reports/`](file:///c:/Users/DELL/Desktop/venv-python/sc-disrupt/sc-disrupt/outputs/reports) (`publication_v001_results_summary.md` and machine-readable run manifests).
+| Location | Contents |
+|---|---|
+| `outputs/tables/` | 26 CSVs — `T01`–`T16` main, `S00`, `S00b`, `S01`–`S08` supplementary — plus `publication_v001_publication_tables.xlsx` |
+| `outputs/figures/` | `figure01`–`figure19`, each as PDF and PNG |
+| `outputs/figures/eda/` | `eda_figure01`–`eda_figure06`, PDF and PNG |
+| `outputs/significance/` | Hypothesis registry (14,072 rows) with Holm and BH-FDR adjustments |
+| `outputs/reports/` | `publication_v001_results_summary.md` and run manifests |
+| `outputs/topsis/` | Entropy-weighted operational model ranking |

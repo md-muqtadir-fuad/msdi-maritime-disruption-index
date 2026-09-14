@@ -260,7 +260,7 @@
     "conditional_granger_tests": "9cbb0aaf6c1174b8e497667eb91826cfa74c2bde54993868f9ae02dd7eef8d7f",
     "conventional_granger_tests": "9fc067a2a3e671abce228f2b99e6b200979387dcaa878a84f6fffd98faad1553",
     "var_diagnostics": "f136bb230b65203a83a0c4b685eeafd61109381187bad9f15e4ee54f142d4433",
-    "var_impulse_responses": "abb20add5bb396930dbece8d73cc2fa91c42c77f76fee64b92cc698be6bbd7d5",
+    "var_impulse_responses": "6ae1ad86f9c5171701c291234dcf24dd8a924453d299fff60fb29fa53c5973fd",
     "var_fevd": "8b803af4f829b43d47a04f1c1251f25d371ccf45fac6f826328bb2b4f6d1c0ad",
     "pcmci_links": "fdd051709d6217096d3886dba8c354159373d3d1c81cb74d6d866e2787a2dc3e",
     "msdi_innovations": "4ee4a11bd69db9fad0b444e72d0b19dfebd96d28cc00b558678b9ca0fdcb6a3e",
@@ -269,7 +269,7 @@
   },
   "code": {
     "script": "C:\\Users\\DELL\\Desktop\\venv-python\\sc-disrupt\\sc-disrupt\\scripts\\19_time_series_causality.py",
-    "script_sha256": "92a320e2b482affb4605ad8287adfe096b9f0b36b992c7a4f2bc015b5389bdd2"
+    "script_sha256": "83021a8e17433178e455ceda6bb38657024fc511580c48e582105c3acd9da2ac"
   },
   "output_row_counts": {
     "stationarity_tests": 32,

@@ -43,8 +43,12 @@ class BuildModelPanelsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "controls.csv"
             frame.to_csv(path, index=False)
-            with self.assertRaisesRegex(ValueError, "obsolete generic"):
-                MODULE.load_external_controls(path)
+            controls, audit = MODULE.load_external_controls(path)
+        # The generic global LSBCI is not the China core-lane series the study uses,
+        # so it must be dropped by the allowlist rather than standing in for it.
+        self.assertNotIn("unctad_lsbci", set(controls["variable"]))
+        self.assertNotIn("unctad_lsbci", audit["variables"])
+        self.assertNotIn("unctad_china_core_lane_lsbci", set(controls["variable"]))
 
     def test_annual_control_is_backward_joined_with_annual_validity(self) -> None:
         panel = pd.DataFrame(

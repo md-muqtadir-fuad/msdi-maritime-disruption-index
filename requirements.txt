@@ -1,30 +1,36 @@
+# Core scientific stack
 pandas
 numpy
 scipy
 scikit-learn
 statsmodels
+
+# Causal discovery
 tigramite==5.2.10.1
-matplotlib
-openpyxl
-xlrd>=2.0.1
-pyyaml
-python-dotenv
-pydantic
-requests
-beautifulsoup4
-newspaper4k
-trafilatura
-tqdm
-joblib
-networkx
+
+# Forecasting models (stage 18)
 xgboost
-lightgbm
-transformers
-datasets
-evaluate
-sentence-transformers
-krippendorff
-optuna
 torch
 prophet
-neuralforecast
+
+# Text retrieval and embeddings
+newspaper4k
+sentence-transformers
+
+# Inter-rater reliability (stages 12, 35, 38)
+krippendorff
+
+# Figures and workbooks
+matplotlib
+openpyxl          # .xlsx read/write; stage 24 names it as the ExcelWriter engine
+xlrd>=2.0.1       # .xls sources under data/01_raw/controls/ (gpr_risk, gscpi)
+
+# Config
+pyyaml
+
+# Transitive, listed for reproducibility
+transformers      # via sentence-transformers
+requests          # via newspaper4k
+beautifulsoup4    # via newspaper4k
+joblib            # via scikit-learn
+networkx          # via tigramite

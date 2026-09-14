@@ -935,18 +935,25 @@ def impulse_responses(
     cumulative_upper: np.ndarray | None = None
     error = ""
     try:
+        # statsmodels' irf_resim() reseeds a fresh RandomState(seed) on every one of
+        # the `repl` replications (via util.varsim), so passing a fixed int here makes
+        # every replication bit-identical and collapses the percentile bands to a
+        # single degenerate point (lower == upper). seed=None draws fresh entropy per
+        # replication, which is required for the Monte Carlo bands to be non-degenerate;
+        # point estimates (analysis.irfs / analysis.cum_effects) are unaffected and stay
+        # fully deterministic since they come from the fitted VAR model, not this step.
         lower, upper = analysis.errband_mc(
             orth=False,
             repl=monte_carlo_repetitions,
             signif=alpha,
-            seed=seed,
+            seed=None,
             burn=max(100, result.k_ar * 20),
         )
         cumulative_lower, cumulative_upper = analysis.cum_errband_mc(
             orth=False,
             repl=monte_carlo_repetitions,
             signif=alpha,
-            seed=seed,
+            seed=None,
             burn=max(100, result.k_ar * 20),
         )
     except Exception as exception:  # retain point estimates if MC bands fail
