@@ -1,8 +1,33 @@
 [project]
-name = "q1-maritime-disruption-index"
+name = "maritime-supply-chain-disruption-index"
 version = "0.1.0"
 description = "Human-validated multi-LLM maritime disruption index and freight-rate causality pipeline"
+readme = "README.md"
 requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Md. Muqtadir Fuad"},
+    {name = "Md. Ashraful Huda Asif"},
+    {name = "Abdullah Al Mazid"},
+]
+keywords = [
+    "supply-chain",
+    "maritime",
+    "shipping",
+    "freight",
+    "disruption-index",
+    "llm",
+    "time-series-forecasting",
+    "causal-inference",
+    "econometrics",
+    "scfi",
+]
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

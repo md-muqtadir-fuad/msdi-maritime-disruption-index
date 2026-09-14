@@ -1,4 +1,4 @@
-# Maritime Supply Chain Disruption Code and Dataset
+# LLM-derived Maritime Supply Chain Disruption Index (MSDI) from news text, with human validation and SCFI freight-rate forecasting: code and data.
 
 Reproducible pipeline for an LLM-derived, human-validated Maritime Supply Chain
 Disruption Index (MSDI), used to forecast Shanghai Containerized Freight Index
@@ -46,54 +46,22 @@ exist under `data/03_processed/model_scores/scores_zips`.
 
 Partial reruns use `--run-id`, `--resume-pipeline`, `--from-stage`, `--to-stage`.
 
-## Stages
+## Pipeline
 
-| # | Script | Purpose |
-|---|---|---|
-| 00 | `00_audit_legacy_project.py` | Audit legacy inputs |
-| 01 | `01_ingest_sources.py` | Register source inputs |
-| 02 | `02_normalize_legacy_news.py` | Normalize legacy news |
-| 03 | `03_normalize_llm_news.py` | Normalize LLM-search news |
-| 04 | `04_enrich_full_text.py` | Full-text umbrella stage |
-| 05 | `05_retrieve_legacy_full_text.py` | Retrieve legacy full text |
-| 06 | `06_retrieve_llm_full_text.py` | Retrieve LLM-search full text |
-| 07 | `07_merge_full_text_deduplicate.py` | Merge and deduplicate full text |
-| 08 | `08_filter_irrelevant_news.py` | Relevance gate; assign canonical events |
-| 09 | `09_analyze_pre_llm_corpus.py` | Describe the retained pre-LLM corpus |
-| 10 | `10_run_llm_scoring.py` | External LLM scoring (manual gate) |
-| 11 | `11_merge_llm_scores.py` | Merge LLM score archives |
-| 12 | `12_human_validation_and_llm_benchmark.py` | Inter-rater reliability, gold reference, LLM benchmark |
-| 13 | `13_build_disruption_index.py` | Article, monthly-primary and weekly-robustness indices |
-| 14 | `14_build_model_panels.py` | Leakage-safe model panels |
-| 15 | `15_prediction_benchmarks.py` | Statistical and ML benchmarks |
-| 16 | `16_llm_scfi_comparison_weekly.py` | Weekly LLM signal comparison |
-| 17 | `17_llm_scfi_comparison_monthly.py` | Monthly LLM signal comparison |
-| 18 | `18_forecasting_models.py` | GLM, RF, XGBoost, LSTM, Prophet forecasts |
-| 19 | `19_time_series_causality.py` | VAR/VARX, Granger, PCMCI, local projections |
-| 20 | `20_causal_ml.py` | Time-aware causal-ML diagnostics |
-| 21 | `21_ablation_sensitivity_checks.py` | Ablation and sensitivity checks |
-| 22 | `22_error_diagnostics.py` | Forecast and model diagnostics |
-| 23 | `23_significance_analysis.py` | Multiplicity-aware inference |
-| 24 | `24_make_figures_tables.py` | Publication tables and figures |
+```text
+news ingestion, full-text retrieval, dedup, relevance gate     scripts 00-09
+    └── four-model LLM scoring and merge                              10-11
+        └── human validation (400 articles, 300 event pairs)             12
+            └── MSDI index: monthly primary, weekly robustness           13
+                ├── leakage-safe panels and forecasting               14-18
+                ├── VAR/VARX, Granger, PCMCI, local projections          19
+                ├── double/debiased machine learning                     20
+                └── ablation, diagnostics, significance, outputs      21-24
+```
 
-### Outside the sequential run
-
-Registered in `OPTIONAL_EXTENSION_SCRIPTS` and compiled by `smoke`, but not part
-of stages 00–24:
-
-- `25`–`27` external control cleaning, EDA, statistical association tests
-- `28`–`29` pseudo-annotation plumbing, inter-annotator agreement
-- `30` PortWatch event study
-- `31` publication EDA figures
-- `33`–`35` pilot validation sampling, pilot agreement, sample-size allocation
-- `37`–`38` event-pair sampling, reliability and threshold evaluation
-- `39` persistent event shocks and ripple effects
-- `40` external disruption benchmark
-- `41` PCMCI directed graph
-- `42` apply human-validated event threshold
-- `43` article-level dimension PCA
-- `44` validation sample-size figure
-- `45` entropy-weighted TOPSIS (reporting path for the operational ranking)
+Scripts `25`–`45` are supporting analyses (external controls, validation
+sampling, EDA, PCA, event studies, TOPSIS). They are compiled by `smoke` but sit
+outside the sequential run. Full listing in [TREE.md](TREE.md).
 
 ## Data
 
