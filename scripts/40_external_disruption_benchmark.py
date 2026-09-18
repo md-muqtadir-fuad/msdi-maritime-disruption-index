@@ -9,7 +9,7 @@ Compares MSDI (Peak & Breadth) with:
 6. Trade Policy Uncertainty (TPU - Baker, Bloom & Davis)
 
 Evaluates:
-- Lead-lag cross-correlation with SCFI spot rate returns (k = -12 to +12 weeks)
+- Lead-lag cross-correlation with SCFI spot rate returns (k = -12 to +12 months)
 - Information timeliness (release lag & real-time responsiveness)
 - Incremental predictive power (OOS R2 and regression F-tests)
 - Crisis episode synchronization (COVID-19, Suez Canal, Red Sea)
@@ -21,6 +21,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy.stats import pearsonr
 
 logging.basicConfig(
     level=logging.INFO,
@@ -61,13 +62,19 @@ def load_panels() -> tuple[pd.DataFrame, pd.DataFrame]:
 
 def compute_lead_lag_correlations(
     df: pd.DataFrame,
-    target_col: str = "scfi_log_change_4w",
+    target_col: str = "scfi_monthly_mean_log_change_1m",
     max_lags: int = 12,
 ) -> pd.DataFrame:
-    """Computes lead-lag cross-correlation between indices and SCFI log change."""
+    """Computes lead-lag cross-correlation between indices and SCFI log change.
+
+    Monthly frequency, the study's primary reporting frequency. The p-value is
+    the ordinary Pearson two-sided test and assumes independent observations,
+    which monthly index levels are not; it is reported as a descriptive marker
+    and is anti-conservative here.
+    """
     benchmarks = {
-        "MSDI (Peak Disruption)": "peak_score_media_corrected",
-        "MSDI (Breadth Disruption)": "breadth_score_media_corrected",
+        "MSDI (Peak Disruption)": "peak_score_media_corrected_mean",
+        "MSDI (Breadth Disruption)": "breadth_score_media_corrected_mean",
         "NY Fed GSCPI": "gscpi",
         "RWI/ISL Container Throughput": "rwi_isl_container_throughput_index",
         "CPB World Trade Volume": "cpb_world_trade_volume",
@@ -88,14 +95,16 @@ def compute_lead_lag_correlations(
             shifted_index = series.shift(lag)
             valid = pd.concat([target, shifted_index], axis=1).dropna()
             if len(valid) > 30:
-                corr = valid.iloc[:, 0].corr(valid.iloc[:, 1])
+                corr, pvalue = pearsonr(valid.iloc[:, 0], valid.iloc[:, 1])
             else:
-                corr = np.nan
+                corr, pvalue = np.nan, np.nan
             results.append({
                 "benchmark_name": name,
                 "benchmark_column": col,
-                "lag_weeks": lag,  # positive means index leads SCFI
+                "lag_months": lag,  # positive means index leads SCFI
                 "correlation_with_scfi_change": corr,
+                "pearson_p_value_iid_assumption": pvalue,
+                "n_observations": len(valid),
             })
 
     return pd.DataFrame(results)
@@ -105,30 +114,29 @@ def compute_incremental_predictive_power(df: pd.DataFrame) -> pd.DataFrame:
     """Evaluates incremental OOS explanatory power and Granger F-statistics."""
     import statsmodels.api as sm
 
-    df_clean = df.copy().dropna(subset=[
-        "scfi_log_change_4w",
-        "scfi_log_lag_1w",
-        "brent_log_change_4w",
-        "peak_score_media_corrected",
-        "gscpi",
-    ])
+    target = "scfi_monthly_mean_log_change_1m"
+    ar_term = "scfi_monthly_mean_log_lag_1m"
+    brent = "brent_monthly_mean_log_change_1m"
+    msdi = "peak_score_media_corrected_mean"
 
-    y = df_clean["scfi_log_change_4w"]
-    x_base = sm.add_constant(df_clean[["scfi_log_lag_1w", "brent_log_change_4w"]])
+    df_clean = df.copy().dropna(subset=[target, ar_term, brent, msdi, "gscpi"])
+
+    y = df_clean[target]
+    x_base = sm.add_constant(df_clean[[ar_term, brent]])
 
     # Model 1: Baseline AR + Brent
     m_base = sm.OLS(y, x_base).fit()
 
     # Model 2: Base + GSCPI
-    x_gscpi = sm.add_constant(df_clean[["scfi_log_lag_1w", "brent_log_change_4w", "gscpi"]])
+    x_gscpi = sm.add_constant(df_clean[[ar_term, brent, "gscpi"]])
     m_gscpi = sm.OLS(y, x_gscpi).fit()
 
     # Model 3: Base + MSDI Peak
-    x_msdi = sm.add_constant(df_clean[["scfi_log_lag_1w", "brent_log_change_4w", "peak_score_media_corrected"]])
+    x_msdi = sm.add_constant(df_clean[[ar_term, brent, msdi]])
     m_msdi = sm.OLS(y, x_msdi).fit()
 
     # Model 4: Full (Base + GSCPI + MSDI Peak)
-    x_full = sm.add_constant(df_clean[["scfi_log_lag_1w", "brent_log_change_4w", "gscpi", "peak_score_media_corrected"]])
+    x_full = sm.add_constant(df_clean[[ar_term, brent, "gscpi", msdi]])
     m_full = sm.OLS(y, x_full).fit()
 
     comparison = pd.DataFrame([
@@ -179,15 +187,16 @@ def plot_external_benchmark_comparison(
 
     # Panel A: MSDI vs GSCPI normalized time series
     ax1 = axes[0, 0]
-    dates = df["date"]
-    msdi_norm = (df["peak_score_media_corrected"] - df["peak_score_media_corrected"].mean()) / df["peak_score_media_corrected"].std()
+    dates = df["month_end"]
+    msdi_col = "peak_score_media_corrected_mean"
+    msdi_norm = (df[msdi_col] - df[msdi_col].mean()) / df[msdi_col].std()
     gscpi_norm = (df["gscpi"] - df["gscpi"].mean()) / df["gscpi"].std()
-    scfi_norm = (df["scfi"] - df["scfi"].mean()) / df["scfi"].std()
+    scfi_norm = (df["scfi_monthly_mean"] - df["scfi_monthly_mean"].mean()) / df["scfi_monthly_mean"].std()
 
     ax1.plot(dates, scfi_norm, label="SCFI Spot Freight Rate (Z-score)", color="#7f7f7f", linewidth=1.2, alpha=0.7)
     ax1.plot(dates, msdi_norm, label="MSDI Peak Disruption (Z-score)", color="#1f77b4", linewidth=1.6)
     ax1.plot(dates, gscpi_norm, label="NY Fed GSCPI (Z-score)", color="#d62728", linewidth=1.3, linestyle="--")
-    ax1.set_title("(a) MSDI vs. NY Fed GSCPI and SCFI Freight Rates (2016–2026)", fontweight="bold")
+    ax1.set_title("(a) MSDI vs. NY Fed GSCPI and SCFI Freight Rates, Monthly", fontweight="bold")
     ax1.set_ylabel("Standardized Index (Z-score)")
     ax1.legend(loc="upper left", frameon=True, framealpha=0.9)
     ax1.grid(True, linestyle=":", alpha=0.5)
@@ -205,24 +214,24 @@ def plot_external_benchmark_comparison(
     for name, (color, ls) in palette.items():
         sub = lead_lag_df[lead_lag_df["benchmark_name"] == name]
         if not sub.empty:
-            ax2.plot(sub["lag_weeks"], sub["correlation_with_scfi_change"], label=name, color=color, linestyle=ls, linewidth=1.5)
+            ax2.plot(sub["lag_months"], sub["correlation_with_scfi_change"], label=name, color=color, linestyle=ls, linewidth=1.5)
 
     ax2.axvline(0, color="black", linestyle="--", linewidth=0.8, alpha=0.7)
     ax2.axhline(0, color="black", linestyle="-", linewidth=0.5, alpha=0.5)
-    ax2.set_title("(b) Lead-Lag Cross-Correlation with SCFI 4-Week Log Return", fontweight="bold")
-    ax2.set_xlabel("Lead (+) / Lag (-) in Weeks (Positive = Index Leads Freight Rates)")
+    ax2.set_title("(b) Lead-Lag Cross-Correlation with SCFI 1-Month Log Return", fontweight="bold")
+    ax2.set_xlabel("Lead (+) / Lag (-) in Months (Positive = Index Leads Freight Rates)")
     ax2.set_ylabel("Pearson Correlation")
     ax2.legend(loc="upper right", frameon=True, framealpha=0.9, fontsize=8)
     ax2.grid(True, linestyle=":", alpha=0.5)
 
     # Panel C: Crisis Synchronization (COVID-19 & Ever Given: 2020-2022)
     ax3 = axes[1, 0]
-    mask_covid = (df["date"] >= "2020-01-01") & (df["date"] <= "2022-06-30")
+    mask_covid = (df["month_end"] >= "2020-01-01") & (df["month_end"] <= "2022-06-30")
     df_covid = df.loc[mask_covid]
 
-    ax3.plot(df_covid["date"], df_covid["peak_score_media_corrected"], label="MSDI Peak (Weekly Real-Time)", color="#1f77b4", linewidth=1.8)
+    ax3.plot(df_covid["month_end"], df_covid[msdi_col], label="MSDI Peak (Monthly)", color="#1f77b4", linewidth=1.8)
     ax3_twin = ax3.twinx()
-    ax3_twin.plot(df_covid["date"], df_covid["gscpi"], label="NY Fed GSCPI (Monthly Macro)", color="#d62728", linewidth=1.5, linestyle="--")
+    ax3_twin.plot(df_covid["month_end"], df_covid["gscpi"], label="NY Fed GSCPI (Monthly Macro)", color="#d62728", linewidth=1.5, linestyle="--")
     ax3.set_title("(c) Crisis Synchronization: COVID-19 & Ever Given (2020–2022)", fontweight="bold")
     ax3.set_ylabel("MSDI Disruption Score", color="#1f77b4")
     ax3_twin.set_ylabel("NY Fed GSCPI Level", color="#d62728")
@@ -230,12 +239,12 @@ def plot_external_benchmark_comparison(
 
     # Panel D: Crisis Synchronization (Red Sea Crisis: 2023-2025)
     ax4 = axes[1, 1]
-    mask_redsea = (df["date"] >= "2023-06-01") & (df["date"] <= "2025-06-30")
+    mask_redsea = (df["month_end"] >= "2023-06-01") & (df["month_end"] <= "2025-06-30")
     df_redsea = df.loc[mask_redsea]
 
-    ax4.plot(df_redsea["date"], df_redsea["peak_score_media_corrected"], label="MSDI Peak (Weekly Real-Time)", color="#1f77b4", linewidth=1.8)
+    ax4.plot(df_redsea["month_end"], df_redsea[msdi_col], label="MSDI Peak (Monthly)", color="#1f77b4", linewidth=1.8)
     ax4_twin = ax4.twinx()
-    ax4_twin.plot(df_redsea["date"], df_redsea["gscpi"], label="NY Fed GSCPI (Monthly Macro)", color="#d62728", linewidth=1.5, linestyle="--")
+    ax4_twin.plot(df_redsea["month_end"], df_redsea["gscpi"], label="NY Fed GSCPI (Monthly Macro)", color="#d62728", linewidth=1.5, linestyle="--")
     ax4.set_title("(d) Crisis Synchronization: Red Sea & Panama Drought (2023–2025)", fontweight="bold")
     ax4.set_ylabel("MSDI Disruption Score", color="#1f77b4")
     ax4_twin.set_ylabel("NY Fed GSCPI Level", color="#d62728")
@@ -260,14 +269,16 @@ def main() -> None:
     logging.info("Loaded weekly panel (%d rows) and monthly panel (%d rows)", len(w_df), len(m_df))
 
     # 1. Lead-lag correlations
-    lead_lag_df = compute_lead_lag_correlations(w_df, target_col="scfi_log_change_4w", max_lags=12)
+    lead_lag_df = compute_lead_lag_correlations(
+        m_df, target_col="scfi_monthly_mean_log_change_1m", max_lags=12
+    )
     reports_dir = PROJECT_ROOT / "outputs/reports"
     reports_dir.mkdir(parents=True, exist_ok=True)
     lead_lag_df.to_csv(reports_dir / "external_benchmark_lead_lag_correlations.csv", index=False)
     logging.info("Saved lead-lag correlation report to %s", reports_dir / "external_benchmark_lead_lag_correlations.csv")
 
     # 2. Incremental predictive power
-    inc_df = compute_incremental_predictive_power(w_df)
+    inc_df = compute_incremental_predictive_power(m_df)
     inc_df.to_csv(reports_dir / "external_benchmark_incremental_predictive_power.csv", index=False)
     logging.info("Saved incremental predictive power report to %s", reports_dir / "external_benchmark_incremental_predictive_power.csv")
 
@@ -277,7 +288,7 @@ def main() -> None:
     # 3. Generate publication Figure 18
     figures_dir = PROJECT_ROOT / "outputs/figures"
     figures_dir.mkdir(parents=True, exist_ok=True)
-    plot_external_benchmark_comparison(w_df, lead_lag_df, figures_dir)
+    plot_external_benchmark_comparison(m_df, lead_lag_df, figures_dir)
 
     logging.info("=" * 80)
     logging.info("  External disruption benchmarking complete.")

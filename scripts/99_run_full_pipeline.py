@@ -64,6 +64,8 @@ OPTIONAL_EXTENSION_SCRIPTS = (
     "43_dimension_pca.py",
     "44_validation_sample_size_figure.py",
     "45_entropy_weighted_topsis.py",
+    "46_interaction_structure_forecast_target.py",
+    "47_monthly_forecast_trajectories_by_horizon.py",
 )
 
 

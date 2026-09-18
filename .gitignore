@@ -123,3 +123,4 @@ Desktop.ini
 scripts/generate_slides_pdf.py
 slides
 latex
+/.tempAgent/

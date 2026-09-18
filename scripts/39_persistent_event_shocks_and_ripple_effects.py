@@ -224,21 +224,25 @@ def compute_cross_variable_ripple_effects(w_df: pd.DataFrame) -> pd.DataFrame:
     return pd.DataFrame(ripple_records)
 
 
-def plot_persistent_shocks_figure(w_df: pd.DataFrame, summary_df: pd.DataFrame) -> None:
-    """Generates Figure 16: Persistent Landmark Disruption Shocks Timeline (300 DPI, Times New Roman)."""
+def plot_persistent_shocks_figure(m_df: pd.DataFrame, summary_df: pd.DataFrame) -> None:
+    """Generates Figure 16: Persistent Landmark Disruption Shocks Timeline (300 DPI, Times New Roman).
+
+    Plotted at the monthly frequency, which is the primary reporting frequency for
+    the study; the weekly panel is a robustness frequency only.
+    """
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(14, 8), sharex=True)
 
     # Upper panel: MSDI Peak Disruption Intensity
-    ax1.plot(w_df["date"], w_df["peak_score_media_corrected"], color="#1f4e79", linewidth=1.4, label="MSDI Peak Severity Index")
-    ax1.set_ylabel("MSDI Intensity (0–4 Scale)")
+    ax1.plot(m_df["month_end"], m_df["peak_score_media_corrected_mean"], color="#1f4e79", linewidth=1.4, label="MSDI Peak Severity Index")
+    ax1.set_ylabel("MSDI Peak Severity (media-corrected)")
     ax1.set_title("A. Maritime Supply Chain Disruption Index (MSDI) and Persistent Shock Regimes", loc="left", fontweight="bold")
     ax1.grid(True, linestyle="--", alpha=0.3)
 
     # Lower panel: Freight Rates (SCFI)
-    ax2.plot(w_df["date"], w_df["scfi"], color="#c55a11", linewidth=1.5, label="SCFI Composite Spot Rate (USD/TEU)")
+    ax2.plot(m_df["month_end"], m_df["scfi_monthly_mean"], color="#c55a11", linewidth=1.5, label="SCFI Composite Spot Rate (USD/TEU)")
     ax2.set_ylabel("SCFI Spot Freight Rate")
-    ax2.set_xlabel("Observation Date (2016–2024)")
-    ax2.set_title("B. Container Freight Rate (SCFI) Response & Ripple Propagation", loc="left", fontweight="bold")
+    ax2.set_xlabel("Observation Date")
+    ax2.set_title("B. Container Freight Rate (SCFI) over the Same Windows", loc="left", fontweight="bold")
     ax2.grid(True, linestyle="--", alpha=0.3)
 
     # Highlight the 6 landmark shock spans
@@ -325,7 +329,7 @@ def main():
     ripple_df.to_csv(OUTPUT_DIR_REP / "persistent_event_ripple_effects.csv", index=False)
 
     # 3. Generate Figures
-    plot_persistent_shocks_figure(w_df, summary_df)
+    plot_persistent_shocks_figure(m_df, summary_df)
     plot_ripple_effects_heatmap(ripple_df)
 
     print("\n" + "=" * 80)
