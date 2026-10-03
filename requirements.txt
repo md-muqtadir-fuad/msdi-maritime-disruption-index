@@ -34,3 +34,6 @@ requests          # via newspaper4k
 beautifulsoup4    # via newspaper4k
 joblib            # via scikit-learn
 networkx          # via tigramite
+
+# Nonlinear conditional independence (script 48, GPDC)
+dcor

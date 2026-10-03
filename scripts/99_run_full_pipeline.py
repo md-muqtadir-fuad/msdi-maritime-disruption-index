@@ -66,6 +66,7 @@ OPTIONAL_EXTENSION_SCRIPTS = (
     "45_entropy_weighted_topsis.py",
     "46_interaction_structure_forecast_target.py",
     "47_monthly_forecast_trajectories_by_horizon.py",
+    "48_pcmci_gpdc_nonlinear_robustness.py",
 )
 
 
