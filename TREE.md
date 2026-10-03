@@ -34,11 +34,6 @@ sc-disrupt/
 │   │   ├── news_full_text/                # incl. pre_llm_filter/event_dedup/
 │   │   └── model_scores/
 │   │       └── scores_zips/               # external LLM scoring archives
-│   ├── 04_validation/
-│   │   ├── annotation_samples/
-│   │   ├── human_goldset/                 # blinded annotator templates
-│   │   ├── pilot_50/
-│   │   └── pseudo_test_only/
 │   ├── 05_indices/
 │   │   ├── article_level/
 │   │   ├── disruption_index_versions/
@@ -56,19 +51,7 @@ sc-disrupt/
 │   ├── 02_taxonomy_classification/
 │   └── 03_severity_scoring/
 ├── src/msdi/
-│   ├── ingestion/
-│   ├── preprocessing/                     # incl. event_clustering.py
-│   ├── taxonomy/
-│   ├── llm_scoring/
-│   ├── validation/
-│   ├── indexing/
-│   ├── external_data/
-│   ├── modeling/
-│   │   ├── prediction/
-│   │   └── causality/
-│   ├── robustness/
-│   ├── visualization/
-│   └── utils/
+│   └── preprocessing/                     # event_clustering.py
 ├── validation/                            # executed human validation
 │   ├── full/                              # N=400 gold standard
 │   ├── pilot/                             # N=50 pilot
@@ -126,7 +109,6 @@ sc-disrupt/
 │   ├── 25_clean_external_controls.py
 │   ├── 26_external_controls_eda.py
 │   ├── 27_external_controls_statistical_analysis.py
-│   ├── 28_create_pseudo_annotations.py
 │   ├── 29_inter_annotator_agreement.py
 │   ├── 30_portwatch_event_study.py
 │   ├── 31_generate_publication_eda_figures.py

@@ -48,7 +48,6 @@ OPTIONAL_EXTENSION_SCRIPTS = (
     "25_clean_external_controls.py",
     "26_external_controls_eda.py",
     "27_external_controls_statistical_analysis.py",
-    "28_create_pseudo_annotations.py",
     "29_inter_annotator_agreement.py",
     "30_portwatch_event_study.py",
     "31_generate_publication_eda_figures.py",
