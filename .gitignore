@@ -63,6 +63,8 @@ secrets.json
 /.backup/
 /backup/
 /a.backup/
+misc/fig_readability_and _dry_change/output_figs
+misc/fig_readability_and _dry_change/original_latex_pdfs
 
 # Experiment trackers and distributed-training state
 /wandb/
