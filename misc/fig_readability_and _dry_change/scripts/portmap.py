@@ -25,21 +25,23 @@ def get_table():
     return grabbed["table"]
 
 
-def place_labels(fig, ax, ports, obstacles):
-    """Greedy first-fit over rings of candidate offsets (points); leader line when far."""
+def place_labels(fig, ax, items, obstacles):
+    """Greedy first-fit over rings of candidate offsets (points). items are dicts with
+    x, y, text, size, weight, color, halo; they are placed in order, each avoiding the
+    obstacles (legend, port markers) and every label already placed. A thin leader line
+    is drawn when a label ends up far from its port."""
     fig.canvas.draw()
     scale = fig.dpi / 72.0
     cands = []
-    for r in (8, 13, 19, 26, 34, 43):
+    for r in (10, 14, 19, 25, 32, 40, 49):
         for ang in (270, 90, 0, 180, 315, 225, 45, 135, 292, 248, 68, 112, 338, 202, 22, 158):
             cands.append((r * math.cos(math.radians(ang)) * 1.3, r * math.sin(math.radians(ang))))
     placed = list(obstacles)
     axbb = ax.get_window_extent()
-    order = ports.sort_values("portcalls_container", ascending=False)
-    for row in order.itertuples():
-        px, py = ax.transData.transform((row.x, row.lat))
-        w = (0.62 * FS * len(row.ISO3) + 2.0) * scale
-        h = (FS + 2.0) * scale
+    for it in items:
+        px, py = ax.transData.transform((it["x"], it["y"]))
+        w = (0.6 * it["size"] * len(it["text"]) + 4.0) * scale
+        h = (it["size"] + 3.0) * scale
         chosen = None
         for dx, dy in cands:
             x0, y0 = px + dx * scale - w / 2, py + dy * scale - h / 2
@@ -52,13 +54,13 @@ def place_labels(fig, ax, ports, obstacles):
                 break
         if chosen is None:
             chosen = cands[0]
-            print("label could not be placed cleanly:", row.ISO3)
-        far = math.hypot(*chosen) > 11
+            print("label could not be placed cleanly:", it["text"])
+        far = math.hypot(*chosen) > 15
         ax.annotate(
-            row.ISO3, xy=(row.x, row.lat), xytext=chosen, textcoords="offset points",
-            ha="center", va="center", fontsize=FS, color="#3a3a3a", zorder=7,
-            path_effects=[path_effects.withStroke(linewidth=1.6, foreground="white")],
-            arrowprops=dict(arrowstyle="-", lw=0.4, color="#6b7280", shrinkA=4, shrinkB=2)
+            it["text"], xy=(it["x"], it["y"]), xytext=chosen, textcoords="offset points",
+            ha="center", va="center", fontsize=it["size"], weight=it["weight"], color=it["color"],
+            zorder=8, path_effects=[path_effects.withStroke(linewidth=it["halo"], foreground="white")],
+            arrowprops=dict(arrowstyle="-", lw=0.4, color="#6b7280", shrinkA=4, shrinkB=3)
             if far else None,
         )
 
@@ -95,9 +97,6 @@ def build(table):
     ax.scatter(focus["x"], focus["lat"],
                s=k * (26 + 150 * float(focus["portcalls_container"].iloc[0]) / float(calls.max())),
                marker="o", color=C["focus"], edgecolor="none", linewidth=0, zorder=6)
-    shanghai = ax.annotate("Shanghai", xy=(ox, oy), xytext=(7, 6), textcoords="offset points",
-                           fontsize=9, weight="bold", color=C["focus_label"], zorder=8,
-                           path_effects=[path_effects.withStroke(linewidth=2.2, foreground="white")])
 
     ax.set_xlim(s49.LON_CUT, s49.LON_CUT + 360)
     ax.set_ylim(-48, 66)
@@ -119,11 +118,20 @@ def build(table):
                     edgecolor="none", fontsize=FS, borderpad=0.4, labelspacing=0.3)
 
     fig.canvas.draw()
-    obstacles = []
-    for art in (leg, shanghai):
-        bb = art.get_window_extent()
-        obstacles.append((bb.x0, bb.y0, bb.width, bb.height))
-    place_labels(fig, ax, others, obstacles)
+    bb = leg.get_window_extent()
+    obstacles = [(bb.x0, bb.y0, bb.width, bb.height)]
+    # every port marker is an obstacle too, so labels do not sit on neighbouring ports
+    sizes = list(k * (26 + 150 * calls / calls.max()))
+    sizes.append(k * (26 + 150 * float(focus["portcalls_container"].iloc[0]) / float(calls.max())))
+    for (mx, my), s_pt2 in zip(list(zip(others["x"], others["lat"])) + [(ox, oy)], sizes):
+        cx, cy = ax.transData.transform((mx, my))
+        r = (math.sqrt(s_pt2) / 2 + 1.0) * fig.dpi / 72.0
+        obstacles.append((cx - r, cy - r, 2 * r, 2 * r))
+    items = [dict(x=ox, y=oy, text="Shanghai", size=9, weight="bold", color=C["focus_label"], halo=2.4)]
+    for row in others.sort_values("portcalls_container", ascending=False).itertuples():
+        items.append(dict(x=row.x, y=row.lat, text=row.ISO3, size=FS, weight="normal",
+                          color="#3a3a3a", halo=2.2))
+    place_labels(fig, ax, items, obstacles)
 
     box = ax.get_position()
     cax = fig.add_axes([box.x0 + 0.28 * box.width, box.y0 - 0.085, 0.44 * box.width, 0.035])

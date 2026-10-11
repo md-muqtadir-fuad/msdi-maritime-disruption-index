@@ -44,8 +44,8 @@ def pcmci_links():
     plt.rcParams.update({"font.family": "serif",
                          "font.serif": ["Times New Roman", "DejaVu Serif", "Times", "STIXGeneral"],
                          "mathtext.fontset": "stix", "pdf.fonttype": 42})
-    fig, axes = plt.subplots(2, 2, figsize=(WIDTH_IN, 5.2))
-    constrained(fig, wspace=0.0, hspace=0.0)
+    fig, axes = plt.subplots(2, 2, figsize=(WIDTH_IN, 5.6))  # taller: weekly bottom label vs GPDC title
+    constrained(fig, wspace=0.0, hspace=0.04)
     for ax in axes.ravel():
         ax.set_xlim(-2.5, 2.5); ax.set_ylim(-1.95, 1.95); ax.set_aspect("equal"); ax.axis("off")
         ax.set_title("x")
@@ -128,7 +128,7 @@ def pairwise_pdp_grid():
         ax.set_xlabel(labels[i])
         ax.set_ylabel(labels[j])
         ax.locator_params(axis="both", nbins=4)
-    bar = fig.colorbar(contour, ax=axes, fraction=0.03, pad=0.02, aspect=40)
+    bar = fig.colorbar(contour, ax=axes, location="bottom", fraction=0.025, pad=0.03, aspect=50)  # right-hand bar clipped column-3 titles
     bar.set_label("Predicted SCFI log change, 6 months")
     restyle(fig)
     constrained(fig, hspace=0.03)

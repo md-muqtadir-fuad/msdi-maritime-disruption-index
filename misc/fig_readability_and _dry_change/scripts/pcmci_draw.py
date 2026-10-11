@@ -33,7 +33,7 @@ def draw(ax, subset, colors, title, s24, unit_pt, fs=8.0):
             color=colors["primary"], zorder=2))
         t = 0.5
         chord = math.hypot(x1 - x0, y1 - y0)
-        offset = abs(rad) * chord / 2 + 0.16
+        offset = abs(rad) * chord / 2 + 0.26  # clear of the arc at 8 pt
         mx, my = x0 + t * (x1 - x0), y0 + t * (y1 - y0)
         # arc3 bulges along rad*(dy, -dx)
         bx, by = (y1 - y0), -(x1 - x0)

@@ -21,6 +21,7 @@ From `scripts/`, with the repo interpreter:
 | Change | File |
 |---|---|
 | Font sizes (8 / 9 / 9 pt), canvas width | `common.py`: `TICK`, `LABEL`, `TITLE`, `WIDTH_IN` |
+| Typeface (Times New Roman, STIX math, as in the original figures) | `common.py`: `FONT`, `apply_font` |
 | Figure height, legend position, tick spacing | `fig24_tune.py` (script-24 figures), `fig_mid.py` (47, 48, 46), `eda_tune.py` (31, 39, 40, 43, 44), `portmap.py` (49) |
 | PCMCI graph geometry and labels | `pcmci_draw.py` |
 | Which figures exist and how each is built | `run_all.py`: `FIGURES` |

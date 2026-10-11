@@ -31,6 +31,7 @@ HEIGHT = {
 }
 
 def build(name):
+    s24.configure_plot_style(config)  # re-apply per figure: run_all resets rcParams between figures
     with capture():
         fig = BUILD[name]()
     return fig

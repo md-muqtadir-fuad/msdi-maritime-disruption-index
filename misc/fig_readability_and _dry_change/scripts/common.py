@@ -16,6 +16,7 @@ CACHE = OUT / "_cache"                                      # captured figures a
 CACHE.mkdir(parents=True, exist_ok=True)
 WIDTH_IN = 6.4         # canvas width; LaTeX text width is 6.5 in
 TICK, LABEL, TITLE = 8.0, 9.0, 9.0
+FONT = "Times New Roman"   # every figure; math in the matching STIX font
 
 sys.path.insert(0, str(REPO / "scripts"))
 sys.path.insert(0, str(REPO / "src"))
@@ -85,6 +86,7 @@ def restyle(fig, tick=TICK, label=LABEL, title=TITLE, other=TICK):
         if id(t) in special or not t.get_text():
             continue
         t.set_fontsize(other)
+    apply_font(fig)  # before any layout, so spacing is computed with the final typeface
 
 
 def slim(fig, marker=0.7, line=0.8):
@@ -150,7 +152,19 @@ def resize(fig, height, width=WIDTH_IN):
     fig.set_size_inches(width, height, forward=True)
 
 
+def apply_font(fig, family=FONT):
+    """One typeface everywhere: existing text objects are switched, and rcParams cover
+    tick labels and any text created at draw time."""
+    plt.rcParams["font.family"] = "serif"
+    plt.rcParams["font.serif"] = [family, "STIXGeneral", "DejaVu Serif"]
+    plt.rcParams["mathtext.fontset"] = "stix"
+    for t in fig.findobj(Text):
+        t.set_fontfamily(family)
+        t.set_math_fontfamily("stix")  # math font is fixed per text object at creation
+
+
 def save(fig, name, dpi_png=170):
+    apply_font(fig)
     pdf = OUT / f"{name}.pdf"
     fig.savefig(pdf, format="pdf", bbox_inches="tight", pad_inches=0.03)
     fig.savefig(OUT / f"{name}.png", format="png", dpi=dpi_png, bbox_inches="tight", pad_inches=0.03)

@@ -46,8 +46,16 @@ def t_correlation(fig):
 
 
 def t_distributions(fig):
+    a, d = fig.axes[0], fig.axes[3]
+    # mathtext puts a space after a comma ("6, 480"); {,} keeps the thousands separator tight
+    a.title.set_text(a.get_title().replace("6,480", "6{,}480"))
     wrap_titles(fig, 40)
-    years(fig.axes[3], step=2)
+    years(d, step=2)
+    leg = d.get_legend()  # was on top of the 2021-22 peak; move under the panel
+    h, l = leg.legend_handles, [t.get_text() for t in leg.get_texts()]
+    leg.remove()
+    d.legend(h, l, loc="upper center", bbox_to_anchor=(0.5, -0.12), ncol=2, frameon=False,
+             handlelength=1.8, columnspacing=1.0)
     constrained(fig)
 
 
@@ -56,9 +64,14 @@ def t_empirical(fig):
         t = ax.get_title()
         if " ($" in t:
             name, rho = t.split(" ($", 1)
-            ax.title.set_text(f"{name}\n(${rho}")
-        if ax.get_ylabel():
-            pass
+            # stars inside mathtext render as spaced operators ("0.82 * * *"); move them out
+            body = rho.rstrip(")").rstrip("$")
+            num = body.rstrip("*")
+            stars = body[len(num):]
+            ax.title.set_text(f"{name}\n(${num}${stars})")
+    leg = fig.axes[0].get_legend()
+    if leg:
+        leg.set_loc("upper left")  # upper right sat on the end of the fit line
     shared_labels(fig, y=fig.axes[0].get_ylabel())
     constrained(fig)
 
@@ -117,16 +130,81 @@ TUNE = {"eda_correlation": t_correlation, "eda_distributions": t_distributions,
         "sample_size_convergence": t_sample}
 
 
+def halo(texts, lw=2.4):
+    """White outline so a label stays legible where a line or arrow crosses it."""
+    import matplotlib.patheffects as pe
+    for t in texts:
+        t.set_path_effects([pe.withStroke(linewidth=lw, foreground="white")])
+
+
+def place_loading_labels(ax, out_pt=7.0, gap_pt=10.5, iters=300):
+    """Biplot labels: put each just beyond its arrow tip, along the arrow, push overlapping
+    labels apart vertically, keep them clear of the legend, and draw a thin leader line
+    from the tip whenever a label had to move."""
+    import numpy as np
+    fig = ax.figure
+    x0, x1 = ax.get_xlim()
+    ax.set_xlim(x0, x1 + 0.12 * (x1 - x0))  # room for the right-most labels inside the axes
+    texts = list(ax.texts)
+    tips = [t.xy for t in texts if hasattr(t, "xy") and not t.get_text()]
+    labels = [t for t in texts if t.get_text() and not hasattr(t, "xy")]
+    new = []
+    for tip, old in zip(tips, labels):
+        px, py = ax.transData.transform(tip) - ax.transData.transform((0, 0))
+        u = np.array([px, py]) / max(np.hypot(px, py), 1e-9)
+        ha = "left" if u[0] > 0.35 else "right" if u[0] < -0.35 else "center"
+        va = "bottom" if u[1] > 0.35 else "top" if u[1] < -0.35 else "center"
+        new.append(ax.annotate(old.get_text(), xy=tip, xytext=tuple(out_pt * u), textcoords="offset points",
+                               ha=ha, va=va, fontsize=old.get_fontsize(), color=old.get_color(), zorder=6))
+        old.remove()
+    legend = ax.get_legend()
+    to_pt = 72.0 / fig.dpi
+    for _ in range(iters):
+        fig.canvas.draw()
+        moved = False
+        boxes = [a.get_window_extent().expanded(1.0, 1.0) for a in new]
+        for i in range(len(new)):
+            for j in range(i + 1, len(new)):
+                A, B = boxes[i], boxes[j]
+                if A.x1 < B.x0 or B.x1 < A.x0:
+                    continue
+                dy = abs((A.y0 + A.y1) - (B.y0 + B.y1)) / 2 * to_pt
+                if dy >= gap_pt:
+                    continue
+                push = (gap_pt - dy) / 2 + 0.3
+                up, dn = (new[i], new[j]) if A.y0 + A.y1 >= B.y0 + B.y1 else (new[j], new[i])
+                for a, s in ((up, 1), (dn, -1)):
+                    x, y = a.xyann
+                    a.xyann = (x, y + s * push)
+                moved = True
+            if legend is not None and boxes[i].overlaps(legend.get_window_extent()):
+                x, y = new[i].xyann
+                new[i].xyann = (x + 2.0, y)
+                moved = True
+        if not moved:
+            break
+    for a in new:  # a leader on every label ties it to its own arrow tip
+        x, y = a.xyann
+        if True:
+            ax.annotate("", xy=a.xy, xytext=(x, y), textcoords="offset points",
+                        arrowprops=dict(arrowstyle="-", lw=0.5, color="#6b7280", shrinkA=0, shrinkB=0),
+                        zorder=5)
+    halo(new)
+
+
 def post(name, fig):
     if name == "persistent_event_shocks_timeline":
         for ax in fig.axes:
             keep_inside(ax)
+            labels = [t for t in ax.texts if t.get_text()]
+            halo(labels)
+            for t in labels:
+                t.set_zorder(6)  # above the MSDI line, which otherwise cuts "Shanghai Lockdown"
+    if name == "sample_size_convergence":
+        for ax in fig.axes:
+            halo([t for t in ax.texts if t.get_text()])
     if name == "dimension_pca":
-        ax = fig.axes[1]
-        labels = [t for t in ax.texts if t.get_text()]
-        repel_y(ax, labels, min_gap_pt=10)
-        if ax.get_legend():
-            clear_of(ax, labels, ax.get_legend())
+        place_loading_labels(fig.axes[1])
 
 
 def run(name):
