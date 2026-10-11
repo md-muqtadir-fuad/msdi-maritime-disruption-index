@@ -14,6 +14,9 @@ python -m venv .venv
 .venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
+`requirements.txt` lists direct dependencies. `requirements-lock.txt` pins the
+exact versions (Python 3.11.9) that produced the archived results.
+
 ## Running
 
 Read-only structural check:
@@ -86,7 +89,15 @@ Raw-file locations and release lags: [configs/external_controls.yaml](configs/ex
 
 ## Outputs
 
-Written by the pipeline; not tracked in git.
+`data/` and most of `outputs/` are not tracked in git. The pipeline writes
+them, and several inputs (the news corpus, SCFI, Brent) cannot be
+redistributed. A subset of `outputs/` is tracked as reference results:
+forecast benchmarks, LLM-vs-SCFI comparisons, causality tests, panel audits,
+and the pre-LLM corpus profile. Their run manifests record absolute paths
+from the original machine. They are kept byte-identical because downstream
+stages verify them by SHA-256.
+
+The full pipeline writes:
 
 | Location | Contents |
 |---|---|
@@ -96,6 +107,22 @@ Written by the pipeline; not tracked in git.
 | `outputs/significance/` | Hypothesis registry (14,072 rows) with Holm and BH-FDR adjustments |
 | `outputs/reports/` | `publication_v001_results_summary.md` and run manifests |
 | `outputs/topsis/` | Entropy-weighted operational model ranking |
+
+## Dataset package
+
+The derived data are archived as a separate dataset: article metadata and
+URLs, LLM scores, MSDI series, and human validation. It excludes article
+text and third-party price series. To build `release/msdi_dataset_v1.0.0/`
+and its zip from saved outputs:
+
+```powershell
+.venv\Scripts\python.exe misc\zenodo_datasetuild_dataset_package.py
+```
+
+## Citation
+
+Cite the archived release through its Zenodo DOI. Metadata is in
+[CITATION.cff](CITATION.cff).
 
 ## License
 

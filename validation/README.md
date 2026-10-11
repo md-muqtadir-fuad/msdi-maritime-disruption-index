@@ -24,6 +24,12 @@ Do not edit files under `completed/` after analysis. Regenerated computational
 outputs belong under `results/`. The human-selected event threshold is 0.82;
 its evidence is `event_pairs/results/event_threshold_evaluation_matrix.csv`.
 
+Article bodies (`retrieved_text`, `text_excerpt_a`, `text_excerpt_b`) were
+removed from every CSV before public release because the articles are
+copyrighted. Annotators rated the full text. IDs, titles and all ratings are
+unchanged, and articles can be re-fetched from their URLs in the released
+dataset. None of the analysis scripts read the removed columns.
+
 Scripts:
 
 - `scripts/33_sample_pilot_validation.py`: create pilot templates.

@@ -1,0 +1,15 @@
+Copyright (c) 2026 Md. Muqtadir Fuad, Md. Ashraful Huda Asif, Abdullah Al Mazid
+
+This dataset is licensed under the Creative Commons Attribution 4.0
+International License (CC BY 4.0).
+
+You are free to share and adapt the material for any purpose, including
+commercially, provided you give appropriate credit, link to the license, and
+indicate if changes were made.
+
+Full legal code: https://creativecommons.org/licenses/by/4.0/legalcode
+
+The license covers the scores, index series, event clusters, human
+annotations and other data created by the authors. It does not cover the
+news articles referenced by URL; their headlines and text remain the property
+of their publishers.

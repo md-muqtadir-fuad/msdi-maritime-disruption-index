@@ -1,3 +1,0 @@
-2026-08-20 21:22:33,529 | INFO | Starting model panel builder version=panel_v001
-2026-08-20 21:22:39,744 | INFO | VIF Multicollinearity audit written to C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\outputs\model_panel_audit\panel_v001_vif_multicollinearity_audit.csv
-2026-08-20 21:22:39,750 | INFO | Panel build completed successfully; wrote C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\06_model_ready\prediction\msdi_scfi_weekly_panel.csv and C:\Users\DELL\Desktop\venv-python\sc-disrupt\sc-disrupt\data\06_model_ready\causality\msdi_scfi_monthly_panel.csv

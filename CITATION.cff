@@ -1,0 +1,33 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it using the metadata below."
+title: "Maritime Supply Chain Disruption Index (MSDI): code, validation data, and results"
+type: software
+version: 1.0.0
+license: MIT
+repository-code: "https://github.com/md-muqtadir-fuad/msdi-maritime-disruption-index"
+abstract: >-
+  Reproducible pipeline for an LLM-derived, human-validated Maritime Supply
+  Chain Disruption Index (MSDI), used to forecast Shanghai Containerized
+  Freight Index (SCFI) movements, with time-series causality, double/debiased
+  machine learning, multiplicity, and sensitivity analyses.
+authors:
+  - family-names: Fuad
+    given-names: Md. Muqtadir
+    affiliation: "Institute of Appropriate Technology, Bangladesh University of Engineering and Technology"
+    orcid: "https://orcid.org/0009-0009-4362-0780"
+  - family-names: Asif
+    given-names: Md. Ashraful Huda
+    affiliation: "Department of Industrial and Production Engineering, Bangladesh University of Engineering and Technology"
+    orcid: "https://orcid.org/0009-0000-3874-234X"
+  - family-names: Mazid
+    given-names: Abdullah Al
+    affiliation: "Department of Industrial and Production Engineering, Bangladesh University of Engineering and Technology"
+    orcid: "https://orcid.org/0009-0003-9834-4652"
+keywords:
+  - supply chain disruption
+  - maritime shipping
+  - freight rates
+  - SCFI
+  - large language models
+  - time-series forecasting
+  - causal inference

@@ -1,0 +1,46 @@
+{
+  "title": "Maritime Supply Chain Disruption Index (MSDI): code, validation data, and results",
+  "upload_type": "software",
+  "description": "<p>Reproducible pipeline for an LLM-derived, human-validated Maritime Supply Chain Disruption Index (MSDI), used to forecast Shanghai Containerized Freight Index (SCFI) movements, with time-series causality, double/debiased machine learning, multiplicity, and sensitivity analyses.</p><p>Includes analysis code, configuration, LLM prompts, human validation annotations (400 articles, 50-article pilot, 300 event pairs), and selected result tables. The full news corpus, market price series, and intermediate data are not included; see README.md.</p>",
+  "creators": [
+    {
+      "name": "Fuad, Md. Muqtadir",
+      "affiliation": "Institute of Appropriate Technology, Bangladesh University of Engineering and Technology",
+      "orcid": "0009-0009-4362-0780"
+    },
+    {
+      "name": "Asif, Md. Ashraful Huda",
+      "affiliation": "Department of Industrial and Production Engineering, Bangladesh University of Engineering and Technology",
+      "orcid": "0009-0000-3874-234X"
+    },
+    {
+      "name": "Mazid, Abdullah Al",
+      "affiliation": "Department of Industrial and Production Engineering, Bangladesh University of Engineering and Technology",
+      "orcid": "0009-0003-9834-4652"
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Hossain, Jannatul Maoya",
+      "type": "Researcher",
+      "orcid": "0009-0009-4222-5949",
+      "affiliation": "Department of Industrial and Production Engineering, Bangladesh Army University of Science and Technology"
+    },
+    {
+      "name": "Ali, Syed Mithun",
+      "type": "Researcher",
+      "affiliation": "Department of Industrial and Production Engineering, Bangladesh University of Engineering and Technology"
+    }
+  ],
+  "license": "MIT",
+  "access_right": "open",
+  "keywords": [
+    "supply chain disruption",
+    "maritime shipping",
+    "freight rates",
+    "SCFI",
+    "large language models",
+    "time-series forecasting",
+    "causal inference"
+  ]
+}

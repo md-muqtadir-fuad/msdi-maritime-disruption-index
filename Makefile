@@ -1,4 +1,4 @@
-.PHONY: setup setup-forecasting audit ingest normalize-legacy normalize-llm retrieve-legacy retrieve-llm merge-text filter-news analyze-news score merge-scores validation-sample index panel predict compare-llms-weekly compare-llms-monthly forecast-models forecast-models-tuned causality causal-ml robustness diagnostics significance figures pipeline-smoke pipeline-full analysis all
+.PHONY: setup audit ingest normalize-legacy normalize-llm retrieve-legacy retrieve-llm merge-text filter-news analyze-news score merge-scores validation index panel predict compare-llms-weekly compare-llms-monthly forecast-models forecast-models-tuned causality causal-ml robustness diagnostics significance figures pipeline-smoke pipeline-full analysis all
 
 ifeq ($(OS),Windows_NT)
 PYTHON ?= .venv/Scripts/python.exe
@@ -10,9 +10,6 @@ PIPELINE_ARGS ?=
 
 setup:
 	$(PYTHON) -m pip install -r requirements.txt
-
-setup-forecasting:
-	$(PYTHON) -m pip install -r requirements-forecasting.txt
 
 audit:
 	$(PYTHON) scripts/00_audit_legacy_project.py
@@ -47,8 +44,8 @@ score:
 merge-scores:
 	$(PYTHON) scripts/11_merge_llm_scores.py
 
-validation-sample:
-	$(PYTHON) scripts/12_human_validation_metrics.py sample
+validation:
+	$(PYTHON) scripts/12_human_validation_and_llm_benchmark.py
 
 index:
 	$(PYTHON) scripts/13_build_disruption_index.py

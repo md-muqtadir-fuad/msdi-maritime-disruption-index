@@ -1,6 +1,6 @@
 [project]
 name = "maritime-supply-chain-disruption-index"
-version = "0.1.0"
+version = "1.0.0"
 description = "Human-validated multi-LLM maritime disruption index and freight-rate causality pipeline"
 readme = "README.md"
 requires-python = ">=3.11"

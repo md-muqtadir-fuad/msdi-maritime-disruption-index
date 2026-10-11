@@ -1,6 +1,7 @@
 # Repository hierarchy
 
 Directories and files below exist in the working tree. Nothing here is aspirational.
+Folders marked *local only* are git-ignored and not part of the archived release.
 
 ```text
 sc-disrupt/
@@ -21,7 +22,7 @@ sc-disrupt/
 │   ├── significance.yaml
 │   ├── significance_script.sha256
 │   └── taxonomy.yaml
-├── data/
+├── data/                                  # local only
 │   ├── 00_legacy/
 │   ├── 01_raw/
 │   │   ├── news/
@@ -57,9 +58,12 @@ sc-disrupt/
 │   ├── pilot/                             # N=50 pilot
 │   └── event_pairs/                       # N=300 adjudicated pairs
 ├── eda/                                   # standalone EDA scripts 00–09
-├── latex/                                 # manuscript sources and figures
-├── notebooks/
-├── outputs/
+├── latex/                                 # local only: manuscript sources and figures
+├── misc/
+│   ├── fig_readability_and _dry_change/   # figure redraw toolkit (saved results only)
+│   └── zenodo_dataset/                    # builds the standalone dataset package
+├── notebooks/                             # Kaggle LLM scoring and event embedding
+├── outputs/                               # mostly local only; reference results tracked
 │   ├── prediction_benchmarks/             # rolling forecasts, DM / Clark-West
 │   ├── llm_scfi_comparison/
 │   ├── nonlinear_forecasts/               # GLM/RF/XGBoost/LSTM/Prophet
@@ -124,13 +128,14 @@ sc-disrupt/
 │   ├── 43_dimension_pca.py
 │   ├── 44_validation_sample_size_figure.py
 │   ├── 45_entropy_weighted_topsis.py
-│   ├── 99_run_full_pipeline.py            # smoke / full orchestration
-│   └── generate_slides_pdf.py
+│   ├── 46_interaction_structure_forecast_target.py
+│   ├── 47_monthly_forecast_trajectories_by_horizon.py
+│   ├── 48_pcmci_gpdc_nonlinear_robustness.py
+│   ├── 49_shanghai_vs_other_ports.py
+│   └── 99_run_full_pipeline.py            # smoke / full orchestration
 ├── tests/                                 # 150 tests
-├── .manu/                                 # git-ignored research notes
-│   ├── MANUSCRIPT_NOTES.md
-│   ├── DATA_SOURCES.md
-│   ├── README.md
+├── .manu/                                 # local only: research notes
+├── README.md
 │   ├── pipeline_variables_and_mathematical_formulation.md
 │   ├── event_clustering_threshold_calibration_and_event_counts.md
 │   └── docs/
@@ -139,15 +144,20 @@ sc-disrupt/
 │       ├── methodology/
 │       ├── misc/
 │       └── reproducibility/
+├── release/                               # local only: built dataset package and zip
 ├── README.md
 ├── TREE.md
-├── requirements.txt
+├── CITATION.cff
+├── .zenodo.json                           # Zenodo release metadata
+├── LICENSE
+├── requirements.txt                       # direct dependencies
+├── requirements-lock.txt                  # exact versions used for the results
 ├── environment.yml
 ├── pyproject.toml
 └── Makefile
 ```
 
-Scripts 32 and 36 do not exist; the numbering is not contiguous.
+Scripts 28, 32 and 36 do not exist; the numbering is not contiguous.
 
 ## Analysis layers
 

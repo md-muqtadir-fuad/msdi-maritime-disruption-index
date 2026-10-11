@@ -1,32 +1,8 @@
-name: q1-maritime-disruption
+name: msdi
 channels:
   - conda-forge
-  - defaults
 dependencies:
   - python=3.11
   - pip
-  - pandas
-  - numpy
-  - scipy
-  - scikit-learn
-  - statsmodels
-  - matplotlib
-  - openpyxl
-  - pyyaml
-  - requests
-  - beautifulsoup4
-  - tqdm
-  - joblib
-  - networkx
   - pip:
-      - trafilatura
-      - python-dotenv
-      - pydantic
-      - xgboost
-      - lightgbm
-      - transformers
-      - datasets
-      - evaluate
-      - sentence-transformers
-      - krippendorff
-      - tigramite==5.2.10.1
+      - -r requirements.txt
