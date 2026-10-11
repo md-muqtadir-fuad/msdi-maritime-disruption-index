@@ -29,7 +29,8 @@
     {
       "name": "Ali, Syed Mithun",
       "type": "Researcher",
-      "affiliation": "Department of Industrial and Production Engineering, Bangladesh University of Engineering and Technology"
+      "affiliation": "Department of Industrial and Production Engineering, Bangladesh University of Engineering and Technology",
+      "orcid": "0000-0002-4302-5991"
     }
   ],
   "license": "MIT",
@@ -42,5 +43,6 @@
     "large language models",
     "time-series forecasting",
     "causal inference"
-  ]
+  ],
+  "version": "1.0.0"
 }

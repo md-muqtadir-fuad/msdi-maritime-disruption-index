@@ -10,7 +10,7 @@ down-weighted for syndicated duplicates and repeated coverage of the same
 event, and aggregated into monthly (primary) and weekly (robustness) series.
 LLM scores were checked against two independent human annotators.
 
-The analysis code is archived separately; see the related software record.
+The analysis code is archived in the same Zenodo record.
 
 ## Contents
 
@@ -92,7 +92,8 @@ look-ahead.
 
 ## Citation
 
-Cite this dataset with its Zenodo DOI.
+Cite this dataset with its Zenodo DOI: 10.5281/zenodo.23300977 (all versions) or
+10.5281/zenodo.23301240 (version 1.0.0).
 
 Authors:
 
@@ -106,4 +107,5 @@ Authors:
 Contributors: Jannatul Maoya Hossain (Department of Industrial and Production
 Engineering, Bangladesh Army University of Science and Technology;
 ORCID 0009-0009-4222-5949) and Syed Mithun Ali (Department of Industrial and
-Production Engineering, Bangladesh University of Engineering and Technology).
+Production Engineering, Bangladesh University of Engineering and Technology;
+ORCID 0000-0002-4302-5991).

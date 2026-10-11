@@ -112,20 +112,23 @@ The full pipeline writes:
 
 ## Dataset package
 
-The derived data are archived as a separate dataset: article metadata and
-URLs, LLM scores, MSDI series, and human validation. It excludes article
+The derived data are archived as a second zip in the same Zenodo record:
+article metadata and URLs, LLM scores, MSDI series, and human validation. It excludes article
 text and third-party price series. To build `release/msdi_dataset_v1.0.0/`
 and its zip from saved outputs:
 
 ```powershell
-.venv\Scripts\python.exe misc\zenodo_datasetuild_dataset_package.py
+.venv\Scripts\python.exe misc\zenodo_dataset\build_dataset_package.py
 ```
 
 ## Citation
 
-Cite the archived release through its Zenodo DOI,
-[10.5281/zenodo.23300977](https://doi.org/10.5281/zenodo.23300977). Metadata is in
-[CITATION.cff](CITATION.cff).
+The Zenodo record holds the code and the dataset package.
+
+- All versions (resolves to the latest): [10.5281/zenodo.23300977](https://doi.org/10.5281/zenodo.23300977)
+- Version 1.0.0: [10.5281/zenodo.23301240](https://doi.org/10.5281/zenodo.23301240)
+
+Metadata is in [CITATION.cff](CITATION.cff).
 
 ## License
 
