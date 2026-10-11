@@ -1,5 +1,7 @@
 # Maritime Supply Chain Disruption Index (MSDI)
 
+[![DOI](https://zenodo.org/badge/1284364848.svg)](https://doi.org/10.5281/zenodo.23300977)
+
 Reproducible pipeline for an LLM-derived, human-validated Maritime Supply Chain
 Disruption Index (MSDI), used to forecast Shanghai Containerized Freight Index
 (SCFI) movements and to run time-series causality, causal-ML, multiplicity, and
@@ -121,7 +123,8 @@ and its zip from saved outputs:
 
 ## Citation
 
-Cite the archived release through its Zenodo DOI. Metadata is in
+Cite the archived release through its Zenodo DOI,
+[10.5281/zenodo.23300977](https://doi.org/10.5281/zenodo.23300977). Metadata is in
 [CITATION.cff](CITATION.cff).
 
 ## License
